@@ -68,10 +68,12 @@ lemma grouping_on_rational_counts
         = ∑ a, p a * Apos H ⟨n a, hpos a⟩ := by
     refine Finset.sum_congr rfl ?_
     intro a _
-    simp [Apos, q]
+    congr 1
   calc
     Apos H ⟨N, hN⟩ = H (composeProb p q) := by
-      simpa [Apos, hident] using hrelab
+      simp only [Apos]
+      rw [hident] at hrelab
+      exact hrelab
     _ = H p + ∑ a, p a * H (q a) := hgroup
     _ = H p + ∑ a, p a * Apos H ⟨n a, hpos a⟩ := by rw [hsumA]
 
