@@ -1,6 +1,13 @@
 name = "shannon-entropy"
 version = "0.1.0"
 defaultTargets = ["Shannon"]
+lintDriver = "batteries/runLinter"
+testDriver = "ShannonTest"
+
+[[require]]
+name = "batteries"
+scope = "leanprover-community"
+rev = "v4.29.0"
 
 [[require]]
 name = "mathlib"
@@ -9,3 +16,7 @@ rev = "v4.29.0"
 
 [[lean_lib]]
 name = "Shannon"
+
+[[lean_lib]]
+name = "ShannonTest"
+globs = ["ShannonTest.+"]
