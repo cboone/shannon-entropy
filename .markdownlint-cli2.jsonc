@@ -1,0 +1,33 @@
+{
+  // Pandoc-flavored Markdown accommodations
+  "config": {
+    // No line length limit; prose wraps at editor level
+    "MD013": false,
+    // Allow raw HTML (HTML comments, admonitions)
+    "MD033": false,
+    // Title lives in YAML frontmatter, so the first line is not a heading
+    "MD041": false,
+    // Allow fenced code blocks with Pandoc info strings like {=latex}
+    "MD040": false,
+    // Allow duplicate headings only when they share a parent heading
+    "MD024": {
+      "siblings_only": true
+    },
+    // The repo uses frontmatter titles and `##`-first body sections
+    "MD025": false,
+    // Allow trailing colons in headings
+    "MD026": {
+      "punctuation": ".,;!"
+    },
+    // Allow hard tabs in code blocks (Makefile snippets)
+    "MD010": {
+      "code_blocks": false
+    },
+    // Dense tables: column-style enforcement creates more churn than value
+    "MD060": false
+  },
+  "ignores": [
+    ".lake/**",
+    "docs/plans/done/**"
+  ]
+}

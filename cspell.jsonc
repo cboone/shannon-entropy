@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    ".lake/**"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./cspell-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words"],
+  // Skip inline math, display math, and LaTeX commands
+  "ignoreRegExpList": [
+    "/\\$[^$]+\\$/g",
+    "/\\$\\$[\\s\\S]*?\\$\\$/gm",
+    "/\\\\[a-zA-Z]+/g"
+  ]
+}
