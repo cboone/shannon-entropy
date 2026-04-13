@@ -1,6 +1,9 @@
 Anson
 approximants
+bibtex
 cboone
+digram
+Equipartition
 lakefile
 leanprover
 Mathlib
