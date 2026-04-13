@@ -2,6 +2,10 @@
 
 setopt ERR_EXIT NO_UNSET PIPE_FAIL
 
+readonly script_dir="${0:A:h}"
+readonly repo_root="${script_dir:h}"
+readonly mathlib_build_dir="${repo_root}/.lake/packages/mathlib/.lake/build/lib/lean"
+
 function ensure_mathlib_cache_present() {
   setopt local_options NULL_GLOB
 
@@ -21,10 +25,6 @@ function ensure_mathlib_cache_present() {
 }
 
 function main() {
-  local script_dir="${0:A:h}"
-  local repo_root="${script_dir:h}"
-  local mathlib_build_dir="${repo_root}/.lake/packages/mathlib/.lake/build/lib/lean"
-
   print "Bootstrapping worktree in ${repo_root}"
 
   cd "${repo_root}"
