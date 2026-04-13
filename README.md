@@ -1,7 +1,7 @@
-# Shannon Entropy Characterization in Lean
+# A Mathematical Theory of Communication
 
-![Lean](https://img.shields.io/badge/Lean-4.28.0-0f766e)
-![License: MIT](https://img.shields.io/badge/License-MIT-2563eb)
+> [!NOTE]
+> This is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), in which I'm expanding the formalization to cover the entirety of [Shannon's paper](./shannon1948.pdf).
 
 This repository formalizes Shannon's finite-alphabet characterization theorem
 from Shannon (1948), Appendix 2.
@@ -127,9 +127,11 @@ throughout the formalization effort.
 
 ## Reference
 
-- Claude E. Shannon, *A Mathematical Theory of Communication* (1948).
+- Claude E. Shannon, _A Mathematical Theory of Communication_ (1948).
   The repository includes `shannon1948.pdf` for study context.
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE`.
+This project is licensed under the MIT License. Original work copyright Samuel
+Schlesinger; modifications and additions copyright Christopher Boone. See
+[`LICENSE`](./LICENSE) for the full text.
