@@ -1,4 +1,4 @@
-name: Lean Action CI
+name: CI
 
 on:
   push:
@@ -6,9 +6,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  lean:
+    name: Build, lint, and test (Lean)
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v5
+
       - uses: leanprover/lean-action@v1
+
+      - name: Lean lint
+        run: lake lint
+
+      - name: Lean test
+        run: lake test
+
+  markdown:
+    name: Lint (Markdown and spelling)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Markdown lint
+        run: npx markdownlint-cli2 "**/*.md"
+
+      - name: Spell check
+        run: npx cspell --no-progress "**/*.md"
