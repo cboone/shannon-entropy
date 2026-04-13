@@ -21,11 +21,15 @@ bin/bootstrap-worktree            # mandatory first-time setup (lake update + ca
 make bootstrap                    # same as bin/bootstrap-worktree
 lake build Shannon                # build just the Shannon library
 lake build Shannon.Entropy.Core   # build a single module
+lake test                         # run the ShannonTest example suite
+lake lint                         # run batteries/runLinter over the Shannon library
 make build                        # lake build Shannon (guards against missing Mathlib cache)
-make check                        # lint, then build
+make test                         # lake test
+make lean-lint                    # lake lint
+make check                        # markdown + spelling + lean-lint + build + test
 ```
 
-CI: `.github/workflows/lean_action_ci.yml` (uses `leanprover/lean-action@v1`)
+CI: `.github/workflows/ci.yml` runs two parallel jobs: a Lean job (build, lint, test via `leanprover/lean-action@v1`) and a Markdown/spelling job (markdownlint-cli2 + cspell).
 
 Lean toolchain: see `lean-toolchain` (currently v4.29.0).
 Mathlib version: see `lakefile.toml` (pinned to v4.29.0).
@@ -72,16 +76,20 @@ or `bin/bootstrap-worktree` first.
 - Follow existing proof style in this repo
 - Final newline in all files; trim trailing whitespace
 
-## Linting
+## Linting and Testing
 
 ```bash
-make lint              # run all linters (markdownlint + cspell)
+make lint              # markdownlint + cspell
 make lint-markdown     # markdownlint only
 make lint-spelling     # cspell only
-make check             # lint, then build
+make lean-lint         # lake lint (batteries/runLinter over the Shannon library)
+make test              # lake test (run the ShannonTest example suite)
+make check             # full pipeline: lint + lean-lint + build + test
 ```
 
 When adding domain-specific terms (author names, Lean identifiers, math vocabulary), add them to `cspell-words.txt`.
+
+The `ShannonTest/` library mirrors the Shannon library's public API with `example`-based tests. When adding, renaming, or removing public definitions or theorems, update the corresponding test file in the same change so `lake test` continues to pass.
 
 ## Key Files
 
