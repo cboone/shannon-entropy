@@ -250,9 +250,9 @@ theorem entropyNat_doublyStochastic_le {n : Type} [Fintype n] [DecidableEq n]
     rw [← Finset.sum_mul, sum_col_of_mem_doublyStochastic hA j, one_mul]
   linarith
 
-/-! ## Properties 5-6: Conditioning reduces entropy -/
+/-! ## Property 6: Conditioning reduces entropy -/
 
-/-- **Property 6**: conditional entropy is nonnegative.
+/-- Conditional entropy is nonnegative (auxiliary lemma supporting Property 6).
 
 Each ratio `p(x,y)/p_X(x) ≤ 1` (since `p(x,y) ≤ ∑_y p(x,y) = p_X(x)`),
 so `log(p(x,y)/p_X(x)) ≤ 0` and each summand is nonpositive. -/
@@ -272,7 +272,7 @@ theorem condEntropy_nonneg {α β : Type} [Fintype α] [Fintype β]
         ((div_le_one hm).mpr
           (Finset.single_le_sum (fun b _ => prob_nonneg p (ab.1, b)) (Finset.mem_univ ab.2))))
 
-/-- **Property 5**: conditioning reduces entropy, `H_X(Y) ≤ H(Y)`.
+/-- **Property 6**: conditioning reduces entropy, `H_X(Y) ≤ H(Y)`.
 
 From the chain rule `H(X,Y) = H(X) + H_X(Y)` and subadditivity
 `H(X,Y) ≤ H(X) + H(Y)`, we get `H_X(Y) ≤ H(Y)`. -/
