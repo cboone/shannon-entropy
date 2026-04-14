@@ -96,4 +96,4 @@ The `ShannonTest/` library mirrors the Shannon library's public API with `exampl
 - `lakefile.toml` -- Lake project config (library name, Mathlib dependency)
 - `lean-toolchain` -- pinned Lean version
 - `Makefile` -- build and lint targets
-- `shannon1948.pdf` -- reference copy of Shannon's 1948 paper
+- `references/shannon1948.pdf` -- reference copy of Shannon's 1948 paper

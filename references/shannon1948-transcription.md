@@ -4,7 +4,7 @@ authors: Claude E. Shannon
 bibtex_key: shannon1948
 year: 1948
 venue: Bell System Technical Journal, Vol. 27, pp. 379-423, 623-656
-pdf: ../shannon1948.pdf
+pdf: ../references/shannon1948.pdf
 transcription_scope: framework-only
 ---
 

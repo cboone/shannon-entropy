@@ -1,7 +1,7 @@
 # A Mathematical Theory of Communication
 
 > [!NOTE]
-> This is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), in which I'm expanding the formalization to cover the entirety of [Shannon's paper](./shannon1948.pdf).
+> This is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), in which I'm expanding the formalization to cover the entirety of [Shannon's paper](./references/shannon1948.pdf).
 
 This repository formalizes Shannon's finite-alphabet characterization theorem
 from Shannon (1948), Appendix 2.
@@ -128,7 +128,7 @@ throughout the formalization effort.
 ## Reference
 
 - Claude E. Shannon, _A Mathematical Theory of Communication_ (1948).
-  The repository includes `shannon1948.pdf` for study context.
+  The repository includes `references/shannon1948.pdf` for study context.
 
 ## License
 
