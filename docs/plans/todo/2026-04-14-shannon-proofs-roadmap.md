@@ -61,11 +61,14 @@ chapter.
 
 Tasks:
 
-1. Add Verso as a Lake dependency. Pick a Verso revision compatible with
-   Lean `v4.29.0` (currently pinned in `lean-toolchain`). Document the
-   compatibility check in `lakefile.toml` as a trailing comment or in the
-   first book chapter. If no compatible Verso exists, fall back to plain
-   Pandoc Markdown under `docs/book/` and revisit when Verso catches up.
+1. Add Verso as a Lake dependency. Before scaffolding, probe Verso's most
+   recent tagged release against Lean `v4.29.0` (currently pinned in
+   `lean-toolchain`) to confirm compatibility. If the latest Verso tag does
+   not build against 4.29.0, fall back immediately to plain Pandoc Markdown
+   under `docs/book/` and revisit when Verso catches up, rather than
+   scaffolding on a broken dependency. Document the compatibility check
+   outcome in `lakefile.toml` as a trailing comment or in the first book
+   chapter.
 2. Scaffold the book.
    - Create a new Lake library target `ShannonBook`.
    - Layout: `Book/Main.lean` as entry, `Book/Chapters/` for per-chapter
@@ -133,9 +136,13 @@ Tasks:
    mnemonic `A(sᵐ) = m·A(s)` and the ratio-confinement bound
    `sᵐ ≤ tⁿ < sᵐ⁺¹`.
 3. Shannon-form conditional entropy. Add `condEntropy_eq_shannon_form` in
-   `Shannon/Entropy/Joint.lean`: Shannon writes
-   `H_x(y) = -∑ p(i, j) log p_i(j)`; expose that as a named lemma.
-   Default conditional entropy definition stays unchanged.
+   `Shannon/Entropy/Joint.lean` asserting that the Lean `condEntropy`
+   definition equals Shannon's summation form
+   `H_x(y) = -∑ p(i, j) log p_i(j)`. In the transcription, this is the
+   defining equation Shannon gives in Property 5 (chain rule), so the
+   lemma directly ties the Lean API to that property rather than
+   introducing a new side-lemma. Default conditional entropy definition
+   stays unchanged.
 4. Sync upstream stylistic cleanups. `Properties.lean`, `Rational.lean`,
    `Uniform.lean` differ from upstream in minor tactic choices
    (`push Not` → `push_neg`; `simp only … rw …` → `simpa …`). Bring these
@@ -208,7 +215,11 @@ Tasks:
    covers Shannon's transducer form, which is Theorem 7.)
 5. Fano's inequality. `H(X|Y) ≤ h₂(Pₑ) + Pₑ · log(|X| − 1)` where `Pₑ` is
    the error probability of an estimator. State and prove in base 2 via
-   `entropyBits`.
+   `entropyBits`. This requires introducing the binary entropy helper
+   `h₂ : ℝ → ℝ` (defined as `entropyBits` on the two-point distribution,
+   or directly via `-p · logb 2 p − (1 − p) · logb 2 (1 − p)` with a
+   `0 · log 0 = 0` convention) with a handful of supporting lemmas
+   (continuity, maximum at `1/2`, value at endpoints).
 6. Testing.
    - New test files `ShannonTest/Entropy/MutualInfo.lean`,
      `ShannonTest/Entropy/RelativeEntropy.lean`.
@@ -256,6 +267,9 @@ Tasks:
      defined as the support-restricted set
       `{x | (∀ i, 0 < p (x i)) ∧
         |(1/N) · ∑ i, -Real.logb 2 (p (x i)) − entropyBits p| < ε}`.
+     The support restriction keeps `Real.logb 2 (p (x i))` finite on the
+     set without needing a defaulted value for zero-probability symbols;
+     for `p` with full support the restriction is vacuous.
    - Per-element bounds
      `2^(-N·(entropyBits p + ε)) ≤ iidDist p N x ≤ 2^(-N·(entropyBits p - ε))`
      for `x` typical (directly in `2^…`, no natural-log detour).
@@ -322,9 +336,12 @@ Tasks:
    - `IsStationary (π : ProbDist S) (K : S → ProbDist (S × A)) :=
         ∀ s, π s = ∑ s', ∑ a, π s' · K s' (s, a)`.
    - Existence of a stationary distribution for any irreducible finite
-     hidden-state chain (Perron–Frobenius; use Mathlib's stochastic-matrix
-     results if available, otherwise an elementary argument via the
-     simplex).
+     hidden-state chain. Plan on an elementary argument via the simplex
+     (Brouwer fixed point on the compact convex set of distributions, or a
+     direct averaged-iterates construction) as the default route; treat
+     Mathlib's stochastic-matrix spectral results as an optional
+     simplification only if they are available and stable at the pinned
+     Lean version.
    - Provide constructors / special cases for i.i.d. sources and visible
      Markov chains, so the old `MarkovSource` viewpoint is recovered as a
      special case rather than the primary abstraction.
@@ -335,8 +352,12 @@ Tasks:
    - Prove the base-2 AEP and typical-set cardinality / `minCover` results
      in this model, reusing Phase D's i.i.d. theorems as warm-up lemmas or
      corollaries where appropriate.
-   - Update the transcription cross-references so Theorems 3 and 4 are only
-     marked complete once this phase lands.
+   - Update the transcription cross-references so the unqualified Theorems
+     3 and 4 entries are only marked complete once this phase lands. At the
+     end of Phase D, add interim cross-references such as
+     "Theorem 3 (i.i.d. case): `aep_iid` in `Shannon/Entropy/AEP.lean`"
+     and a matching entry for Theorem 4, so partial progress is visible in
+     the transcription between phases.
 3. Block entropy definitions.
    - `G (M : FiniteStateSource S A) (N : ℕ) : ℝ :=
         (1 / N) · entropyBits (outputDist M N)`
@@ -422,7 +443,11 @@ Existing, to modify:
 - `.github/workflows/ci.yml` — Verso build job
 - `README.md` — companion book section, updated scope
 - `references/shannon1948-transcription.md` — append cross-references for
-  each newly formalized theorem as it lands
+  each newly formalized theorem as it lands. Note: Phase B's
+  `condEntropy_eq_shannon_form` corresponds to the existing Property 5
+  entry (chain rule), not a new one; only genuinely new theorems (Phase
+  C's mutual-info / KL lemmas, Phase D's i.i.d. AEP, Phase E's
+  finite-state results) warrant new cross-reference entries.
 - `cspell-words.txt` — Verso / information-theory vocabulary
 
 New, to create:
@@ -486,7 +511,9 @@ Applies to every phase:
   `references/shannon1948-transcription.md` with the new theorem names,
   and adds the corresponding Book chapter.
 
-Per-phase sanity checks:
+Per-phase sanity checks (a minimal tripwire subset, not a restatement of
+each phase's full test coverage; pick these as the quick smoke checks
+when iterating):
 
 - Phase A: `lake build ShannonBook` succeeds as a source-compile check;
   `make book` generates non-empty rendered output in the documented book
