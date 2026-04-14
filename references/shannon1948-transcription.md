@@ -35,8 +35,8 @@ This 55-page paper defines the foundations of information theory. This transcrip
 Shannon poses the question: given a set of possible events with probabilities $p_1, p_2, \ldots, p_n$, can we find a measure $H(p_1, p_2, \ldots, p_n)$ of "choice" or "uncertainty"? He requires three properties (Section 6):
 
 1. $H$ should be continuous in the $p_i$.
-2. If all $p_i$ are equal ($p_i = 1/n$), then $H$ should be a monotonic increasing function of $n$. With equally likely events, there is greater choice when the number of possible events increases.
-3. If a choice is broken into two successive choices, the original $H$ should be the weighted sum of the individual values of $H$. For example: $H(1/2, 1/3, 1/6) = H(1/2, 1/2) + (1/2) \cdot H(2/3, 1/3)$.
+2. If all the $p_i$ are equal, $p_i = 1/n$, then $H$ should be a monotonic increasing function of $n$. With equally likely events there is more choice, or uncertainty, when there are more possible events.
+3. If a choice be broken down into two successive choices, the original $H$ should be the weighted sum of the individual values of $H$. For example: $H(1/2, 1/3, 1/6) = H(1/2, 1/2) + (1/2) \cdot H(2/3, 1/3)$.
 
 ### Theorem 2 (Uniqueness of entropy)
 
@@ -75,17 +75,23 @@ with equality if and only if the events are independent ($p(i, j) = p(i) \cdot p
 :::
 
 ::: {.proposition}
-**Property 5** (Conditioning reduces entropy). The conditional entropy $H_x(y)$ satisfies
+**Property 5** (Chain rule). The conditional entropy of $y$ given $x$ is defined as
 
-$$H(y) \geq H_x(y).$$
+$$H_x(y) = -\sum_{i, j} p(i, j) \log p_i(j),$$
 
-The uncertainty of $y$ is never increased by knowledge of $x$. Equality holds if and only if $x$ and $y$ are independent.
+where $p_i(j) = p(i, j) / \sum_j p(i, j)$. Substituting gives $H_x(y) = H(x, y) - H(x)$, or equivalently
+
+$$H(x, y) = H(x) + H_x(y).$$
+
+The uncertainty of the joint event $x, y$ is the uncertainty of $x$ plus the uncertainty of $y$ when $x$ is known.
 :::
 
 ::: {.proposition}
-**Property 6** (Chain rule). The joint entropy decomposes as
+**Property 6** (Conditioning reduces entropy). Combining Properties 3 and 5 gives $H(x) + H(y) \geq H(x, y) = H(x) + H_x(y)$, hence
 
-$$H(x, y) = H(x) + H_x(y).$$
+$$H(y) \geq H_x(y).$$
+
+The uncertainty of $y$ is never increased by knowledge of $x$. It will be decreased unless $x$ and $y$ are independent events, in which case it is not changed.
 :::
 
 ## Asymptotic Equipartition Property
@@ -109,7 +115,7 @@ In other words, we are almost certain to have $\frac{\log p^{-1}}{N}$ close to $
 **Theorem 4** (Thm. 4). $\lim_{N \to \infty} \frac{\log n(q)}{N} = H$ when $q$ does not equal 0 or 1, where $n(q)$ is the number of sequences of length $N$ that must be taken (starting from the most probable) to accumulate a total probability $q$.
 :::
 
-This means $n(q) \approx 2^{NH}$ for large $N$: the number of "reasonably probable" sequences grows exponentially at rate $H$, independent of the probability threshold $q$.
+This means $n(q) \approx 2^{HN}$ for large $N$: the number of "reasonably probable" sequences grows exponentially at rate $H$, independent of the probability threshold $q$. Shannon notes that "for most purposes to treat the long sequences as though there were just $2^{HN}$ of them, each with a probability $2^{-HN}$."
 
 ## Per-Symbol Entropy Convergence
 
@@ -156,6 +162,6 @@ This is an early form of the data processing inequality: deterministic processin
 - **Property 2** (maximum at uniformity): `entropyNat_eq_log_card_iff` in `Shannon/Entropy/Properties.lean`
 - **Property 3** (subadditivity): `entropyNat_joint_le_add` in `Shannon/Entropy/Properties.lean`
 - **Property 4** (doubly stochastic): `entropyNat_doublyStochastic_le` in `Shannon/Entropy/Properties.lean`
-- **Property 5** (conditioning reduces entropy): `condEntropy_le_entropyNat` in `Shannon/Entropy/Properties.lean`
-- **Property 6** (chain rule): `chain_rule` in `Shannon/Entropy/Joint.lean`
+- **Property 5** (chain rule): `chain_rule` in `Shannon/Entropy/Joint.lean`
+- **Property 6** (conditioning reduces entropy): `condEntropy_le_entropyNat` in `Shannon/Entropy/Properties.lean`
 - **Converse** (entropyNat satisfies axioms): `entropyNat_shannonAxioms` in `Shannon/Entropy/Converse.lean`
