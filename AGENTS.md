@@ -76,6 +76,18 @@ or `bin/bootstrap-worktree` first.
 - Follow existing proof style in this repo
 - Final newline in all files; trim trailing whitespace
 
+### Skill and Workflow
+
+Invoke the `write-lean-code` skill before any Lean edit, read-for-review, or planning discussion. The skill carries generic Lean/Mathlib guidance; user-level overrides (no line-length limit, no hardwrapping in comments or docstrings) are documented in `~/.claude/CLAUDE.md`. This file (`AGENTS.md`, symlinked as `CLAUDE.md`) is authoritative for shannon-entropy-specific facts: bootstrap script, build targets, module layout, test-mirroring rule, namespace conventions.
+
+### Namespace Conventions
+
+Everything in this library lives under the `Shannon.Entropy.*` module hierarchy with flat per-file namespaces; there is no second-tier nesting by topic. New files go under `Shannon/Entropy/` unless a distinct concern justifies a new top-level `Shannon/<Area>/` tree.
+
+### Vendored Lean Dependencies
+
+None beyond Mathlib. This library is itself the one that strength-model vendors; it does not vendor any third-party Lean code of its own. When grepping for style examples or API confirmation, all of `Shannon/`, `ShannonTest/`, and Mathlib under `.lake/packages/mathlib/` are valid; there is no third-party Lean package to exclude.
+
 ## Linting and Testing
 
 ```bash
