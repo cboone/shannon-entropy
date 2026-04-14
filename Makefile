@@ -28,7 +28,7 @@ lint-markdown: ## Lint Markdown files
 	markdownlint-cli2 "**/*.md"
 
 lint-spelling: ## Check spelling with cspell
-	cspell --no-progress "**/*.md"
+	cspell --no-progress .
 
 check: lint lean-lint build test ## Lint, build, and test
 

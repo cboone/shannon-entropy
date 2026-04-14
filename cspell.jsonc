@@ -1,8 +1,22 @@
 {
   "version": "0.2",
   "language": "en",
+  // Scope the spell check to Markdown by excluding other file types we don't
+  // proofread: Lean sources, configs, the license, shell scripts, lockfiles.
   "ignorePaths": [
-    ".lake/**"
+    ".lake/**",
+    "**/*.lean",
+    "**/*.toml",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.txt",
+    "**/*.pdf",
+    "LICENSE",
+    "Makefile",
+    "lean-toolchain",
+    "bin/**"
   ],
   "dictionaryDefinitions": [
     {
