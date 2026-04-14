@@ -26,7 +26,7 @@ Shannon's original notation uses uppercase for entropy ($H$) and lowercase for p
 
 ## Scope
 
-This 55-page paper defines the foundations of information theory. This transcription extracts only the results directly relevant to the formalization: the axiomatic definition of entropy (Theorem 2), key properties of $H$, the Asymptotic Equipartition Property (Theorem 3), the typical set characterization (Theorem 4), and the per-symbol entropy convergence (Theorems 5-6). Proofs are omitted (they are standard textbook material).
+This 55-page paper defines the foundations of information theory. This transcription extracts only the results directly relevant to the formalization: the axiomatic definition of entropy (Theorem 2), key properties of $H$, the Asymptotic Equipartition Property (Theorem 3), the typical set characterization (Theorem 4), the per-symbol entropy convergence (Theorems 5-6), and the data processing inequality (Theorem 7). Proofs are omitted (they are standard textbook material).
 
 ## Axiomatic Definition of Entropy
 
@@ -41,7 +41,7 @@ Shannon poses the question: given a set of possible events with probabilities $p
 ### Theorem 2 (Uniqueness of entropy)
 
 ::: {.theorem}
-**Theorem 2** (Thm. 2)**.** The only $H$ satisfying the three above assumptions is of the form:
+**Theorem 2** (Thm. 2). The only $H$ satisfying the three above assumptions is of the form:
 
 $$H = -K \sum_{i=1}^{n} p_i \log p_i$$
 
@@ -55,15 +55,15 @@ The choice of $K$ corresponds to the choice of logarithm base. With $K = 1$ and 
 The following properties are established in Section 6 (pp. 11-12):
 
 ::: {.proposition}
-**Property 1** (Non-negativity)**.** $H = 0$ if and only if all $p_i$ but one are zero, with that one being unity. Otherwise $H > 0$.
+**Property 1** (Non-negativity). $H = 0$ if and only if all $p_i$ but one are zero, with that one being unity. Otherwise $H > 0$.
 :::
 
 ::: {.proposition}
-**Property 2** (Maximum at uniformity)**.** For a given $n$, $H$ is a maximum and equal to $\log n$ when all $p_i$ are equal ($p_i = 1/n$).
+**Property 2** (Maximum at uniformity). For a given $n$, $H$ is a maximum and equal to $\log n$ when all $p_i$ are equal ($p_i = 1/n$).
 :::
 
 ::: {.proposition}
-**Property 3** (Subadditivity)**.** For any two events $x$ and $y$,
+**Property 3** (Subadditivity). For any two events $x$ and $y$,
 
 $$H(x, y) \leq H(x) + H(y)$$
 
@@ -71,11 +71,11 @@ with equality if and only if the events are independent ($p(i, j) = p(i) \cdot p
 :::
 
 ::: {.proposition}
-**Property 4** (Averaging increases entropy)**.** Any change toward equalization of the probabilities $p_1, p_2, \ldots, p_n$ increases $H$. More generally, if $p_i' = \sum_j a_{ij} p_j$ where $\sum_i a_{ij} = \sum_j a_{ij} = 1$ and all $a_{ij} \geq 0$ (a doubly stochastic matrix), then $H$ increases (except when the transformation is a permutation).
+**Property 4** (Averaging increases entropy). Any change toward equalization of the probabilities $p_1, p_2, \ldots, p_n$ increases $H$. More generally, if $p_i' = \sum_j a_{ij} p_j$ where $\sum_i a_{ij} = \sum_j a_{ij} = 1$ and all $a_{ij} \geq 0$ (a doubly stochastic matrix), then $H$ increases (except when the transformation is a permutation).
 :::
 
 ::: {.proposition}
-**Property 5** (Conditioning reduces entropy)**.** The conditional entropy $H_x(y)$ satisfies
+**Property 5** (Conditioning reduces entropy). The conditional entropy $H_x(y)$ satisfies
 
 $$H(y) \geq H_x(y).$$
 
@@ -83,7 +83,7 @@ The uncertainty of $y$ is never increased by knowledge of $x$. Equality holds if
 :::
 
 ::: {.proposition}
-**Property 6** (Chain rule)**.** The joint entropy decomposes as
+**Property 6** (Chain rule). The joint entropy decomposes as
 
 $$H(x, y) = H(x) + H_x(y).$$
 :::
@@ -93,7 +93,7 @@ $$H(x, y) = H(x) + H_x(y).$$
 ### Theorem 3 (AEP)
 
 ::: {.theorem}
-**Theorem 3** (Thm. 3)**.** Given any $\epsilon > 0$ and $\delta > 0$, we can find an $N_0$ such that the sequences of any length $N \geq N_0$ fall into two classes:
+**Theorem 3** (Thm. 3). Given any $\epsilon > 0$ and $\delta > 0$, we can find an $N_0$ such that the sequences of any length $N \geq N_0$ fall into two classes:
 
 1. A set whose total probability is less than $\epsilon$.
 2. The remainder, all of whose members have probabilities satisfying the inequality
@@ -106,7 +106,7 @@ In other words, we are almost certain to have $\frac{\log p^{-1}}{N}$ close to $
 ### Theorem 4 (Typical set size)
 
 ::: {.theorem}
-**Theorem 4** (Thm. 4)**.** $\lim_{N \to \infty} \frac{\log n(q)}{N} = H$ when $q$ does not equal 0 or 1, where $n(q)$ is the number of sequences of length $N$ that must be taken (starting from the most probable) to accumulate a total probability $q$.
+**Theorem 4** (Thm. 4). $\lim_{N \to \infty} \frac{\log n(q)}{N} = H$ when $q$ does not equal 0 or 1, where $n(q)$ is the number of sequences of length $N$ that must be taken (starting from the most probable) to accumulate a total probability $q$.
 :::
 
 This means $n(q) \approx 2^{NH}$ for large $N$: the number of "reasonably probable" sequences grows exponentially at rate $H$, independent of the probability threshold $q$.
@@ -116,7 +116,7 @@ This means $n(q) \approx 2^{NH}$ for large $N$: the number of "reasonably probab
 ### Theorem 5
 
 ::: {.theorem}
-**Theorem 5** (Thm. 5)**.** Let $p(B_i)$ be the probability of a sequence $B_i$ of symbols from the source. Let
+**Theorem 5** (Thm. 5). Let $p(B_i)$ be the probability of a sequence $B_i$ of symbols from the source. Let
 
 $$G_N = -\frac{1}{N} \sum_i p(B_i) \log p(B_i)$$
 
@@ -128,7 +128,7 @@ $$\lim_{N \to \infty} G_N = H.$$
 ### Theorem 6
 
 ::: {.theorem}
-**Theorem 6** (Thm. 6)**.** Let $F_N = -\sum_{i,j} p(B_i, S_j) \log p_{B_i}(S_j)$ where the sum is over all blocks $B_i$ of $N - 1$ symbols and all symbols $S_j$. Then $F_N$ is a monotone decreasing function of $N$,
+**Theorem 6** (Thm. 6). Let $F_N = -\sum_{i,j} p(B_i, S_j) \log p_{B_i}(S_j)$ where the sum is over all blocks $B_i$ of $N - 1$ symbols and all symbols $S_j$. Then $F_N$ is a monotone decreasing function of $N$,
 
 $$F_N = N G_N - (N - 1) G_{N-1},$$
 
@@ -144,7 +144,7 @@ $F_N$ is the conditional entropy of the next symbol given the preceding $N - 1$ 
 ### Theorem 7 (Data processing inequality)
 
 ::: {.theorem}
-**Theorem 7** (Thm. 7)**.** The output of a finite state transducer driven by a finite state statistical source is a finite state statistical source, with entropy (per unit time) less than or equal to that of the input. If the transducer is non-singular they are equal.
+**Theorem 7** (Thm. 7). The output of a finite state transducer driven by a finite state statistical source is a finite state statistical source, with entropy (per unit time) less than or equal to that of the input. If the transducer is non-singular they are equal.
 :::
 
 This is an early form of the data processing inequality: deterministic processing cannot increase entropy.

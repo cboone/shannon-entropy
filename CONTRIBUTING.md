@@ -32,7 +32,7 @@ bin/bootstrap-worktree
 # Run linter
 make lint
 
-# Run all checks (lint + build)
+# Run all checks (lint + lean-lint + build + test)
 make check
 ```
 
