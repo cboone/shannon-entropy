@@ -79,7 +79,7 @@ with equality if and only if the events are independent ($p(i, j) = p(i) \cdot p
 
 $$H_x(y) = -\sum_{i, j} p(i, j) \log p_i(j),$$
 
-where $p_i(j) = p(i, j) / \sum_j p(i, j)$. Substituting gives $H_x(y) = H(x, y) - H(x)$, or equivalently
+where $p_i(j) = p(i, j) / \sum_k p(i, k) = p(i, j)/p(i)$. Substituting gives $H_x(y) = H(x, y) - H(x)$, or equivalently
 
 $$H(x, y) = H(x) + H_x(y).$$
 
@@ -115,7 +115,7 @@ In other words, we are almost certain to have $\frac{\log p^{-1}}{N}$ close to $
 **Theorem 4** (Thm. 4). $\lim_{N \to \infty} \frac{\log n(q)}{N} = H$ when $q$ does not equal 0 or 1, where $n(q)$ is the number of sequences of length $N$ that must be taken (starting from the most probable) to accumulate a total probability $q$.
 :::
 
-This means $n(q) \approx 2^{HN}$ for large $N$: the number of "reasonably probable" sequences grows exponentially at rate $H$, independent of the probability threshold $q$. Shannon notes that "for most purposes to treat the long sequences as though there were just $2^{HN}$ of them, each with a probability $2^{-HN}$."
+If $\log$ is base 2 (so that $H$ is measured in bits), this means $n(q) \approx 2^{HN}$ for large $N$; more generally, if $\log = \log_b$, then $n(q) \approx b^{HN}$. Thus the number of "reasonably probable" sequences grows exponentially at rate $H$, independent of the probability threshold $q$. In Shannon's base-2 formulation, he notes that "for most purposes to treat the long sequences as though there were just $2^{HN}$ of them, each with a probability $2^{-HN}$."
 
 ## Per-Symbol Entropy Convergence
 
