@@ -81,16 +81,23 @@ Tasks:
    - `Chapters/Bibliography.lean`: Shannon 1948 with DOI, supporting
      references (Cover and Thomas, MacKay).
 4. Build target.
-   - `lake build ShannonBook` builds HTML / PDF output under `.lake/build/doc/`.
-   - Add a `make book` convenience target.
-   - Document in `README.md` under a new "Companion book" section.
+   - `lake build ShannonBook` compiles the Lean book sources.
+   - Add a `make book` convenience target that runs the actual Verso render
+     pipeline, e.g. `lake build ShannonBook:literate` followed by
+     `lake exe verso-html ...`, and writes HTML to a documented output
+     directory under `.lake/build/doc/` or another repo-standard path chosen
+     during implementation.
+   - Document in `README.md` under a new "Companion book" section which
+     command is the compile check and which command renders the book.
 5. CI integration.
    - Extend `.github/workflows/ci.yml` with a `book` job that runs
-     `lake build ShannonBook`.
+     `make book` (and, if helpful for clearer failure modes,
+     `lake build ShannonBook` before the render step).
    - Optional follow-up (flagged, not required this phase): publish to
      GitHub Pages on `main` merges.
 6. Testing.
-   - `lake build ShannonBook` passes in CI.
+   - `lake build ShannonBook` passes as a compile-only check.
+   - `make book` passes in CI and produces non-empty rendered output.
    - `make check` still passes end-to-end.
    - Add an `example`-style smoke test under `ShannonTest/Book.lean` that
      imports the book's top-level module to catch import regressions.
@@ -179,16 +186,21 @@ Tasks:
    - `mutualInfo_self`: `I(X;X) = H(X)`
    - `mutualInfo_le_entropy`: `I(X;Y) ≤ min(H(X), H(Y))`
    - Also provide the base-2 variants `mutualInfoBits` via `entropyBits`.
-2. New module `Shannon/Entropy/RelativeEntropy.lean`. Define
+2. New module `Shannon/Entropy/RelativeEntropy.lean`. Define a support
+   predicate `Supports q p := ∀ a, 0 < p a → 0 < q a`. Define
    `relEntropy (p q : ProbDist α) : ℝ := ∑ a, p a * log (p a / q a)` (KL
-   divergence `D(p‖q)`) with the `0 · log 0 = 0`, `log 0 = 0` conventions,
-   and a `relEntropyBits` variant. Prove:
-   - `relEntropy_nonneg`
-   - `relEntropy_eq_zero_iff`: `D(p‖q) = 0 ↔ p = q` pointwise
-   - Reframe `gibbs_inequality` to additionally state `−relEntropy p q ≤ 0`
-     (keep existing form for backward compatibility).
+   divergence `D(p‖q)`) as the finite-valued expression used on
+   support-covered pairs, and a `relEntropyBits` variant. State the standard
+   KL theorems under `Supports q p`. Prove:
+   - `relEntropy_nonneg (hsupp : Supports q p)`
+   - `relEntropy_eq_zero_iff (hsupp : Supports q p)`:
+     `D(p‖q) = 0 ↔ p = q` pointwise
+   - Reframe `gibbs_inequality` to additionally state `0 ≤ relEntropy p q`
+     under the same support hypothesis (keep existing form for backward
+     compatibility).
 3. Log-sum inequality. In `RelativeEntropy.lean`: for nonneg sequences
-   `aᵢ, bᵢ` with `∑ aᵢ = A`, `∑ bᵢ = B`,
+   `aᵢ, bᵢ` with `∑ aᵢ = A`, `∑ bᵢ = B`, and support condition
+   `aᵢ > 0 → bᵢ > 0`,
    `∑ aᵢ · log (aᵢ/bᵢ) ≥ A · log (A/B)`.
 4. Data processing inequality (information form). In `MutualInfo.lean`:
    given a kernel `W : α → ProbDist γ` and a joint `(X, Y)`, the Markov
@@ -202,10 +214,11 @@ Tasks:
      `ShannonTest/Entropy/RelativeEntropy.lean`.
    - Cases: `mutualInfo_nonneg` on an independent `prodDist` gives exactly
      zero; `mutualInfo_self` on a two-point uniform gives `1` bit;
-     `relEntropy` of `(1/2, 1/2)` vs. `(1/4, 3/4)` matches the closed-form
-     value; `log_sum_inequality` equality case when `aᵢ = bᵢ`; Fano's
-     inequality numerically sanity-checked on a two-symbol alphabet with a
-     known error probability.
+     `relEntropy` of a support-covering pair such as `(1/2, 1/2)` vs.
+     `(1/4, 3/4)` matches the closed-form value; `log_sum_inequality`
+     equality case when `aᵢ = bᵢ`; Fano's inequality numerically
+     sanity-checked on a two-symbol alphabet with a known error
+     probability.
    - `make check` green.
 7. Verso book update.
    - New chapter `Chapters/MutualInformation.lean` covers `I(X;Y)` and the
@@ -463,7 +476,10 @@ Applies to every phase:
 
 - `make check` passes (markdown lint, cspell, `lake lint`, `lake build`,
   `lake test`).
-- `lake build ShannonBook` passes starting in Phase A.
+- `lake build ShannonBook` passes starting in Phase A as a compile-only
+  check.
+- `make book` passes starting in Phase A and produces non-empty rendered
+  output.
 - Every new public definition or theorem has a corresponding entry in
   `ShannonTest/Entropy/…` exercising a concrete instance.
 - Each phase updates the `Formalization Cross-References` section in
@@ -472,15 +488,16 @@ Applies to every phase:
 
 Per-phase sanity checks:
 
-- Phase A: `lake build ShannonBook` generates non-empty output in
-  `.lake/build/doc/`; the book's table of contents lists the Introduction
-  and Foundations chapters.
+- Phase A: `lake build ShannonBook` succeeds as a source-compile check;
+  `make book` generates non-empty rendered output in the documented book
+  directory; the book's table of contents lists the Introduction and
+  Foundations chapters.
 - Phase B: `entropyBits (uniformPNat 2) = 1`;
   `entropyBits (uniformPNat 4) = 2`; Shannon's worked `(1/2, 1/3, 1/6)`
   example computes to the expected value in the new test file.
 - Phase C: for a specific independent `prodDist p q`, `mutualInfo = 0` and
-  `mutualInfoBits = 0`; `relEntropy` of a hand-picked pair matches the
-  analytic value.
+  `mutualInfoBits = 0`; `relEntropy` of a support-covering hand-picked pair
+  matches the analytic value.
 - Phase D: pick `α := Fin 2`, `p := (0.3, 0.7)`, `N := 10`, `ε := 0.1`;
   check an explicit element of the typical set and the bounds on
   `|typicalSet|`.
@@ -494,4 +511,5 @@ Per-phase sanity checks:
 All phases follow the existing documented workflow: `bin/bootstrap-worktree`
 for fresh worktrees, `lake build Shannon.Entropy.<Module>` for single-module
 iteration, `lake test` for the regression suite, `lake build ShannonBook`
-for the companion book.
+for book-source compile checks, and `make book` for companion-book
+rendering.
