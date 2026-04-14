@@ -1,1 +1,10 @@
+# Lean / Lake build artifacts
 /.lake
+
+# OS artifacts
+.DS_Store
+
+# Editor state
+*.swp
+*.swo
+*~

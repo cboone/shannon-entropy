@@ -1,0 +1,35 @@
+{
+  "version": "0.2",
+  "language": "en",
+  // Scope the spell check to Markdown by excluding other file types we don't
+  // proofread: Lean sources, configs, the license, shell scripts, lockfiles.
+  "ignorePaths": [
+    ".lake/**",
+    "**/*.lean",
+    "**/*.toml",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.txt",
+    "**/*.pdf",
+    "LICENSE",
+    "Makefile",
+    "lean-toolchain",
+    "bin/**"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./cspell-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words"],
+  // Skip inline math, display math, and LaTeX commands
+  "ignoreRegExpList": [
+    "/\\$[^$]+\\$/g",
+    "/\\$\\$[\\s\\S]*?\\$\\$/gm",
+    "/\\\\[a-zA-Z]+/g"
+  ]
+}

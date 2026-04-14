@@ -1,0 +1,6 @@
+panes:
+  - command: claude --dangerously-skip-permissions --enable-auto-mode
+    focus: true
+  - split: vertical
+    percentage: 50
+    command: echo "Run bin/bootstrap-worktree if this worktree needs Lean."
