@@ -35,8 +35,13 @@ scope here (see Phase F note). Upstream PRs are welcome but not prioritized
 
 Design decisions locked in for this plan:
 
-- The formalization ships through Phase E (Markov sources, Shannon
-  Theorems 5–7). Phase F is explicitly deferred.
+- The formalization ships through Phase E (transcription-faithful
+  finite-state statistical sources, Shannon Theorems 3–7). Phase F is
+  explicitly deferred.
+- Phase D is explicitly the i.i.d. special case of Shannon's Theorems 3
+  and 4. Phase E upgrades those results to the paper's finite-state source
+  setting using Shannon's state-space model and product-state transducer
+  proof pattern.
 - Base-2 logarithms are the native output for all new Phase C+ theorems.
   `entropyBits` becomes the primary public entropy API; `entropyNat` (natural
   log) stays as an internal helper used inside proofs. Phase B introduces
@@ -215,11 +220,12 @@ Files created: `Shannon/Entropy/MutualInfo.lean`,
 `Shannon/Entropy/RelativeEntropy.lean`, matching test files, new Book
 chapters. Facade `Shannon.Entropy.lean` updated.
 
-## Phase D — Asymptotic equipartition property (Theorems 3–4)
+## Phase D — I.i.d. AEP and typical sets (Theorems 3–4 special case)
 
-Goal: formalize Shannon's Theorems 3 and 4 for the i.i.d. case, with
-statements in base 2 (matching Shannon's `2^(NH)` phrasing directly rather
-than converting from natural log after the fact).
+Goal: formalize the i.i.d. special case of Shannon's Theorems 3 and 4,
+with statements in base 2 (matching Shannon's `2^(NH)` phrasing directly
+rather than converting from natural log after the fact). Phase E upgrades
+these statements to the transcription-faithful finite-state-source setting.
 
 Tasks:
 
@@ -229,12 +235,14 @@ Tasks:
      `Finset.prod_univ_sum` style lemmas.
    - `iidDist_entropyBits`:
      `entropyBits (iidDist p N) = N · entropyBits p` (N-fold additivity).
-   - `logProbBits p x := -Real.logb 2 (p x)` with the `p x = 0 → 0`
-     convention.
+   - `logProbBits p x := -Real.logb 2 (p x)` on the support of `p`; add a
+     support-aware wrapper so typical-set statements exclude impossible
+     symbols.
 2. Typical set (base 2 directly).
    - `typicalSet (p : ProbDist α) (N : ℕ) (ε : ℝ) : Finset (Fin N → α)`
-     defined as
-     `{x | |(1/N) · ∑ i, -Real.logb 2 (p (x i)) − entropyBits p| < ε}`.
+     defined as the support-restricted set
+      `{x | (∀ i, 0 < p (x i)) ∧
+        |(1/N) · ∑ i, -Real.logb 2 (p (x i)) − entropyBits p| < ε}`.
    - Per-element bounds
      `2^(-N·(entropyBits p + ε)) ≤ iidDist p N x ≤ 2^(-N·(entropyBits p - ε))`
      for `x` typical (directly in `2^…`, no natural-log detour).
@@ -265,7 +273,8 @@ Tasks:
    - `make check` green.
 6. Verso book update.
    - New chapter `Chapters/IIDAndAEP.lean` covers the i.i.d. product
-     construction, the typical set, Theorems 3 and 4.
+     construction, the typical set, and the i.i.d. special case of
+     Theorems 3 and 4.
    - Inline numerical example: walk through the `p = (0.3, 0.7)`, `N = 10`
      case with explicit probabilities, showing the typical set bounds.
    - Cross-link to `Chapters/MutualInformation.lean` for the role of
@@ -279,58 +288,89 @@ Open issue to resolve during execution: whether `Real.logb 2` /
 or whether we need a thin wrapper. If awkward, add a small `Bits` namespace
 with `log2`, `exp2`, and conversion lemmas used across Phases D and E.
 
-## Phase E — Finite-state sources and per-symbol entropy (Theorems 5–7)
+## Phase E — Finite-state statistical sources and entropy rate (Theorems 3–7)
 
-Goal: formalize Theorems 5, 6, and 7 for finite-state Markov sources —
-the last piece of the transcription's stated scope. All entropy-rate
-statements use base 2 (`entropyBits`-valued).
+Goal: upgrade Phase D's i.i.d. results to Shannon's transcription-faithful
+finite-state-source setting and formalize Theorems 5, 6, and 7 in the same
+model. The source model follows Shannon's state-space presentation: hidden
+states carry the residue of influence, emitted symbols arise on
+transitions, and finite-state transducers are handled by product state
+spaces. All entropy-rate statements use base 2 (`entropyBits`-valued).
 
 Tasks:
 
-1. New module `Shannon/Entropy/MarkovSource.lean`.
-   - `structure MarkovSource (S : Type) [Fintype S]` bundling an initial
-     `ProbDist S` and a transition kernel `S → ProbDist S`.
-   - `markovDist (M : MarkovSource S) (N : ℕ) : ProbDist (Fin N → S)` for
-     block probabilities under the source.
-   - `IsStationary (π : ProbDist S) (P : S → ProbDist S) :=
-        ∀ s, π s = ∑ s', π s' · P s' s`.
+1. New module `Shannon/Entropy/FiniteStateSource.lean`.
+   - `structure FiniteStateSource (S A : Type) [Fintype S] [Fintype A]`
+     bundling `init : ProbDist S` and
+     `step : S → ProbDist (S × A)`.
+   - `outputDist (M : FiniteStateSource S A) (N : ℕ) : ProbDist (Fin N → A)`
+     for output-block probabilities.
+   - `nextStateKernel` extracted from the transition/emission kernel.
+   - `IsStationary (π : ProbDist S) (K : S → ProbDist (S × A)) :=
+        ∀ s, π s = ∑ s', ∑ a, π s' · K s' (s, a)`.
    - Existence of a stationary distribution for any irreducible finite
-     chain (Perron–Frobenius; use Mathlib's stochastic-matrix results if
-     available, otherwise an elementary argument via the simplex).
-2. Block entropy definitions.
-   - `G (M : MarkovSource S) (N : ℕ) : ℝ :=
-        (1 / N) · entropyBits (markovDist M N)`
-   - `F (M : MarkovSource S) (N : ℕ) : ℝ` = entropy (base 2) of the N-th
-     symbol conditional on the preceding `N − 1`.
-   - `entropyRate (M : MarkovSource S) : ℝ := ∑ s, π s · entropyBits (P s)`
-     under a stationary `π`.
-3. Theorem 5. For a stationary Markov source:
+     hidden-state chain (Perron–Frobenius; use Mathlib's stochastic-matrix
+     results if available, otherwise an elementary argument via the
+     simplex).
+   - Provide constructors / special cases for i.i.d. sources and visible
+     Markov chains, so the old `MarkovSource` viewpoint is recovered as a
+     special case rather than the primary abstraction.
+2. Upgrade Theorems 3 and 4 to the transcription-faithful finite-state
+   source setting.
+   - Define a per-symbol information-density notion and a typical set for
+     output blocks of a stationary finite-state source.
+   - Prove the base-2 AEP and typical-set cardinality / `minCover` results
+     in this model, reusing Phase D's i.i.d. theorems as warm-up lemmas or
+     corollaries where appropriate.
+   - Update the transcription cross-references so Theorems 3 and 4 are only
+     marked complete once this phase lands.
+3. Block entropy definitions.
+   - `G (M : FiniteStateSource S A) (N : ℕ) : ℝ :=
+        (1 / N) · entropyBits (outputDist M N)`
+   - `F (M : FiniteStateSource S A) (N : ℕ) : ℝ` = entropy (base 2) of the
+     N-th emitted symbol conditional on the preceding `N − 1` emitted
+     symbols.
+   - `entropyRate (M : FiniteStateSource S A) (π : ProbDist S) : ℝ :=`
+     `∑ s, π s · entropyBits (M.step s)` under `IsStationary π M.step`.
+4. Theorem 5. For a stationary finite-state source:
    - `G_monotone_decreasing`: `G (N + 1) ≤ G N`
    - `G_tendsto_entropyRate`
-4. Theorem 6. Algebraic identities:
+5. Theorem 6. Algebraic identities:
    - `F_eq_NG_sub_prev`: `F N = N · G N − (N − 1) · G (N − 1)`
    - `G_eq_avg_F`:
      `G N = (1 / N) · ∑ n ∈ Finset.range N, F (n + 1)`
    - `F_le_G`
    - `F_monotone_decreasing`
    - `F_tendsto_entropyRate`
-5. Theorem 7 (data processing, transducer form). Model a finite-state
-   transducer, prove that its output is a finite-state Markov source of
-   entropy rate no larger than the input's (equal when the transducer is
-   non-singular).
-6. Testing.
-   - New test files `ShannonTest/Entropy/MarkovSource.lean`,
+6. Theorem 7 (data processing, transducer form).
+   - Model a finite-state transducer with internal state and emitted output
+     blocks.
+   - Form the product state space `(sourceState × transducerState)` to show
+     that the output process is again a finite-state statistical source in
+     Shannon's sense.
+   - Prove that output entropy rate is no larger than input entropy rate,
+     with equality for non-singular transducers.
+7. Testing.
+   - New test files `ShannonTest/Entropy/FiniteStateSource.lean`,
      `ShannonTest/Entropy/EntropyRate.lean`,
      `ShannonTest/Entropy/Transducer.lean`.
    - Cases: concrete 2-state Markov chain with transition matrix
-     `[[0.8, 0.2], [0.4, 0.6]]`; stationary distribution computed and
-     verified; `G N`, `F N` evaluated at `N = 1, 2, 3` and compared
-     against hand-computed values; transducer example where a merging
-     transducer strictly decreases entropy rate.
+     `[[0.8, 0.2], [0.4, 0.6]]`, encoded as a `FiniteStateSource` special
+     case; stationary distribution computed and verified; `G N`, `F N`
+     evaluated at `N = 1, 2, 3` and compared against hand-computed values;
+     product-state closure sanity check for a nontrivial transducer;
+     transducer example where a merging transducer strictly decreases
+     entropy rate.
    - `make check` green.
-7. Verso book update.
-   - New chapter `Chapters/MarkovSources.lean` on finite-state sources,
-     stationary distributions, and `entropyRate`.
+8. Verso book update.
+   - New chapter `Chapters/FiniteStateSources.lean` on Shannon's
+     state-space source model, stationary distributions, and product-state
+     constructions.
+   - Update `Chapters/IIDAndAEP.lean` to mark Phase D as the i.i.d. warm-up
+     special case.
+   - New chapter `Chapters/FiniteStateAEP.lean` on the
+     transcription-faithful finite-state-source versions of Theorems 3
+     and 4.
    - New chapter `Chapters/PerSymbolEntropy.lean` on `G_N`, `F_N`,
      Theorems 5 and 6.
    - New chapter `Chapters/DataProcessing.lean` on the transducer form of
@@ -338,7 +378,7 @@ Tasks:
    - Final chapter `Chapters/Conclusion.lean` summarizes scope covered
      and explicitly lists Phase F items as future work.
 
-Files created: `Shannon/Entropy/MarkovSource.lean`,
+Files created: `Shannon/Entropy/FiniteStateSource.lean`,
 `Shannon/Entropy/EntropyRate.lean`, `Shannon/Entropy/Transducer.lean`,
 matching tests, new Book chapters.
 
@@ -385,10 +425,10 @@ New, to create:
 - Phase D: `Shannon/Entropy/{IID, AEP}.lean`,
   `ShannonTest/Entropy/{IID, AEP}.lean`,
   `Book/Chapters/IIDAndAEP.lean`
-- Phase E: `Shannon/Entropy/{MarkovSource, EntropyRate, Transducer}.lean`,
-  `ShannonTest/Entropy/{MarkovSource, EntropyRate, Transducer}.lean`,
-  `Book/Chapters/{MarkovSources, PerSymbolEntropy, DataProcessing,
-  Conclusion}.lean`
+- Phase E: `Shannon/Entropy/{FiniteStateSource, EntropyRate, Transducer}.lean`,
+  `ShannonTest/Entropy/{FiniteStateSource, EntropyRate, Transducer}.lean`,
+  `Book/Chapters/{FiniteStateSources, FiniteStateAEP, PerSymbolEntropy,
+  DataProcessing, Conclusion}.lean`
 
 ## Existing utilities to reuse
 
@@ -445,8 +485,11 @@ Per-phase sanity checks:
   check an explicit element of the typical set and the bounds on
   `|typicalSet|`.
 - Phase E: 2-state Markov chain with transition matrix
-  `[[0.8, 0.2], [0.4, 0.6]]`; verify `G N`, `F N` converge to the
-  analytically computed entropy rate as `N` grows (check `N = 1, 2, 3, 4`).
+  `[[0.8, 0.2], [0.4, 0.6]]`, treated as a `FiniteStateSource` special
+  case; verify `G N`, `F N` converge to the analytically computed entropy
+  rate as `N` grows (check `N = 1, 2, 3, 4`), and check the
+  transcription-faithful finite-state-source upgrade of Theorems 3 and 4 on
+  a stationary example.
 
 All phases follow the existing documented workflow: `bin/bootstrap-worktree`
 for fresh worktrees, `lake build Shannon.Entropy.<Module>` for single-module
