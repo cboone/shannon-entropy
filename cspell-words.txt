@@ -39,6 +39,7 @@ pandocciter
 pointwise
 rpow
 Schur
+shannontest
 simpa
 subadditivity
 symm

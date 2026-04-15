@@ -26,6 +26,7 @@ The committed commit `e33a679` refines `docs/plans/done/2026-04-14-backfill-shan
 ### File Inventory
 
 New (6):
+
 - `ShannonTest/Entropy/Approx.lean`
 - `ShannonTest/Entropy/Converse.lean`
 - `ShannonTest/Entropy/Gibbs.lean`
@@ -34,6 +35,7 @@ New (6):
 - `ShannonTest/Entropy/Uniform.lean`
 
 Modified (3):
+
 - `ShannonTest/Entropy.lean` (aggregator imports)
 - `ShannonTest/Entropy/Final.lean` (trim converse example)
 - `cspell-words.txt` (30 new entries)
