@@ -1,13 +1,13 @@
 ## Branch Review: test/backfill-test-coverage
 
 Base: main (merge base: 2312e6d)
-Commits: 1 committed + working-tree changes (the core backfill is uncommitted)
+Snapshot reviewed: commit `e33a679` plus local backfill edits present before this PR was assembled
 Files changed: 9 (6 added, 3 modified, 0 deleted, 0 renamed)
-Reviewed through: e33a679 + uncommitted working tree
+Reviewed through: historical pre-PR snapshot at `e33a679` with the backfill edits now included in this PR
 
 ### Summary
 
-This branch backfills the `ShannonTest/` mirror with six new smoke-test modules (Uniform, Rational, Approx, Joint, Gibbs, Converse), wires them into the `ShannonTest.Entropy` aggregator, trims the now-redundant converse example from `ShannonTest/Entropy/Final.lean`, and extends `cspell-words.txt` with the vocabulary introduced by the new tests and recent plan docs. The single committed change on the branch so far is a polish pass on the plan document itself; all test code is staged in the working tree awaiting commit.
+This branch backfills the `ShannonTest/` mirror with six new smoke-test modules (Uniform, Rational, Approx, Joint, Gibbs, Converse), wires them into the `ShannonTest.Entropy` aggregator, trims the now-redundant converse example from `ShannonTest/Entropy/Final.lean`, and extends `cspell-words.txt` with the vocabulary introduced by the new tests and recent plan docs. This review was written from a pre-PR snapshot in which `e33a679` was the only committed branch change and the test backfill still existed as local edits; those backfill edits were subsequently committed as part of this PR.
 
 ### Changes by Area
 
@@ -21,7 +21,7 @@ Six new `example`-based test files covering the headline results and a handful o
 `cspell-words.txt` grows by 30 entries (sorted in-place alongside existing terms). Additions split roughly into Lean/Mathlib identifiers used by the new tests (`Fintype`, `Finset`, `Tendsto`, `tendsto`, `simpa`, `symm`, `logb`, `rpow`, `hsupp`, `nonneg`, `pointwise`), math vocabulary from plan docs and roadmap (`Brouwer`, `Chebyshev`, `Fano`, `Frobenius`, `memoryless`, `agnostically`, `degenericize`, `Degenericize`, `degenericized`), and tooling/writing terms (`cleveref`, `docstrings`, `frontmatter`, `hardwrap`, `hardwrapped`, `hardwrapping`, `latexmk`, `natbib`, `nocite`, `tikz`, `worktrees`).
 
 **Docs**
-The committed commit `e33a679` refines `docs/plans/todo/2026-04-14-backfill-shannontest-coverage.md`: 35/34 line churn, no behavior change.
+The committed commit `e33a679` refines `docs/plans/done/2026-04-14-backfill-shannontest-coverage.md` (then at `docs/plans/todo/…` in the reviewed snapshot): 35/34 line churn, no behavior change.
 
 ### File Inventory
 
@@ -48,7 +48,7 @@ Deleted: none. Renamed: none.
 
 ### Plan Compliance
 
-Plan: `docs/plans/todo/2026-04-14-backfill-shannontest-coverage.md` (auto-detected by branch-name match).
+Plan: `docs/plans/done/2026-04-14-backfill-shannontest-coverage.md` (then at `docs/plans/todo/…` in the reviewed snapshot; auto-detected by branch-name match).
 
 **Verdict:** Strong compliance. Every planned test file exists, every headline result listed in the plan is exercised by a direct `example`, and every "good supporting example" the plan suggested is also present. The plan's "file to simplify" step (`ShannonTest/Entropy/Final.lean` dropping the converse example) is also done. No scope additions, no scope omissions.
 
