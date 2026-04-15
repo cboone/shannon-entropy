@@ -1,3 +1,9 @@
 import ShannonTest.Entropy.Core
+import ShannonTest.Entropy.Uniform
+import ShannonTest.Entropy.Rational
+import ShannonTest.Entropy.Approx
+import ShannonTest.Entropy.Gibbs
+import ShannonTest.Entropy.Joint
 import ShannonTest.Entropy.Properties
+import ShannonTest.Entropy.Converse
 import ShannonTest.Entropy.Final

@@ -1,18 +1,12 @@
 import Shannon.Entropy.Final
-import Shannon.Entropy.Converse
 
 /-!
-# Shannon Entropy: Uniqueness and Converse Tests
+# Shannon Entropy: Uniqueness Tests
 
-Exercises for the main characterization theorems and the converse.
+Exercises for the main characterization theorems.
 -/
 
 open Shannon
-
-/-- The converse: `entropyNat` satisfies all four Shannon axioms.
-This is the "if" direction of the characterization. -/
-example : ShannonEntropyAxioms (fun {α} [Fintype α] => entropyNat) :=
-  entropyNat_shannonAxioms
 
 /-- Uniqueness (nat log form): any H satisfying the axioms equals
 -K * ∑ p_i log p_i. -/
