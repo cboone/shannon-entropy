@@ -33,18 +33,18 @@ The central result is:
 
 ### Converse
 
-- `entropyNat_shannonAxioms`: `entropyNat` satisfies `ShannonEntropyAxioms` — `Shannon/Entropy/Converse.lean`
+- `entropyNat_shannonAxioms`: `entropyNat` satisfies `ShannonEntropyAxioms` in `Shannon/Entropy/Converse.lean`
 
 ### Section 6 Properties
 
-- `entropyNat_eq_zero_iff`: H = 0 iff deterministic — `Shannon/Entropy/Properties.lean`
-- `entropyNat_eq_log_card_iff`: H = log|α| iff uniform — `Shannon/Entropy/Properties.lean`
-- `entropyNat_joint_le_add`: subadditivity H(X,Y) ≤ H(X) + H(Y) — `Shannon/Entropy/Properties.lean`
-- `entropyNat_doublyStochastic_le`: Schur-concavity H(Ap) ≥ H(p) — `Shannon/Entropy/Properties.lean`
-- `condEntropy_le_entropyNat`: conditioning reduces entropy — `Shannon/Entropy/Properties.lean`
-- `condEntropy_nonneg`: conditional entropy ≥ 0 — `Shannon/Entropy/Properties.lean`
-- `chain_rule`: H(X,Y) = H(X) + H_X(Y) — `Shannon/Entropy/Joint.lean`
-- `entropyNat_prodDist`: H(X×Y) = H(X) + H(Y) — `Shannon/Entropy/Joint.lean`
+- `entropyNat_eq_zero_iff`: H = 0 iff deterministic in `Shannon/Entropy/Properties.lean`
+- `entropyNat_eq_log_card_iff`: H = log|α| iff uniform in `Shannon/Entropy/Properties.lean`
+- `entropyNat_joint_le_add`: subadditivity H(X,Y) ≤ H(X) + H(Y) in `Shannon/Entropy/Properties.lean`
+- `entropyNat_doublyStochastic_le`: Schur-concavity H(Ap) ≥ H(p) in `Shannon/Entropy/Properties.lean`
+- `condEntropy_le_entropyNat`: conditioning reduces entropy in `Shannon/Entropy/Properties.lean`
+- `condEntropy_nonneg`: conditional entropy ≥ 0 in `Shannon/Entropy/Properties.lean`
+- `chain_rule`: H(X,Y) = H(X) + H_X(Y) in `Shannon/Entropy/Joint.lean`
+- `entropyNat_prodDist`: H(X×Y) = H(X) + H(Y) in `Shannon/Entropy/Joint.lean`
 
 ## Module Layout
 

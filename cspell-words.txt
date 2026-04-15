@@ -1,6 +1,7 @@
 Anson
 agnostically
 approximants
+backticked
 bibtex
 Brouwer
 cboone
@@ -39,6 +40,7 @@ pandocciter
 pointwise
 rpow
 Schur
+shannontest
 simpa
 subadditivity
 symm

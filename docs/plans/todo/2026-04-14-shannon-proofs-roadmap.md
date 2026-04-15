@@ -15,12 +15,12 @@ is already very close: the `Apos_mul` / `Apos_pow` / ratio-squeeze chain in
 The paper transcription in `references/shannon1948-transcription.md` declares
 a wider target scope:
 
-- Theorem 2 (uniqueness) — done
-- Properties 1–6 — done
-- Theorem 3 (AEP) — not yet formalized
-- Theorem 4 (typical set size) — not yet formalized
-- Theorems 5–6 (per-symbol entropy `Gₙ`, `Fₙ` convergence) — not yet formalized
-- Theorem 7 (data processing inequality) — not yet formalized
+- Theorem 2 (uniqueness): done
+- Properties 1–6: done
+- Theorem 3 (AEP): not yet formalized
+- Theorem 4 (typical set size): not yet formalized
+- Theorems 5–6 (per-symbol entropy `Gₙ`, `Fₙ` convergence): not yet formalized
+- Theorem 7 (data processing inequality): not yet formalized
 
 Goal: extend the formalization to cover the transcription's stated scope,
 tighten the existing proofs' correspondence to Shannon's narrative, and
@@ -52,7 +52,7 @@ Design decisions locked in for this plan:
 - Every phase (B onward) includes a Verso book update so the companion
   walkthrough stays in lockstep with the code.
 
-## Phase A — Verso companion book setup
+## Phase A: Verso companion book setup
 
 Goal: add a Verso-powered book that will grow alongside the Lean code,
 containing a math-and-Lean walkthrough of Shannon's paper. The book lives
@@ -110,7 +110,7 @@ Files created: `Book/Main.lean`, `Book/Chapters/*.lean`, `Book/Config.lean`,
 `ShannonTest/Book.lean`. Files modified: `lakefile.toml`, `lake-manifest.json`,
 `README.md`, `Makefile`, `.github/workflows/ci.yml`, `cspell-words.txt`.
 
-## Phase B — Revision: tighten correspondence with Shannon's narrative
+## Phase B: Revision, tighten correspondence with Shannon's narrative
 
 Goal: make each existing proof traceable to a specific page / argument in
 Shannon's paper; fill test-coverage gaps; introduce the base-2 public API
@@ -174,7 +174,7 @@ Files touched: `Shannon/Entropy/{Uniform, Rational, Approx, Final, Joint,
 Properties}.lean`, new `Shannon/Entropy/Bits.lean`, new files in
 `ShannonTest/Entropy/`, new files in `Book/Chapters/`.
 
-## Phase C — Information-theoretic primitives
+## Phase C: Information-theoretic primitives
 
 Goal: complete the primitives layer (mutual information properties,
 relative entropy, log-sum inequality, data processing inequality in its
@@ -244,7 +244,7 @@ Files created: `Shannon/Entropy/MutualInfo.lean`,
 `Shannon/Entropy/RelativeEntropy.lean`, matching test files, new Book
 chapters. Facade `Shannon.Entropy.lean` updated.
 
-## Phase D — I.i.d. AEP and typical sets (Theorems 3–4 special case)
+## Phase D: I.i.d. AEP and typical sets (Theorems 3–4 special case)
 
 Goal: formalize the i.i.d. special case of Shannon's Theorems 3 and 4,
 with statements in base 2 (matching Shannon's `2^(NH)` phrasing directly
@@ -315,7 +315,7 @@ Open issue to resolve during execution: whether `Real.logb 2` /
 or whether we need a thin wrapper. If awkward, add a small `Bits` namespace
 with `log2`, `exp2`, and conversion lemmas used across Phases D and E.
 
-## Phase E — Finite-state statistical sources and entropy rate (Theorems 3–7)
+## Phase E: Finite-state statistical sources and entropy rate (Theorems 3–7)
 
 Goal: upgrade Phase D's i.i.d. results to Shannon's transcription-faithful
 finite-state-source setting and formalize Theorems 5, 6, and 7 in the same
@@ -416,7 +416,7 @@ Files created: `Shannon/Entropy/FiniteStateSource.lean`,
 `Shannon/Entropy/EntropyRate.lean`, `Shannon/Entropy/Transducer.lean`,
 matching tests, new Book chapters.
 
-## Phase F — Out of scope
+## Phase F: Out of scope
 
 Explicitly deferred:
 
@@ -433,22 +433,22 @@ Verso conclusion chapter will flag these as natural successors.
 
 Existing, to modify:
 
-- `Shannon/Entropy/Joint.lean` — add `condEntropy_eq_shannon_form`
-- `Shannon/Entropy/Gibbs.lean` — cross-reference with `relEntropy`
-- `Shannon/Entropy/Final.lean` — add `entropyBits`-flavored corollaries
-- `Shannon/Entropy.lean` — facade imports for every new module
-- `Shannon.lean` — top-level re-export
-- `lakefile.toml`, `lake-manifest.json` — Verso dependency, new lean_libs
-- `Makefile` — `make book` target
-- `.github/workflows/ci.yml` — Verso build job
-- `README.md` — companion book section, updated scope
-- `references/shannon1948-transcription.md` — append cross-references for
+- `Shannon/Entropy/Joint.lean`: add `condEntropy_eq_shannon_form`
+- `Shannon/Entropy/Gibbs.lean`: cross-reference with `relEntropy`
+- `Shannon/Entropy/Final.lean`: add `entropyBits`-flavored corollaries
+- `Shannon/Entropy.lean`: facade imports for every new module
+- `Shannon.lean`: top-level re-export
+- `lakefile.toml`, `lake-manifest.json`: Verso dependency, new lean_libs
+- `Makefile`: `make book` target
+- `.github/workflows/ci.yml`: Verso build job
+- `README.md`: companion book section, updated scope
+- `references/shannon1948-transcription.md`: append cross-references for
   each newly formalized theorem as it lands. Note: Phase B's
   `condEntropy_eq_shannon_form` corresponds to the existing Property 5
   entry (chain rule), not a new one; only genuinely new theorems (Phase
   C's mutual-info / KL lemmas, Phase D's i.i.d. AEP, Phase E's
   finite-state results) warrant new cross-reference entries.
-- `cspell-words.txt` — Verso / information-theory vocabulary
+- `cspell-words.txt`: Verso / information-theory vocabulary
 
 New, to create:
 
