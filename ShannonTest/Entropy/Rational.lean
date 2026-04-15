@@ -44,7 +44,7 @@ example :
       (fun _ : Fin 3 => show 0 < (1 : ℕ) from by decide)
       3
       (by decide)
-      (by native_decide)
+      (by decide)
       (by intro a; norm_num [uniformPNat])
 
 example :
