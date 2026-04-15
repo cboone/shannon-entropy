@@ -54,61 +54,128 @@ Design decisions locked in for this plan:
 
 ## Phase A: Verso companion book setup
 
-Goal: add a Verso-powered book that will grow alongside the Lean code,
-containing a math-and-Lean walkthrough of Shannon's paper. The book lives
-in-repo as a separate Lake target; each later phase adds at least one
-chapter.
+Goal: add a Manual-genre Verso book that grows alongside the Lean
+formalization, modeled structurally on the [Lean Reference
+Manual](https://github.com/leanprover/reference-manual). The book lives
+in-repo as a separate Lake library plus executable pair; each later phase
+adds at least one chapter.
+
+Design notes:
+
+- Manual genre, not Blog. Shannon walkthrough wants hierarchical parts and
+  chapters, TOC, cross-references from prose into `Shannon.Entropy.*` Lean
+  definitions, and a bibliography. Manual supplies these; Blog does not.
+- Single `verso` dependency, pinned to `v4.29.0` to match `lean-toolchain`.
+  Skip `verso-web-components` (Lean-website styling, not needed), `illuminate`
+  (diagramming, not needed for Shannon's prose), and Plausible analytics.
+  All three are optional adornments reference-manual chose to add.
+- Short namespace `Book`, matching reference-manual's use of the short name
+  `Manual` for its lean_lib and root module.
 
 Tasks:
 
-1. Add Verso as a Lake dependency. Before scaffolding, probe Verso's most
-   recent tagged release against Lean `v4.29.0` (currently pinned in
-   `lean-toolchain`) to confirm compatibility. If the latest Verso tag does
-   not build against 4.29.0, fall back immediately to plain Pandoc Markdown
-   under `docs/book/` and revisit when Verso catches up, rather than
-   scaffolding on a broken dependency. Document the compatibility check
-   outcome in `lakefile.toml` as a trailing comment or in the first book
-   chapter.
-2. Scaffold the book.
-   - Create a new Lake library target `ShannonBook`.
-   - Layout: `Book/Main.lean` as entry, `Book/Chapters/` for per-chapter
-     files, `Book/Chapters/Bibliography.lean` for citations, a
-     `Book/Config.lean` for genre/style config.
-3. Initial chapters.
-   - `Chapters/Introduction.lean`: paper overview, fork relationship,
-     scope (what is formalized, what is not), reading order, how to run
-     `lake build Shannon`.
-   - `Chapters/Foundations.lean`: `ProbDist`, `composeProb`, `relabelProb`,
-     `uniformPNat`; quote relevant Shannon paragraphs and the
-     `ShannonEntropyAxioms` structure side by side.
-   - `Chapters/Bibliography.lean`: Shannon 1948 with DOI, supporting
-     references (Cover and Thomas, MacKay).
-4. Build target.
-   - `lake build ShannonBook` compiles the Lean book sources.
-   - Add a `make book` convenience target that runs the actual Verso render
-     pipeline, e.g. `lake build ShannonBook:literate` followed by
-     `lake exe verso-html ...`, and writes HTML to a documented output
-     directory under `.lake/build/doc/` or another repo-standard path chosen
-     during implementation.
-   - Document in `README.md` under a new "Companion book" section which
-     command is the compile check and which command renders the book.
-5. CI integration.
-   - Extend `.github/workflows/ci.yml` with a `book` job that runs
-     `make book` (and, if helpful for clearer failure modes,
-     `lake build ShannonBook` before the render step).
-   - Optional follow-up (flagged, not required this phase): publish to
-     GitHub Pages on `main` merges.
-6. Testing.
-   - `lake build ShannonBook` passes as a compile-only check.
-   - `make book` passes in CI and produces non-empty rendered output.
-   - `make check` still passes end-to-end.
-   - Add an `example`-style smoke test under `ShannonTest/Book.lean` that
-     imports the book's top-level module to catch import regressions.
-   - Ensure cspell dictionary covers Verso-specific terms added to prose.
+1. Add Verso as a Lake dependency.
+   - In `lakefile.toml`, add a `[[require]]` entry for `verso` at
+     `https://github.com/leanprover/verso.git` rev `v4.29.0`.
+   - Verso publishes a tag per Lean release, so this pinning is stable.
+   - Run `lake update` to confirm Mathlib and Verso co-exist at 4.29.0.
+     The strength-model repo already uses this combination successfully, so
+     failure here would indicate a real problem worth investigating rather
+     than a reason to fall back to an alternative toolchain.
+   - Record the compatibility check outcome as a one-line comment in
+     `lakefile.toml` next to the Verso require.
 
-Files created: `Book/Main.lean`, `Book/Chapters/*.lean`, `Book/Config.lean`,
-`ShannonTest/Book.lean`. Files modified: `lakefile.toml`, `lake-manifest.json`,
-`README.md`, `Makefile`, `.github/workflows/ci.yml`, `cspell-words.txt`.
+2. Scaffold the book.
+   - New `lean_lib` target `Book` in `lakefile.toml`.
+   - New `lean_exe` target `generate-book` with `root = "Main"`.
+   - Add `moreLeancArgs = ["-O0"]` at the package level to cut C compile
+     time (reference-manual does this; the optimization cost exceeds the
+     savings for doc builds).
+   - The `Book` library depends transitively on `Shannon` so chapters can
+     `import Shannon.Entropy.*` modules and reference their definitions in
+     prose.
+   - Layout:
+     - `Main.lean` at repo root: executable entry point; calls
+       `manualMain (%doc Book) (config := config)` with `sourceLink` and
+       `issueLink` pointing at this repo.
+     - `Book.lean` at repo root: root document; opens with
+       `#doc (Manual) "Shannon 1948: A Formalization Companion" => ...`
+       followed by chapter imports and `{include 0 ...}` splices.
+     - `Book/` directory: per-chapter modules, mirroring `Manual/` in
+       reference-manual.
+
+3. Initial chapters (Phase A scope).
+
+   Keep Phase A content narrow to prove the pipeline works; defer
+   content-heavy chapters to Phase B.
+
+   - `Book/Introduction.lean`: paper overview, fork relationship
+     (cboone/shannon-entropy off SamuelSchlesinger's), scope (Appendix 2 and
+     Section 6 Properties 1-6 done; Theorems 3-7 planned), reading order,
+     `bin/bootstrap-worktree` and `make book` invocations.
+   - `Book/Bibliography.lean`: Shannon 1948 with DOI, supporting references
+     (Cover and Thomas, MacKay).
+
+   Foundations moves to Phase B, grouped with `AxiomaticEntropy`, to avoid
+   splitting the axiomatic content across phases.
+
+4. Build targets.
+
+   Add to `Makefile`:
+
+   ```makefile
+   book: ## Build the companion book HTML
+     @test -f .lake/packages/verso/.lake/build/lib/lean/VersoManual.olean || \
+       (printf "Verso not bootstrapped. Run bin/bootstrap-worktree first.\n" >&2; exit 1)
+     lake build Book
+     lake exe generate-book --depth 2 --output _site
+
+   serve: book ## Build and serve the book locally
+     python3 -m http.server 8000 --directory _site
+   ```
+
+   The two-step invocation (`lake build Book` then `lake exe generate-book`)
+   mirrors reference-manual's pattern. `--depth 2` controls TOC granularity
+   (Parts and chapters expanded; sections collapsed by default). Output to
+   `_site/` at repo root; `.gitignore` it.
+
+   Update `bin/bootstrap-worktree` to also run `lake build Book` alongside
+   `lake build Shannon` so fresh worktrees are book-ready.
+
+   Document in `README.md` under a new "Companion book" section: `make book`
+   renders, `make serve` previews locally. Note that `lake build Book` alone
+   is a compile-only check, useful in tight iteration loops.
+
+5. CI integration.
+   - Extend `.github/workflows/ci.yml` with a `book` job that runs after
+     the existing Lean job succeeds: checkout, install lean-action, run
+     `lake build Book`, run `lake exe generate-book --depth 2 --output _site`,
+     upload `_site/` as an artifact.
+   - Optional follow-up (flagged, not required this phase): GitHub Pages
+     deployment from `main` merges. Ship as a separate workflow and a
+     separate PR.
+
+6. Testing.
+   - `lake build Book` passes as a source-compile check.
+   - `lake exe generate-book --depth 2 --output _site` produces a non-empty
+     `_site/index.html` and `_site/book/` tree.
+   - `make check` still passes end-to-end.
+   - Add `ShannonTest/Book.lean` with a single `example` that imports
+     `Book` to catch import regressions without duplicating content tests.
+   - Update `cspell-words.txt` with any Verso-specific terms surfaced by
+     prose (e.g. `Verso`, `manualMain`, `versowebcomponents` if cross-refs
+     mention it).
+
+7. Documentation.
+   - Update `CLAUDE.md` / `AGENTS.md` module layout section to list `Book/`
+     and note the companion-book convention.
+   - README "Companion book" section per Task 4.
+
+Files created: `Main.lean`, `Book.lean`, `Book/Introduction.lean`,
+`Book/Bibliography.lean`, `ShannonTest/Book.lean`. Files modified:
+`lakefile.toml`, `lake-manifest.json`, `README.md`, `Makefile`,
+`.github/workflows/ci.yml`, `bin/bootstrap-worktree`, `.gitignore`,
+`cspell-words.txt`, `CLAUDE.md`.
 
 ## Phase B: Revision, tighten correspondence with Shannon's narrative
 
@@ -160,19 +227,19 @@ Tasks:
      the `entropyBits`-flavored corollary.
    - `make check` green end-to-end.
 6. Verso book update.
-   - New chapter `Chapters/AxiomaticEntropy.lean` walks Shannon's Appendix 2
+   - New chapter `Book/AxiomaticEntropy.lean` walks Shannon's Appendix 2
      proof with references into `Shannon/Entropy/{Uniform, Rational, Approx,
      Final}.lean`.
-   - New chapter `Chapters/Properties.lean` walks Section 6 Properties
+   - New chapter `Book/Properties.lean` walks Section 6 Properties
      1–6 with references into `Shannon/Entropy/{Joint, Properties,
      Gibbs}.lean`.
-   - New chapter `Chapters/Logarithm.lean` discusses the `K` scale
+   - New chapter `Book/Logarithm.lean` discusses the `K` scale
      constant, base choice, and the `entropyBits` API.
-   - `Book/Main.lean` links the new chapters in order.
+   - `Book.lean` (the root document) links the new chapters in order.
 
 Files touched: `Shannon/Entropy/{Uniform, Rational, Approx, Final, Joint,
 Properties}.lean`, new `Shannon/Entropy/Bits.lean`, new files in
-`ShannonTest/Entropy/`, new files in `Book/Chapters/`.
+`ShannonTest/Entropy/`, new files in `Book/`.
 
 ## Phase C: Information-theoretic primitives
 
@@ -232,13 +299,13 @@ Tasks:
      probability.
    - `make check` green.
 7. Verso book update.
-   - New chapter `Chapters/MutualInformation.lean` covers `I(X;Y)` and the
+   - New chapter `Book/MutualInformation.lean` covers `I(X;Y)` and the
      identities proved in this phase.
-   - New chapter `Chapters/RelativeEntropy.lean` covers `D(p‖q)`, the
+   - New chapter `Book/RelativeEntropy.lean` covers `D(p‖q)`, the
      log-sum inequality, and the information-form DPI.
-   - New chapter `Chapters/FanoInequality.lean` discusses the estimator
+   - New chapter `Book/FanoInequality.lean` discusses the estimator
      setting and points forward to Phase E.
-   - Chapter ordering in `Book/Main.lean` updated.
+   - Chapter ordering in `Book.lean` updated.
 
 Files created: `Shannon/Entropy/MutualInfo.lean`,
 `Shannon/Entropy/RelativeEntropy.lean`, matching test files, new Book
@@ -299,12 +366,12 @@ Tasks:
      fixed case.
    - `make check` green.
 6. Verso book update.
-   - New chapter `Chapters/IIDAndAEP.lean` covers the i.i.d. product
+   - New chapter `Book/IIDAndAEP.lean` covers the i.i.d. product
      construction, the typical set, and the i.i.d. special case of
      Theorems 3 and 4.
    - Inline numerical example: walk through the `p = (0.3, 0.7)`, `N = 10`
      case with explicit probabilities, showing the typical set bounds.
-   - Cross-link to `Chapters/MutualInformation.lean` for the role of
+   - Cross-link to `Book/MutualInformation.lean` for the role of
      information rate.
 
 Files created: `Shannon/Entropy/IID.lean`, `Shannon/Entropy/AEP.lean`,
@@ -397,19 +464,19 @@ Tasks:
      entropy rate.
    - `make check` green.
 8. Verso book update.
-   - New chapter `Chapters/FiniteStateSources.lean` on Shannon's
+   - New chapter `Book/FiniteStateSources.lean` on Shannon's
      state-space source model, stationary distributions, and product-state
      constructions.
-   - Update `Chapters/IIDAndAEP.lean` to mark Phase D as the i.i.d. warm-up
+   - Update `Book/IIDAndAEP.lean` to mark Phase D as the i.i.d. warm-up
      special case.
-   - New chapter `Chapters/FiniteStateAEP.lean` on the
+   - New chapter `Book/FiniteStateAEP.lean` on the
      transcription-faithful finite-state-source versions of Theorems 3
      and 4.
-   - New chapter `Chapters/PerSymbolEntropy.lean` on `G_N`, `F_N`,
+   - New chapter `Book/PerSymbolEntropy.lean` on `G_N`, `F_N`,
      Theorems 5 and 6.
-   - New chapter `Chapters/DataProcessing.lean` on the transducer form of
+   - New chapter `Book/DataProcessing.lean` on the transducer form of
      Theorem 7; tie back to the information-form DPI from Phase C.
-   - Final chapter `Chapters/Conclusion.lean` summarizes scope covered
+   - Final chapter `Book/Conclusion.lean` summarizes scope covered
      and explicitly lists Phase F items as future work.
 
 Files created: `Shannon/Entropy/FiniteStateSource.lean`,
@@ -438,9 +505,11 @@ Existing, to modify:
 - `Shannon/Entropy/Final.lean`: add `entropyBits`-flavored corollaries
 - `Shannon/Entropy.lean`: facade imports for every new module
 - `Shannon.lean`: top-level re-export
-- `lakefile.toml`, `lake-manifest.json`: Verso dependency, new lean_libs
-- `Makefile`: `make book` target
+- `lakefile.toml`, `lake-manifest.json`: Verso dependency pinned at
+  `v4.29.0`; new `Book` lean_lib and `generate-book` lean_exe
+- `Makefile`: `make book` and `make serve` targets
 - `.github/workflows/ci.yml`: Verso build job
+- `bin/bootstrap-worktree`: add `lake build Book` after Shannon build
 - `README.md`: companion book section, updated scope
 - `references/shannon1948-transcription.md`: append cross-references for
   each newly formalized theorem as it lands. Note: Phase B's
@@ -452,20 +521,20 @@ Existing, to modify:
 
 New, to create:
 
-- Phase A: `Book/Main.lean`, `Book/Chapters/{Introduction, Foundations,
-  Bibliography}.lean`, `Book/Config.lean`, `ShannonTest/Book.lean`
+- Phase A: `Main.lean`, `Book.lean`, `Book/{Introduction,
+  Bibliography}.lean`, `ShannonTest/Book.lean`
 - Phase B: `Shannon/Entropy/Bits.lean`,
   `ShannonTest/Entropy/{Uniform, Rational, Gibbs, Bits}.lean`,
-  `Book/Chapters/{AxiomaticEntropy, Properties, Logarithm}.lean`
+  `Book/{Foundations, AxiomaticEntropy, Properties, Logarithm}.lean`
 - Phase C: `Shannon/Entropy/{MutualInfo, RelativeEntropy}.lean`,
   `ShannonTest/Entropy/{MutualInfo, RelativeEntropy}.lean`,
-  `Book/Chapters/{MutualInformation, RelativeEntropy, FanoInequality}.lean`
+  `Book/{MutualInformation, RelativeEntropy, FanoInequality}.lean`
 - Phase D: `Shannon/Entropy/{IID, AEP}.lean`,
   `ShannonTest/Entropy/{IID, AEP}.lean`,
-  `Book/Chapters/IIDAndAEP.lean`
+  `Book/IIDAndAEP.lean`
 - Phase E: `Shannon/Entropy/{FiniteStateSource, EntropyRate, Transducer}.lean`,
   `ShannonTest/Entropy/{FiniteStateSource, EntropyRate, Transducer}.lean`,
-  `Book/Chapters/{FiniteStateSources, FiniteStateAEP, PerSymbolEntropy,
+  `Book/{FiniteStateSources, FiniteStateAEP, PerSymbolEntropy,
   DataProcessing, Conclusion}.lean`
 
 ## Existing utilities to reuse
@@ -501,7 +570,7 @@ Applies to every phase:
 
 - `make check` passes (markdown lint, cspell, `lake lint`, `lake build`,
   `lake test`).
-- `lake build ShannonBook` passes starting in Phase A as a compile-only
+- `lake build Book` passes starting in Phase A as a compile-only
   check.
 - `make book` passes starting in Phase A and produces non-empty rendered
   output.
@@ -515,10 +584,10 @@ Per-phase sanity checks (a minimal tripwire subset, not a restatement of
 each phase's full test coverage; pick these as the quick smoke checks
 when iterating):
 
-- Phase A: `lake build ShannonBook` succeeds as a source-compile check;
-  `make book` generates non-empty rendered output in the documented book
-  directory; the book's table of contents lists the Introduction and
-  Foundations chapters.
+- Phase A: `lake build Book` succeeds as a source-compile check;
+  `make book` generates non-empty rendered output under `_site/`; the
+  book's table of contents lists the Introduction and Bibliography
+  chapters (Foundations lands in Phase B).
 - Phase B: `entropyBits (uniformPNat 2) = 1`;
   `entropyBits (uniformPNat 4) = 2`; Shannon's worked `(1/2, 1/3, 1/6)`
   example computes to the expected value in the new test file.
@@ -537,6 +606,6 @@ when iterating):
 
 All phases follow the existing documented workflow: `bin/bootstrap-worktree`
 for fresh worktrees, `lake build Shannon.Entropy.<Module>` for single-module
-iteration, `lake test` for the regression suite, `lake build ShannonBook`
+iteration, `lake test` for the regression suite, `lake build Book`
 for book-source compile checks, and `make book` for companion-book
 rendering.

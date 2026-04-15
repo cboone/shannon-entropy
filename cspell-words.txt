@@ -25,6 +25,7 @@ hardwrapping
 hsupp
 lakefile
 latexmk
+Leanc
 leanprover
 logb
 Mathlib
@@ -34,6 +35,7 @@ nocite
 nolints
 nonneg
 nonnegativity
+olean
 oleans
 Pandoc
 pandocciter
@@ -47,6 +49,8 @@ symm
 tendsto
 Tendsto
 tikz
+Verso
+versowebcomponents
 workmux
 worktree
 worktrees
