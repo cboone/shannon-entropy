@@ -1,7 +1,7 @@
 # Shannon Proofs Roadmap
 
 Date: 2026-04-14
-Status: proposed
+Status: Phase A shipped 2026-04-18 on branch `docs/implement-phase-a-verso`; Phases B through E pending.
 
 ## Context
 
@@ -51,8 +51,20 @@ Design decisions locked in for this plan:
   `ShannonTest/` discipline.
 - Every phase (B onward) includes a Verso book update so the companion
   walkthrough stays in lockstep with the code.
+- Chapters under `Book/` must not `import Shannon` or any `Shannon.*` module.
+  Lake links every transitive C object on the `generate-book` argv, and
+  pulling Mathlib through `Shannon` pushes the macOS link command past
+  `ARG_MAX` (~1 MB). Chapters that need to render Lean code will use
+  `subverso` highlight artifacts instead of direct imports. This applies
+  to every later phase and is documented in `AGENTS.md`.
 
 ## Phase A: Verso companion book setup
+
+Status: shipped 2026-04-18 on branch `docs/implement-phase-a-verso`. All
+seven tasks below were delivered. Rendered output lives under
+`_site/html-multi/` rather than `_site/` directly; the `import Shannon`
+prohibition added during implementation is recorded as a cross-cutting
+design decision above and should be honored by every later phase.
 
 Goal: add a Manual-genre Verso book that grows alongside the Lean
 formalization, modeled structurally on the [Lean Reference
@@ -91,9 +103,11 @@ Tasks:
    - Add `moreLeancArgs = ["-O0"]` at the package level to cut C compile
      time (reference-manual does this; the optimization cost exceeds the
      savings for doc builds).
-   - The `Book` library depends transitively on `Shannon` so chapters can
-     `import Shannon.Entropy.*` modules and reference their definitions in
-     prose.
+   - The `Book` library does **not** import `Shannon` or any `Shannon.*`
+     module. Lake places every transitive C object on the `generate-book`
+     link argv, and pulling Mathlib through `Shannon` pushes the macOS
+     command line past `ARG_MAX`. Chapters that need to render Lean code
+     use `subverso` highlight artifacts instead of direct imports.
    - Layout:
      - `Main.lean` at repo root: executable entry point; calls
        `manualMain (%doc Book) (config := config)` with `sourceLink` and
@@ -131,13 +145,14 @@ Tasks:
      lake exe generate-book --depth 2 --output _site
 
    serve: book ## Build and serve the book locally
-     python3 -m http.server 8000 --directory _site
+     uv run python -m http.server 8000 --directory _site/html-multi
    ```
 
    The two-step invocation (`lake build Book` then `lake exe generate-book`)
    mirrors reference-manual's pattern. `--depth 2` controls TOC granularity
-   (Parts and chapters expanded; sections collapsed by default). Output to
-   `_site/` at repo root; `.gitignore` it.
+   (Parts and chapters expanded; sections collapsed by default). The
+   rendered HTML lands in `_site/html-multi/`; `.gitignore` the `_site/`
+   directory.
 
    Update `bin/bootstrap-worktree` to also run `lake build Book` alongside
    `lake build Shannon` so fresh worktrees are book-ready.
@@ -158,7 +173,7 @@ Tasks:
 6. Testing.
    - `lake build Book` passes as a source-compile check.
    - `lake exe generate-book --depth 2 --output _site` produces a non-empty
-     `_site/index.html` and `_site/book/` tree.
+     `_site/html-multi/index.html` with per-chapter subdirectories.
    - `make check` still passes end-to-end.
    - Add `ShannonTest/Book.lean` with a single `example` that imports
      `Book` to catch import regressions without duplicating content tests.
