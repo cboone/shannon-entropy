@@ -20,16 +20,19 @@ A Lean 4 formalization of Shannon's 1948 finite-alphabet entropy characterizatio
 bin/bootstrap-worktree            # mandatory first-time setup (lake update + cache + build)
 make bootstrap                    # same as bin/bootstrap-worktree
 lake build Shannon                # build just the Shannon library
+lake build Book                   # build the Verso companion book sources
 lake build Shannon.Entropy.Core   # build a single module
 lake test                         # run the ShannonTest example suite
 lake lint                         # run batteries/runLinter over the Shannon library
 make build                        # lake build Shannon (guards against missing Mathlib cache)
+make book                         # render the companion book into `_site/html-multi/`
+make serve                        # build and serve the companion book locally
 make test                         # lake test
 make lean-lint                    # lake lint
 make check                        # markdown + spelling + lean-lint + build + test
 ```
 
-CI: `.github/workflows/ci.yml` runs two parallel jobs: a Lean job (build, lint, test via `leanprover/lean-action@v1`) and a Markdown/spelling job (markdownlint-cli2 + cspell).
+CI: `.github/workflows/ci.yml` runs three jobs: a Lean job (build, lint, test via `leanprover/lean-action@v1`), a Markdown/spelling job (markdownlint-cli2 + cspell), and a book job that builds `Book` and renders `_site/`.
 
 Lean toolchain: see `lean-toolchain` (currently v4.29.0).
 Mathlib version: see `lakefile.toml` (pinned to v4.29.0).
@@ -46,7 +49,7 @@ bin/bootstrap-worktree
 
 This is mandatory in every fresh clone or worktree. The script runs `lake update`,
 `lake exe cache get`, verifies that Mathlib's prebuilt artifacts exist, and only
-then runs `lake build Shannon`. Never bootstrap by running `lake build` directly
+then runs `lake build Shannon` and `lake build Book`. Never bootstrap by running `lake build` directly
 in a clean worktree or clone. Mathlib must always come from downloaded prebuilt
 artifacts, not a local source compilation.
 
@@ -57,6 +60,9 @@ or `bin/bootstrap-worktree` first.
 ## Module Layout
 
 - `Shannon.lean` -- project entrypoint (re-exports `Shannon.Entropy`)
+- `Book.lean` -- root Manual document for the companion book
+- `Main.lean` -- Verso executable entrypoint for rendering the companion book
+- `Book/` -- companion-book chapters written in the Verso Manual genre
 - `Shannon/Entropy.lean` -- facade import for all entropy modules
 - `Shannon/Entropy/Core.lean` -- foundations: probability distributions, axiom bundle, core constructions
 - `Shannon/Entropy/Uniform.lean` -- phase 1: equiprobable characterization
@@ -67,6 +73,10 @@ or `bin/bootstrap-worktree` first.
 - `Shannon/Entropy/Joint.lean` -- joint distributions, marginals, conditional entropy, chain rule
 - `Shannon/Entropy/Properties.lean` -- Section 6: deterministic iff, uniform iff, subadditivity, Schur-concavity
 - `Shannon/Entropy/Converse.lean` -- converse: `entropyNat` satisfies the Shannon axioms
+
+### Book Import Discipline
+
+Chapters under `Book/` must not `import Shannon` (or any `Shannon.*` module) directly. Lake links every transitive C object on the `generate-book` argv, and pulling Mathlib through `Shannon` pushes the macOS link command past `ARG_MAX` (~1 MB). Chapters that need to render Lean code should use `subverso` highlight artifacts instead of a direct import.
 
 ## Lean Conventions
 
@@ -95,6 +105,8 @@ make lint              # markdownlint + cspell
 make lint-markdown     # markdownlint only
 make lint-spelling     # cspell only
 make lean-lint         # lake lint (batteries/runLinter over the Shannon library)
+make book              # render the companion book HTML
+make serve             # serve the rendered companion book locally
 make test              # lake test (run the ShannonTest example suite)
 make check             # full pipeline: lint + lean-lint + build + test
 ```

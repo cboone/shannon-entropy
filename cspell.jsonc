@@ -5,6 +5,7 @@
   // proofread: Lean sources, configs, the license, shell scripts, lockfiles.
   "ignorePaths": [
     ".lake/**",
+    "_site/**",
     "**/*.lean",
     "**/*.toml",
     "**/*.json",

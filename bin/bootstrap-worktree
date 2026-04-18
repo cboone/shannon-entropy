@@ -28,14 +28,16 @@ function main() {
   print "Bootstrapping worktree in ${repo_root}"
 
   cd "${repo_root}"
-  print "[1/4] Running lake update"
+  print "[1/5] Running lake update"
   lake update
-  print "[2/4] Downloading prebuilt dependency artifacts with lake exe cache get"
+  print "[2/5] Downloading prebuilt dependency artifacts with lake exe cache get"
   lake exe cache get
-  print "[3/4] Verifying Mathlib prebuilt artifacts"
+  print "[3/5] Verifying Mathlib prebuilt artifacts"
   ensure_mathlib_cache_present "${mathlib_build_dir}"
-  print "[4/4] Building Shannon library"
+  print "[4/5] Building Shannon library"
   lake build Shannon
+  print "[5/5] Building Book library"
+  lake build Book
 }
 
 main "${@}"

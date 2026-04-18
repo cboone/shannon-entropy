@@ -25,8 +25,11 @@ hardwrapping
 hsupp
 lakefile
 latexmk
+Leanc
 leanprover
 logb
+MacKay
+manualMain
 Mathlib
 memoryless
 natbib
@@ -34,6 +37,7 @@ nocite
 nolints
 nonneg
 nonnegativity
+olean
 oleans
 Pandoc
 pandocciter
@@ -43,10 +47,14 @@ Schur
 shannontest
 simpa
 subadditivity
+subverso
 symm
 tendsto
 Tendsto
 tikz
+Verso
+VersoManual
+versowebcomponents
 workmux
 worktree
 worktrees
