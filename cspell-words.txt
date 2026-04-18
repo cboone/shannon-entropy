@@ -3,6 +3,7 @@ agnostically
 approximants
 backticked
 bibtex
+binentropy
 Brouwer
 cboone
 Chebyshev
@@ -20,6 +21,8 @@ Finset
 Fintype
 Frobenius
 frontmatter
+hcard
+hchain
 hident
 hrelab
 hsum
@@ -27,15 +30,20 @@ hardwrap
 hardwrapped
 hardwrapping
 hsupp
+kernelpushforward
+Kullback
 lakefile
 latexmk
 Leanc
 leanprover
+Leibler
+linarith
 logb
 MacKay
 manualMain
 Mathlib
 memoryless
+mutualinfo
 noncomputable
 natbib
 nocite
@@ -47,6 +55,8 @@ oleans
 Pandoc
 pandocciter
 pointwise
+pushforward
+Pushforward
 recursivity
 rpow
 Schur
@@ -57,6 +67,7 @@ subverso
 symm
 tendsto
 Tendsto
+termwise
 tikz
 Verso
 VersoManual
