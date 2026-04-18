@@ -31,13 +31,6 @@ example (p : ProbDist (Fin 3)) : entropyBits p ≤ Real.logb 2 (Fintype.card (Fi
   entropyBits_le_logb_two_card p
 
 example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
-    (hH : ShannonEntropyAxioms H) :
-    ∃ Kb : ℝ, 0 < Kb ∧
-      ∀ {α : Type} [Fintype α] (p : ProbDist α),
-        H p = -Kb * ∑ a, p a * Real.logb 2 (p a) :=
-  entropyBits_unique H hH
-
-example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
     (hH : ShannonEntropyAxioms H) {α : Type} [Fintype α] (p : ProbDist α) :
     H p = -(K H * Real.log 2) * ∑ a, p a * Real.logb 2 (p a) :=
-  entropyBits_unique_const H hH p
+  entropyBits_unique_eq H hH p

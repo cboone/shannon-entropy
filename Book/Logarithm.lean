@@ -32,7 +32,7 @@ Two choices of base are standard in the information-theory literature:
 The Lean counterparts of the base-parametric and base-2 forms of Theorem 2 are:
 
 - `entropyBase_unique` in `Shannon/Entropy/Final.lean`, the base-parametric restatement that makes the scaling explicit.
-- `entropyBits_unique` in `Shannon/Entropy/Bits.lean`, the base-2 specialization with existential constant, and `entropyBits_unique_const`, the tighter form that names the constant as `K H · Real.log 2`.
+- `entropyBits_unique` in `Shannon/Entropy/Bits.lean`, the base-2 specialization with existential constant, and `entropyBits_unique_eq`, the tighter form that names the constant as `K H · Real.log 2`.
 
 # Going Forward
 

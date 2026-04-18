@@ -20,7 +20,7 @@ the uniqueness theorems in base-2 units.
 - `entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`:
   base-2 counterparts of the single-variable bounds from `Gibbs`
 - `entropyBits_unique`: the base-2 restatement of `entropyBase_unique`
-- `entropyBits_unique_const`: same, with the constant named as `K H * Real.log 2`
+- `entropyBits_unique_eq`: same, with the constant named as `K H * Real.log 2`
 -/
 namespace Shannon
 
@@ -33,7 +33,7 @@ This is the primary public entropy API for Phase C and later. -/
 def entropyBits {α : Type} [Fintype α] (p : ProbDist α) : ℝ :=
   entropyBase 2 p
 
-/-- Definitional expansion of `entropyBits` in terms of `Real.logb 2`. -/
+/-- Definitional expansion of `entropyBits` in terms of `Real.logb 2`. Holds by `rfl` because `entropyBits p` unfolds through `entropyBase 2 p` directly to `-∑ a, p a * Real.logb 2 (p a)`. -/
 lemma entropyBits_def {α : Type} [Fintype α] (p : ProbDist α) :
     entropyBits p = -∑ a, p a * Real.logb 2 (p a) := rfl
 
@@ -78,7 +78,7 @@ theorem entropyBits_le_logb_two_card {α : Type} [Fintype α] [Nonempty α]
 /-- Base-2 uniqueness (tighter statement that names the constant):
 any `H` satisfying the Shannon axioms agrees with base-2 Shannon entropy
 scaled by `K H * Real.log 2`. -/
-theorem entropyBits_unique_const
+theorem entropyBits_unique_eq
     (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
     (hH : ShannonEntropyAxioms H)
     {α : Type} [Fintype α] (p : ProbDist α) :
