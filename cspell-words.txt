@@ -6,6 +6,7 @@ bibtex
 Brouwer
 cboone
 Chebyshev
+congr
 cleveref
 cooldown
 degenericize
@@ -19,6 +20,9 @@ Finset
 Fintype
 Frobenius
 frontmatter
+hident
+hrelab
+hsum
 hardwrap
 hardwrapped
 hardwrapping
@@ -32,6 +36,7 @@ MacKay
 manualMain
 Mathlib
 memoryless
+noncomputable
 natbib
 nocite
 nolints
@@ -42,6 +47,7 @@ oleans
 Pandoc
 pandocciter
 pointwise
+recursivity
 rpow
 Schur
 shannontest
