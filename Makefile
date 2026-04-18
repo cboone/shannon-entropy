@@ -10,6 +10,7 @@ book: _check-mathlib-cache ## Build the companion book HTML
 		exit 1; \
 	fi
 	rm -rf _site
+	lake build Book
 	lake exe generate-book --depth 2 --output _site
 
 serve: book ## Build and serve the book locally

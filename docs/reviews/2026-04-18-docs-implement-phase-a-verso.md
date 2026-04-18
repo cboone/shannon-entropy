@@ -1,9 +1,9 @@
 ## Branch Review: docs/implement-phase-a-verso
 
 Base: main (merge base: `ae68ffdb`)
-Commits: 2
-Files changed: 17 (5 added, 12 modified, 0 deleted, 0 renamed)
-Reviewed through: `7cf5f0c`
+Commits: 7
+Files changed: 18 (6 added, 12 modified, 0 deleted, 0 renamed)
+Reviewed through: `d081bdb`
 
 ### Summary
 
@@ -22,7 +22,7 @@ Implements Phase A of the Shannon proofs roadmap: a Verso Manual-genre companion
 
 #### CI
 
-- `.github/workflows/ci.yml`: adds a `book` job `needs: lean` that renders via `lake exe generate-book --depth 2 --output _site` and uploads `_site/html-multi` as an artifact.
+- `.github/workflows/ci.yml`: adds a `book` job `needs: lean` that runs `lake build Book` and then renders via `lake exe generate-book --depth 2 --output _site`, uploading `_site/html-multi` as an artifact.
 
 #### Book sources (new)
 
@@ -44,7 +44,7 @@ Implements Phase A of the Shannon proofs roadmap: a Verso Manual-genre companion
 
 ### File Inventory
 
-- **New (5):** `Main.lean`, `Book.lean`, `Book/Introduction.lean`, `Book/Bibliography.lean`, `ShannonTest/Book.lean`
+- **New (6):** `Main.lean`, `Book.lean`, `Book/Introduction.lean`, `Book/Bibliography.lean`, `ShannonTest/Book.lean`, `docs/reviews/2026-04-18-docs-implement-phase-a-verso.md`
 - **Modified (12):** `.github/workflows/ci.yml`, `.gitignore`, `AGENTS.md`, `Makefile`, `README.md`, `ShannonTest.lean`, `bin/bootstrap-worktree`, `cspell-words.txt`, `cspell.jsonc`, `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`, `lake-manifest.json`, `lakefile.toml`
 - **Deleted:** none
 - **Renamed:** none
@@ -58,22 +58,19 @@ Implements Phase A of the Shannon proofs roadmap: a Verso Manual-genre companion
 
 ### Plan Compliance
 
-**Verdict: Good compliance.** All seven numbered tasks in Phase A are implemented end to end, the Phase A smoke-check from the Verification section is wired up (Introduction + Bibliography both appear in the rendered `_site/html-multi/` tree observed locally), and the two documented deviations from the plan are either forced by a real platform constraint or an alignment with user-global tooling preferences. One concrete item from the plan is missing.
+**Verdict: Good compliance.** All seven numbered tasks in Phase A are implemented end to end, the Phase A smoke-check from the Verification section is wired up (Introduction + Bibliography both appear in the rendered `_site/html-multi/` tree observed locally), and the documented deviations from the plan are either forced by a real platform constraint or aligned with user-global tooling preferences.
 
-**Overall progress: 6/7 tasks fully done, 1/7 partially done. Roughly 90% of listed sub-bullets.**
+**Overall progress: 7/7 tasks fully done. All listed sub-bullets accounted for.**
 
 #### Done
 
-- **Task 1 (Verso dependency)**: `lakefile.toml:17-20` pins `verso` at `v4.29.0` with the one-line compatibility comment the plan asked for; `lake-manifest.json` records the resolved revision `7ae82ac2...`.
+- **Task 1 (Verso dependency)**: `lakefile.toml` pins `verso` at `v4.29.0` with the one-line compatibility comment the plan asked for; `lake-manifest.json` records the resolved revision `7ae82ac2...`.
+- **Task 2 (Scaffold)**: lean_lib and lean_exe are present; `Main.lean` and `Book.lean` follow the reference-manual pattern exactly; per-chapter modules live under `Book/`. `moreLeancArgs = ["-O0"]` is set at the package level in `lakefile.toml` per the plan (added in `ea95fb4`).
 - **Task 3 (Initial chapters)**: `Book/Introduction.lean` covers paper overview, fork relationship, scope (Appendix 2 + Section 6 Properties 1-6 done, Theorems 3-7 planned), reading order, and bootstrap/build invocations. `Book/Bibliography.lean` lists Shannon 1948 with DOI and both supporting references.
 - **Task 4 (Build targets)**: `Makefile` adds `book` (with the Verso-artifact guard the plan specified) and `serve`; `bin/bootstrap-worktree` adds `[5/5] Building Book library`; README documents both targets.
-- **Task 5 (CI)**: `.github/workflows/ci.yml` appends a `book` job with `needs: lean`, renders via `lake exe generate-book`, and uploads the artifact.
+- **Task 5 (CI)**: `.github/workflows/ci.yml` appends a `book` job with `needs: lean` that runs `lake build Book` and then `lake exe generate-book`, and uploads the artifact (explicit build step added in `de7e5dd`).
 - **Task 6 (Testing)**: `ShannonTest/Book.lean` adds the one-line `example` import smoke test; `cspell-words.txt` gains the Verso vocabulary the plan mentioned plus a few adjacent terms the scaffolding surfaced (`Leanc`, `olean`, `subverso`, `VersoManual`, `MacKay`).
 - **Task 7 (Documentation)**: AGENTS.md (the canonical source; `CLAUDE.md` is a symlink) gets an updated module layout and a new "Book Import Discipline" subsection; README gets a "Companion Book" section.
-
-#### Partially done
-
-- **Task 2 (Scaffold)**: lean_lib and lean_exe are present; `Main.lean` and `Book.lean` follow the reference-manual pattern exactly; per-chapter modules live under `Book/`. **What is missing**: the plan explicitly calls for `moreLeancArgs = ["-O0"]` at the package level in `lakefile.toml` ("reference-manual does this; the optimization cost exceeds the savings for doc builds"). `lakefile.toml` does not set this. It is a pure performance item, not a correctness one, but it is a named plan deliverable and should be either added or explicitly retracted.
 
 #### Not started
 
@@ -84,17 +81,16 @@ Implements Phase A of the Shannon proofs roadmap: a Verso Manual-genre companion
 1. **Book chapters must not import Shannon** (new invariant not in the plan). The plan's Task 2 says "The `Book` library depends transitively on `Shannon` so chapters can `import Shannon.Entropy.*` modules and reference their definitions in prose." The implementation does the opposite and prohibits this. **Assessment: reasonable and necessary.** The commit message documents the `ARG_MAX` failure mode on macOS concretely, the constraint is recorded in AGENTS.md and README.md (not just the commit), and a future-compatible cross-referencing path (subverso highlight artifacts) is named. The deviation should land in the plan document itself when it graduates from `todo/` so Phases B+ do not re-trip the same wire.
 2. **`make serve` uses `uv run python -m http.server`** instead of `python3` as the plan's sample Makefile snippet shows. **Assessment: reasonable.** Aligns with the user's global preference in `~/.claude/CLAUDE.md` ("Use `uv` to run Python scripts. Never use `python3` or `pip` directly.").
 3. **Output path shape**: plan's sample expected tree names `_site/index.html` and `_site/book/`; the actual Verso output is `_site/html-multi/index.html`. Makefile, README, and CI all consistently use `_site/html-multi`. **Assessment: the plan was inaccurate; implementation matches Verso's real layout.**
-4. **CI omits an explicit `lake build Book` step**. The `generate-book` executable builds the `Book` lib as a dependency, so the net effect is identical, but a separate build step would give clearer failure diagnostics when a rendering error masks a compile error. **Assessment: minor; defensible either way.**
-5. **CI artifact path** is `_site/html-multi` rather than the plan's `_site/`. **Assessment: correct adjustment to actual Verso layout.**
+4. **CI artifact path** is `_site/html-multi` rather than the plan's `_site/`. **Assessment: correct adjustment to actual Verso layout.**
 
 #### Fidelity concerns
 
 - The scope shrinkage on Task 3 (Foundations moved to Phase B) is written into the plan itself in d877edb and is fine.
-- The Introduction chapter says the book should be read "alongside `references/shannon1948-transcription.md`", but that file is not visible in the merge-base tree from this branch's vantage (no diff touches it). If the referenced file is not yet present on `main`, the reference will dangle until whoever authors the transcription commits it. Worth confirming before merge that the transcription already exists on `main`.
+- The Introduction chapter points readers at `references/shannon1948-transcription.md`. The file exists on `main` (committed alongside `references/shannon1948.pdf` and `references/shannon1948-summary.md`), so the cross-reference resolves.
 
 ### Code Quality Assessment
 
-**Overall: ready to merge after the `-O0` omission is resolved.** The scaffolding is small, internally consistent, and faithful to the reference-manual pattern it claims to follow. The ARG_MAX workaround is documented in the right places. Prose in the two chapters is accurate and appropriately minimal for a pipeline-proving Phase A.
+**Overall: ready to merge.** The scaffolding is small, internally consistent, and faithful to the reference-manual pattern it claims to follow. The ARG_MAX workaround is documented in the right places. Prose in the two chapters is accurate and appropriately minimal for a pipeline-proving Phase A. The `-O0`, explicit CI build step, and `htmlSplit` items flagged during the initial review pass all shipped in follow-up commits (`ea95fb4`, `de7e5dd`, `173091b`).
 
 #### Strengths
 
@@ -108,11 +104,13 @@ Implements Phase A of the Shannon proofs roadmap: a Verso Manual-genre companion
 
 #### Issues to address
 
-1. **Missing `moreLeancArgs = ["-O0"]`** at the package level in `lakefile.toml`. The plan explicitly identified this as a build-time optimization borrowed from reference-manual. Either add it and confirm book builds still pass, or explicitly decide to drop it (and note the decision in the plan's revision next time the plan is edited). Severity: low, but it is a named plan deliverable the scaffold skipped silently.
-2. **Introduction chapter's forward reference** to `references/shannon1948-transcription.md` should be verified to land before the book is published anywhere readers see it. If the transcription is not on `main` yet, either stage it or change the sentence to "as later chapters land" phrasing consistent with Bibliography.
+None open. The items raised in the initial review pass were all addressed before merge:
+
+1. ~~**Missing `moreLeancArgs = ["-O0"]`**~~: added at the package level in `lakefile.toml` by `ea95fb4`.
+2. ~~**Introduction chapter's forward reference** to `references/shannon1948-transcription.md`~~: verified present on `main` alongside `references/shannon1948.pdf`, so the cross-reference resolves.
 
 #### Suggestions (non-blocking)
 
-- **CI**: consider adding an explicit `lake build Book` step before `lake exe generate-book` in the book job. It gives a cleaner failure message when a Lean-level regression in a chapter masquerades as a render failure. Alternatively, drop both and just run `make book` so developers and CI exercise the same command.
-- **`htmlSplit := .never`** on the Introduction chapter keeps Introduction on the contents page. If that is the intent for all short meta-chapters, consider adding the same to Bibliography for consistency; if not, the difference is worth a one-line comment for a future reader.
-- **Plan graduation**: after this merges, the plan document should move from `docs/plans/todo/` to `docs/plans/done/` (matching existing projects' convention in this repo) or the plan should be updated in-place to mark Phase A complete and codify the `import Shannon` prohibition for Phases B+.
+- ~~**CI**: add an explicit `lake build Book` step before `lake exe generate-book` in the book job.~~ Shipped in `de7e5dd`.
+- ~~**`htmlSplit := .never`** on the Introduction chapter~~: dropped in `173091b`; Verso's default applies uniformly across both chapters.
+- **Plan graduation**: after this merges, the plan document should move from `docs/plans/todo/` to `docs/plans/done/` (matching existing projects' convention in this repo) or the plan should be updated in-place to mark Phase A complete and codify the `import Shannon` prohibition for Phases B+. The Phase A status line was updated in `759e72b`; the directory move remains.
