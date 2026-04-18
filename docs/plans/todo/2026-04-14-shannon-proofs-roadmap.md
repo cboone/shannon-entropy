@@ -277,6 +277,13 @@ Tasks:
    - `mutualInfo_self`: `I(X;X) = H(X)`
    - `mutualInfo_le_entropy`: `I(X;Y) ≤ min(H(X), H(Y))`
    - Also provide the base-2 variants `mutualInfoBits` via `entropyBits`.
+   - Along the way, add `entropyBits_prodDist`:
+     `entropyBits (prodDist p q) = entropyBits p + entropyBits q`, a one-line
+     consequence of `entropyNat_prodDist` and the
+     `entropyBits_eq_entropyNat_div_log_two` bridge. Called out in the Phase
+     B branch review (`docs/reviews/2026-04-18-chore-implement-phase-b.md`)
+     as a natural companion lemma to land with Phase C's first base-2
+     statements. Lives in `Shannon/Entropy/Bits.lean`, not `MutualInfo.lean`.
 2. New module `Shannon/Entropy/RelativeEntropy.lean`. Define a support
    predicate `Supports q p := ∀ a, 0 < p a → 0 < q a`. Define
    `relEntropy (p q : ProbDist α) : ℝ := ∑ a, p a * log (p a / q a)` (KL
