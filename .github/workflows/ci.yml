@@ -37,6 +37,9 @@ jobs:
 
       - uses: leanprover/lean-action@v1
 
+      - name: Build book sources
+        run: lake build Book
+
       - name: Render book HTML
         run: lake exe generate-book --depth 2 --output _site
 
