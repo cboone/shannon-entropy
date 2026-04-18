@@ -59,8 +59,7 @@ lemma Apos_mul
     simpa [p, q] using relabel_compose_uniform_eq_uniform_mul n m
   calc
     Apos H (n * m) = H (composeProb p q) := by
-      simp only [Apos, hident] at hrelab ⊢
-      exact hrelab
+      simpa [Apos] using (congrArg H hident.symm).trans hrelab
     _ = H p + (∑ a : Fin n, p a * H (q a)) := hgroup
     _ = H p + H (uniformPNat m) := by rw [hsum]
     _ = Apos H n + Apos H m := by simp [Apos, p]

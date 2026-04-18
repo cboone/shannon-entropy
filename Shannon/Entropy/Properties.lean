@@ -33,7 +33,7 @@ private lemma deterministic_of_all_zero_or_one {α : Type} [Fintype α]
     IsDeterministic p := by
   by_contra hnd
   unfold IsDeterministic at hnd
-  push_neg at hnd
+  push Not at hnd
   have hall0 : ∀ a, p a = 0 := by
     intro a
     cases h a with
@@ -103,7 +103,7 @@ theorem entropyNat_eq_log_card_iff {α : Type} [Fintype α] [Nonempty α]
     have hcard_pos : (0 : ℝ) < Fintype.card α := by exact_mod_cast Fintype.card_pos (α := α)
     have hcard_ne : (Fintype.card α : ℝ) ≠ 0 := ne_of_gt hcard_pos
     by_contra hne
-    push_neg at hne
+    push Not at hne
     obtain ⟨a₀, ha₀⟩ := hne
     have hlt : entropyNat p < Real.log (Fintype.card α) := by
       rw [entropyNat_eq_sum_negMulLog]
@@ -115,7 +115,7 @@ theorem entropyNat_eq_log_card_iff {α : Type} [Fintype α] [Nonempty α]
       -- Not all p_i equal: if all were equal to p(a₀), then p(a₀) = 1/|α|
       have hexists : ∃ k ∈ Finset.univ, (fun a => p a) a₀ ≠ (fun a => p a) k := by
         by_contra h_all_eq
-        push_neg at h_all_eq
+        push Not at h_all_eq
         have hall : ∀ k, p k = p a₀ := fun k => (h_all_eq k (Finset.mem_univ k)).symm
         have hsum : (∑ a, p a) = Fintype.card α * p a₀ := by
           simp_rw [hall]; rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
