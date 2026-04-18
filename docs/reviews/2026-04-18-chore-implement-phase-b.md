@@ -11,42 +11,42 @@ Phase B of the Shannon proofs roadmap. The branch adds a base-2 public API (`ent
 
 ### Changes by Area
 
-**Base-2 public API (Task 1)**
+#### Base-2 public API (Task 1)
 
 - New `Shannon/Entropy/Bits.lean` defines `entropyBits p := entropyBase 2 p`, a bridge to `entropyNat` (`entropyBits_eq_entropyNat_div_log_two`, `entropyNat_eq_entropyBits_mul_log_two`), base-2 analogues of the single-variable bounds (`entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`), and base-2 restatements of uniqueness (`entropyBits_unique` existential form, `entropyBits_unique_const` with `K H * Real.log 2` named).
 - `Shannon/Entropy.lean` facade updated to import `Bits` and advertise the base-2 API; module-chain diagram shows `Bits` as a second leaf parallel to `Converse`.
 - Files: `Shannon/Entropy/Bits.lean` (new), `Shannon/Entropy.lean`.
 
-**Conditional-entropy Shannon form (Task 3)**
+#### Conditional-entropy Shannon form (Task 3)
 
 - `condEntropy_eq_shannon_form` added to `Shannon/Entropy/Joint.lean`, reshaping the `∑ ab` single-sum into the `∑ i, ∑ j` double-sum form Shannon uses in the defining equation of Property 5.
 - Files: `Shannon/Entropy/Joint.lean`.
 
-**Shannon narrative docstrings (Task 2)**
+#### Shannon narrative docstrings (Task 2)
 
 - `Uniform.lean`, `Rational.lean`, `Approx.lean`, `Final.lean` each gain a "Shannon narrative" docstring section citing Shannon 1948 by page and pointing at the corresponding Lean identifiers (`Apos_mul`, `Apos_pow`, `Apos_eq_K_mul_log`, `grouping_on_rational_counts`, `workedCompose`, `approxProb`, `entropyNat_unique`).
 - Files: `Shannon/Entropy/{Uniform, Rational, Approx, Final}.lean`.
 
-**Upstream stylistic sync (Task 4)**
+#### Upstream stylistic sync (Task 4)
 
 - Commit 90f85c7 moved `Properties.lean` (`push Not` to `push_neg`), `Uniform.lean` (`Apos_mul` calc head), and `Rational.lean` (`grouping_on_rational_counts` sum-congr body) toward upstream tactic style. Commit 761db70 subsequently reverted `Properties.lean` back to `push Not at _` (because Mathlib v4.29 marks `push_neg` as deprecated in favor of `push Not`) and rewrote `Rational.lean`/`Uniform.lean` to different forms again. See Plan Compliance for the intent gap.
 - Files: `Shannon/Entropy/{Properties, Uniform, Rational}.lean`.
 
-**Verso book chapters (Task 6)**
+#### Verso book chapters (Task 6)
 
 - New chapters `Book/AxiomaticEntropy.lean` (three axioms, equiprobable case, rational case, continuity extension, Theorem 2), `Book/Properties.lean` (Section 6 Properties 1-6 with Lean theorem names and proof sketches), `Book/Logarithm.lean` (scale constant `K`, base choice / bits vs nats, `entropyBits_unique`).
 - `Book.lean` and `Book/Introduction.lean` updated to include the chapters in reading order.
 - All three chapters comply with the Phase A "no `import Shannon`" rule; identifiers are referenced by backticks only.
 - Files: `Book.lean`, `Book/Introduction.lean`, `Book/AxiomaticEntropy.lean` (new), `Book/Properties.lean` (new), `Book/Logarithm.lean` (new).
 
-**Tests (Task 5)**
+#### Tests (Task 5)
 
 - New `ShannonTest/Entropy/Bits.lean` covers `entropyBits (uniformPNat 2) = 1`, `entropyBits (uniformPNat 4) = 2`, the natural-log bridge, nonnegativity, the card bound, and both uniqueness forms (existential and named-constant).
 - Existing test files extended: `Uniform.lean` (`Apos_pow n = 4` equality), `Rational.lean` (flat `(1/2, 1/3, 1/6)` direct `entropyNat_of_rational_counts` plus an exact `entropyNat` value), `Gibbs.lean` (concrete non-equal `(1/4, 3/4)` Gibbs pair plus an exact sum), `Final.lean` (`entropyBits_unique` example), `Joint.lean` (`condEntropy_eq_shannon_form` example).
 - `ShannonTest/Entropy.lean` aggregator imports the new `Bits` test module.
 - Files: `ShannonTest/Entropy.lean`, `ShannonTest/Entropy/Bits.lean` (new), `ShannonTest/Entropy/{Uniform, Rational, Gibbs, Joint, Final}.lean`.
 
-**Documentation / supporting (Tasks 7, 8)**
+#### Documentation / supporting (Tasks 7, 8)
 
 - `references/shannon1948-transcription.md`: extended Property 5 entry and added Theorem 2 base-2 entry.
 - `AGENTS.md`: added `Bits.lean` to module layout with a one-liner on the `entropyBits` / `entropyNat` public-vs-internal split.
