@@ -1,5 +1,4 @@
 import Shannon.Entropy.Bits
-import Shannon.Entropy.Converse
 
 /-!
 # Shannon Entropy: Bits Tests

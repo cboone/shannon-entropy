@@ -71,11 +71,7 @@ lemma grouping_on_rational_counts
     simpa [q] using relabel_compose_rational_eq_uniform p n hpos N hN hp e
   have hsumA :
       (∑ a, p a * H (q a))
-        = ∑ a, p a * Apos H ⟨n a, hpos a⟩ := by
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    show p a * H (uniformPNat ⟨n a, hpos a⟩) = p a * H (uniformPNat ⟨n a, hpos a⟩)
-    rfl
+        = ∑ a, p a * Apos H ⟨n a, hpos a⟩ := rfl
   calc
     Apos H ⟨N, hN⟩ = H (composeProb p q) := by
       simpa [Apos, hident] using hrelab

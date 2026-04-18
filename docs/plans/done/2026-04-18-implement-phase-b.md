@@ -60,7 +60,7 @@ Lemmas:
 Corollaries of existing uniqueness theorems (new names; keep old names untouched):
 
 - `entropyBits_unique` : for `H` satisfying `ShannonEntropyAxioms`, there exists `Kb > 0` with `H p = -Kb * ∑ a, p a * Real.logb 2 (p a)` for every `p`. Obtained by invoking `entropyBase_unique H hH 2 (by norm_num : (1:ℝ) < 2)`.
-- `entropyBits_unique_const` (tighter statement that names the constant): `H p = -(K H * Real.log 2) * ∑ a, p a * Real.logb 2 (p a)`. Follows the `entropyBase_unique` proof inlined with `b := 2`.
+- `entropyBits_unique_eq` (tighter statement that names the constant; originally drafted as `entropyBits_unique_const`, renamed in commit `bc31a19`): `H p = -(K H * Real.log 2) * ∑ a, p a * Real.logb 2 (p a)`. Follows the `entropyBase_unique` proof inlined with `b := 2`.
 
 Facade update in `Shannon/Entropy.lean`:
 

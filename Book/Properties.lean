@@ -35,7 +35,7 @@ The independent-case equality is witnessed by `entropyNat_prodDist` in `Shannon/
 
 # Property 4: Schur-Concavity
 
-Shannon states that averaging two probabilities decreases uncertainty: if `p'_i = ∑ A_{ij} p_j` for a doubly stochastic matrix `A`, then `H(p') ≥ H(p)`.
+Shannon states that averaging two probabilities increases uncertainty: if `p'_i = ∑ A_{ij} p_j` for a doubly stochastic matrix `A`, then `H(p') ≥ H(p)`.
 The Lean statement is `entropyNat_doublyStochastic_le` in `Shannon/Entropy/Properties.lean`.
 The proof applies Jensen's inequality for `Real.negMulLog` row-by-row with weights `A_{ij}`, then sums over rows and uses column-stochasticity (`∑_i A_{ij} = 1`) to collapse the left-hand side.
 
