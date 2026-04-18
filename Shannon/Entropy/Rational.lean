@@ -9,6 +9,12 @@ This module derives the entropy formula for distributions of the form
 `p_i = n_i / N` via grouped equiprobable refinement and the grouping axiom.
 It also includes a worked decomposition corresponding to Shannon's
 `(1/2, 1/3, 1/6)` narrative.
+
+## Shannon narrative (Appendix 2, p. 49)
+
+Shannon lifts the equiprobable formula to any rational distribution `p_i = n_i / N` by refinement: starting from a uniform distribution on `N` equiprobable outcomes, group those outcomes into `|α|` blocks of sizes `n_1, ..., n_{|α|}` and observe that the two-stage choice (pick a block, then pick within the block uniformly) recovers a uniform on `N` outcomes up to relabelling. Applying the grouping axiom, relabel invariance, and the Phase 1 logarithmic formula `A(k) = K log k` then rearranges into `H p = -K ∑ p_i log p_i`. Our counterparts are `grouping_on_rational_counts` (the rearrangement) feeding `entropyNat_of_rational_counts` (the rational-case formula).
+
+Shannon motivates the construction with a `(1/2, 1/3, 1/6)` example (p. 49) shown as a two-stage tree: first a fair coin for `{true, false}`, then a `(2/3, 1/3)` split on the `false` branch. Our worked counterparts are `workedP`, `workedQ`, `workedCompose`, `workedCompose_masses` (pinning the three outcome masses to `1/2`, `1/3`, `1/6`), and `worked_grouping_identity` for the grouping identity on this concrete tree.
 -/
 namespace Shannon
 

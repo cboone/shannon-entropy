@@ -8,6 +8,10 @@ Final theorem layer.
 Combines the rational characterization and continuity extension to prove:
 - natural-log uniqueness (`entropyNat_unique`);
 - base-parametric uniqueness (`entropyBase_unique`).
+
+## Shannon narrative (Appendix 2, closing paragraph, p. 49)
+
+This module states Shannon's **Theorem 2** (the uniqueness statement advertised at the top of Section 6 and proved across Appendix 2, pp. 48-49): any functional `H` satisfying the three axioms of continuity, monotonicity on uniforms, and grouping must be of the form `H p = -K ∑ p_i log p_i` for some positive constant `K`. The base-parametric restatement `entropyBase_unique` shows the constant rescales with the logarithm base, anchoring the "base choice = unit choice" reading that Shannon stresses in Section 1. The base-2 specialization lives in `Shannon/Entropy/Bits.lean`. The corresponding transcription entries are in `references/shannon1948-transcription.md` under the `## Formalization Cross-References` section.
 -/
 namespace Shannon
 
