@@ -56,3 +56,22 @@ example :
 example :
     entropyNat workedCompose = entropyNat workedP + (1 / 2 : ℝ) * entropyNat (workedQ false) :=
   worked_grouping_identity entropyNat entropyNat_shannonAxioms
+
+/-- Numeric complement to the `workedCompose` tree: `entropyNat_of_rational_counts`
+instantiated on the flat `(1/2, 1/3, 1/6)` distribution with counts `(3, 2, 1)`
+summing to `N = 6`. -/
+example :
+    let p : ProbDist (Fin 3) :=
+      ⟨![1/2, 1/3, 1/6], by
+        refine ⟨fun i => ?_, ?_⟩
+        · fin_cases i <;> norm_num
+        · simp [Fin.sum_univ_three]; norm_num⟩
+    entropyNat p = -K entropyNat * ∑ a, p a * Real.log (p a) := by
+  intro p
+  refine entropyNat_of_rational_counts
+      entropyNat entropyNat_shannonAxioms
+      p (fun i : Fin 3 => ![3, 2, 1] i)
+      (fun i => by fin_cases i <;> decide)
+      6 (by decide) (by decide) ?_
+  intro a
+  fin_cases a <;> simp [p] <;> norm_num

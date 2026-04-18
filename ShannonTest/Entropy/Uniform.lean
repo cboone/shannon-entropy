@@ -36,3 +36,8 @@ example : Apos entropyNat 2 ≤ Apos entropyNat 4 :=
 example :
     Apos entropyNat 3 = (K entropyNat * Real.log 10) * Real.logb 10 3 :=
   Apos_eq_K_mul_logb entropyNat entropyNat_shannonAxioms 10 (by norm_num) 3
+
+example : Apos entropyNat 4 = 2 * Apos entropyNat 2 := by
+  have h : (4 : ℕ+) = 2 ^ 2 := rfl
+  have := Apos_pow entropyNat entropyNat_shannonAxioms 2 2
+  rw [h]; exact_mod_cast this
