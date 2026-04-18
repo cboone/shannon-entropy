@@ -103,12 +103,29 @@ Requirements:
 Commands:
 
 ```bash
-lake build
+bin/bootstrap-worktree
+lake build Shannon
+lake build Book
+make test
+make check
+make book
 ```
 
 CI workflow:
 
-- `.github/workflows/lean_action_ci.yml` (`Lean Action CI`)
+- `.github/workflows/ci.yml`
+
+## Companion Book
+
+The repository includes a Verso companion book, `Shannon 1948: A Formalization Companion`, that grows alongside the Lean development.
+
+- `make book` renders the HTML book into `./_site/html-multi/`.
+- `make serve` builds the book and serves it locally at `http://localhost:8000/`.
+- `lake build Book` is a compile-only check for the book sources, useful when iterating on prose without rendering.
+
+Book chapters must not `import Shannon` directly. The `generate-book` executable links every transitive C object on its argv, and pulling Mathlib through `Shannon` pushes the macOS link command past `ARG_MAX`. Future chapters that need to render Lean code will use `subverso` highlight artifacts instead of a direct import.
+
+The book's Phase A scaffold currently includes an introduction and bibliography chapter. Later roadmap phases add technical chapters in lockstep with the formalization.
 
 ## Notes on Axioms
 

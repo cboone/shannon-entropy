@@ -28,6 +28,8 @@ latexmk
 Leanc
 leanprover
 logb
+MacKay
+manualMain
 Mathlib
 memoryless
 natbib
@@ -45,11 +47,13 @@ Schur
 shannontest
 simpa
 subadditivity
+subverso
 symm
 tendsto
 Tendsto
 tikz
 Verso
+VersoManual
 versowebcomponents
 workmux
 worktree

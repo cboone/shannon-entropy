@@ -14,9 +14,21 @@ name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
 rev = "8a178386ffc0f5fef0b77738bb5449d50efeea95"  # v4.29.0
 
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso.git"
+rev = "v4.29.0"  # verified compatible with Mathlib v4.29.0 via `lake update`
+
 [[lean_lib]]
 name = "Shannon"
 
 [[lean_lib]]
+name = "Book"
+
+[[lean_lib]]
 name = "ShannonTest"
 globs = ["ShannonTest.+"]
+
+[[lean_exe]]
+name = "generate-book"
+root = "Main"
