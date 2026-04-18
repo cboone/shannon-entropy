@@ -6,7 +6,6 @@ open Verso.Genre.Manual.InlineLean
 #doc (Manual) "Introduction" =>
 %%%
 tag := "introduction"
-htmlSplit := .never
 %%%
 
 This repository formalizes Shannon's finite-alphabet entropy characterization theorem from Appendix 2 of _A Mathematical Theory of Communication_ and the Section 6 properties that currently depend on it.
