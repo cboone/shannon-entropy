@@ -46,6 +46,18 @@ The central result is:
 - `chain_rule`: H(X,Y) = H(X) + H_X(Y) in `Shannon/Entropy/Joint.lean`
 - `entropyNat_prodDist`: H(X×Y) = H(X) + H(Y) in `Shannon/Entropy/Joint.lean`
 
+### Base-2 Public API
+
+`entropyBits` is the primary public entropy API from Phase C onward;
+`entropyNat` remains the internal natural-log workhorse used throughout the
+Appendix 2 characterization proof.
+
+- `entropyBits`: base-2 Shannon entropy in `Shannon/Entropy/Bits.lean`
+- `entropyBits_eq_entropyNat_div_log_two`: bridge to the natural-log form in `Shannon/Entropy/Bits.lean`
+- `entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`: base-2 counterparts of the single-variable bounds in `Shannon/Entropy/Bits.lean`
+- `entropyBits_unique`: base-2 restatement of `entropyBase_unique` in `Shannon/Entropy/Bits.lean`
+- `entropyBits_unique_eq`: same, with the constant named as `K H * Real.log 2` in `Shannon/Entropy/Bits.lean`
+
 ## Module Layout
 
 - `Shannon/Entropy/Core.lean`
@@ -66,6 +78,8 @@ The central result is:
   Section 6 properties: deterministic iff, uniform iff, subadditivity, Schur-concavity, conditioning.
 - `Shannon/Entropy/Converse.lean`
   Converse: `entropyNat` satisfies the Shannon axioms, completing the iff characterization.
+- `Shannon/Entropy/Bits.lean`
+  Base-2 public API: `entropyBits`, natural-log bridge, and base-2 uniqueness theorems.
 - `Shannon/Entropy.lean`
   Facade import.
 - `Shannon.lean`
@@ -86,6 +100,7 @@ If you want to read this like a paper:
 7. Read `Shannon/Entropy/Joint.lean` for joint distributions and the chain rule.
 8. Read `Shannon/Entropy/Properties.lean` for the Section 6 entropy properties.
 9. Read `Shannon/Entropy/Converse.lean` for the proof that `entropyNat` satisfies the axioms.
+10. Read `Shannon/Entropy/Bits.lean` for the base-2 public API (`entropyBits`) and its uniqueness restatement.
 
 For pedagogical context, see the worked decomposition theorem in
 `Shannon/Entropy/Rational.lean`:
@@ -125,7 +140,7 @@ The repository includes a Verso companion book, `Shannon 1948: A Formalization C
 
 Book chapters must not `import Shannon` directly. The `generate-book` executable links every transitive C object on its argv, and pulling Mathlib through `Shannon` pushes the macOS link command past `ARG_MAX`. Future chapters that need to render Lean code will use `subverso` highlight artifacts instead of a direct import.
 
-The book's Phase A scaffold currently includes an introduction and bibliography chapter. Later roadmap phases add technical chapters in lockstep with the formalization.
+The book currently includes an introduction, a chapter on the axiomatic entropy characterization, a chapter on the Section 6 properties, a chapter on the logarithm law, and a bibliography. Later roadmap phases add further technical chapters in lockstep with the formalization.
 
 ## Notes on Axioms
 
