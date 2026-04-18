@@ -25,7 +25,7 @@ Deliver five things in one branch:
 2. Shannon-narrative docstrings on the Appendix 2 modules, with explicit page references to Shannon 1948.
 3. A `condEntropy_eq_shannon_form` lemma that anchors the Lean conditional entropy definition to the summation form Shannon uses in Property 5.
 4. Upstream stylistic sync for three modules, so a future upstream PR has a minimum-diff footprint.
-5. Three new Verso chapters (`AxiomaticEntropy`, `Properties`, `Logarithm`) covering all currently-formalized material, plus the corresponding test additions.
+5. Three new Verso chapters (`AxiomaticEntropy`, `Properties`, `Logarithm`) covering the currently-formalized Appendix 2 and Section 6 material, plus the corresponding test additions.
 
 Non-goals (reserved for Phase C+): mutual-information/KL-divergence primitives, i.i.d. AEP, finite-state source machinery.
 
@@ -35,7 +35,7 @@ Non-goals (reserved for Phase C+): mutual-information/KL-divergence primitives, 
 
 Create `Shannon/Entropy/Bits.lean`:
 
-- Imports `Shannon.Entropy.Final` (which provides `entropyBase`, `entropyBase_unique`, `K`, `K_pos`).
+- Imports `Shannon.Entropy.Gibbs` and `Shannon.Entropy.Final`. `Final` provides `entropyBase`, `entropyBase_unique`, `K`, and `K_pos`; `Gibbs` provides the single-variable lemmas (`entropyNat_nonneg`, `entropyNat_uniformPNat`, `entropyNat_le_log_card`) that the Phase B base-2 bridge lemmas reuse.
 - `namespace Shannon`, `noncomputable section`.
 - Module docstring describing `entropyBits` as the base-2 specialization, the primary public entropy API going forward, while `entropyNat` stays as the internal natural-log workhorse.
 
@@ -65,11 +65,11 @@ Corollaries of existing uniqueness theorems (new names; keep old names untouched
 Facade update in `Shannon/Entropy.lean`:
 
 - Add `import Shannon.Entropy.Bits`.
-- Update the module-chain diagram in the docstring to place `Bits` as a leaf after `Final`:
+- Update the module-chain diagram in the docstring to place `Bits` as a leaf after `Gibbs`, reflecting the actual import path for the Phase B bridge lemmas:
 
   ```
   Core → Uniform → Rational → Approx → Final → Gibbs → Joint → Properties
-                                           ↘ Bits
+                                                    ↘ Bits
                                            ↘ Converse
   ```
 
@@ -125,7 +125,7 @@ One commit for the sync, separate from the Phase B content commits, so a future 
 
 ### 5. Testing
 
-The ShannonTest mirror must remain complete. Phase B's test surface adds exactly one new file (`ShannonTest/Entropy/Bits.lean`) and extends three existing files.
+The ShannonTest mirror must remain complete. Phase B's test surface adds exactly one new file (`ShannonTest/Entropy/Bits.lean`) and extends five existing entropy test files, plus the `ShannonTest/Entropy.lean` aggregator.
 
 New: `ShannonTest/Entropy/Bits.lean`
 
@@ -182,6 +182,8 @@ Sections (approximate):
 - "Continuity Extension": `approxProb`, `tendsto_approxProb`. Cite `Shannon/Entropy/Approx.lean`.
 - "Theorem 2": the final statement `entropyNat_unique` and its base-parametric form `entropyBase_unique`. Cite `Shannon/Entropy/Final.lean`.
 
+This chapter subsumes the older roadmap placeholder name `Foundations`; no separate `Book/Foundations.lean` file is planned for Phase B.
+
 New: `Book/Properties.lean`
 
 Sections, in transcription order:
@@ -202,6 +204,8 @@ Sections:
 - "The Scale Constant `K`": Shannon's proof delivers `H p = -K ∑ p_i log p_i` for an implementation-defined positive `K`; changing the logarithm base changes `K`. Reference `K`, `K_pos` from `Shannon/Entropy/Uniform.lean`.
 - "Base Choice": discuss natural log (nats, `entropyNat`), base 2 (bits, `entropyBits`), base e vs base 2 as conventions in the literature; reference `entropyBase_unique` in `Shannon/Entropy/Final.lean` as the base-parametric statement, and `entropyBits_unique` in `Shannon/Entropy/Bits.lean` as its base-2 specialization.
 - "Going Forward": signal that Phase C onward will state results in bits via `entropyBits`.
+
+The converse theorem `entropyNat_shannonAxioms` remains part of the Lean public surface in Phase B, but it is not one of the Shannon-paper-facing narrative targets for these three chapters. The book scope here is Appendix 2, Section 6 Properties 1-6, and the new base-2 API layer.
 
 Update `Book.lean` (root document) to include the new chapters in reading order, between Introduction and Bibliography:
 

@@ -130,8 +130,8 @@ Tasks:
    - `Book/Bibliography.lean`: Shannon 1948 with DOI, supporting references
      (Cover and Thomas, MacKay).
 
-   Foundations moves to Phase B, grouped with `AxiomaticEntropy`, to avoid
-   splitting the axiomatic content across phases.
+   The earlier `Foundations` placeholder is folded into `AxiomaticEntropy` in
+   Phase B, to avoid splitting the axiomatic content across phases.
 
 4. Build targets.
 
@@ -230,8 +230,10 @@ Tasks:
    (`push Not` → `push_neg`; `simp only … rw …` → `simpa …`). Bring these
    over in one commit so a future upstream PR has a clean diff.
 5. Testing.
-   - New test files: `ShannonTest/Entropy/Uniform.lean`,
-     `ShannonTest/Entropy/Rational.lean`, `ShannonTest/Entropy/Gibbs.lean`,
+   - `ShannonTest/Entropy/Uniform.lean`,
+     `ShannonTest/Entropy/Rational.lean`, and
+     `ShannonTest/Entropy/Gibbs.lean` were added in the 2026-04-14 test
+     backfill; Phase B extends those files and adds the new
      `ShannonTest/Entropy/Bits.lean`.
    - Cases to exercise: `Apos_mul` on concrete `n, m`; `Apos_eq_K_mul_log`
      on `n = 4` equal to `2 · Apos H 2`; `entropyNat_of_rational_counts` on
@@ -540,7 +542,7 @@ New, to create:
   Bibliography}.lean`, `ShannonTest/Book.lean`
 - Phase B: `Shannon/Entropy/Bits.lean`,
   `ShannonTest/Entropy/{Uniform, Rational, Gibbs, Bits}.lean`,
-  `Book/{Foundations, AxiomaticEntropy, Properties, Logarithm}.lean`
+  `Book/{AxiomaticEntropy, Properties, Logarithm}.lean`
 - Phase C: `Shannon/Entropy/{MutualInfo, RelativeEntropy}.lean`,
   `ShannonTest/Entropy/{MutualInfo, RelativeEntropy}.lean`,
   `Book/{MutualInformation, RelativeEntropy, FanoInequality}.lean`
@@ -602,7 +604,7 @@ when iterating):
 - Phase A: `lake build Book` succeeds as a source-compile check;
   `make book` generates non-empty rendered output under `_site/`; the
   book's table of contents lists the Introduction and Bibliography
-  chapters (Foundations lands in Phase B).
+  chapters (`AxiomaticEntropy` lands in Phase B).
 - Phase B: `entropyBits (uniformPNat 2) = 1`;
   `entropyBits (uniformPNat 4) = 2`; Shannon's worked `(1/2, 1/3, 1/6)`
   example computes to the expected value in the new test file.
