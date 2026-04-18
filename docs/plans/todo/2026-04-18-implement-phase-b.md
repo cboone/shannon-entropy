@@ -35,7 +35,7 @@ Non-goals (reserved for Phase C+): mutual-information/KL-divergence primitives, 
 
 Create `Shannon/Entropy/Bits.lean`:
 
-- Imports `Shannon.Entropy.Gibbs` and `Shannon.Entropy.Final`. `Final` provides `entropyBase`, `entropyBase_unique`, `K`, and `K_pos`; `Gibbs` provides the single-variable lemmas (`entropyNat_nonneg`, `entropyNat_uniformPNat`, `entropyNat_le_log_card`) that the Phase B base-2 bridge lemmas reuse.
+- Imports `Shannon.Entropy.Gibbs`. `Gibbs` already imports `Shannon.Entropy.Final` (which in turn imports `Approx → Rational → Uniform`), so a single `import Shannon.Entropy.Gibbs` transitively provides everything `Bits` needs: `entropyBase`, `K`, and `K_pos` from `Uniform.lean`; `entropyBase_unique` from `Final.lean`; and the single-variable lemmas (`entropyNat_nonneg`, `entropyNat_uniformPNat`, `entropyNat_le_log_card`) from `Gibbs.lean` that the Phase B base-2 bridge lemmas reuse.
 - `namespace Shannon`, `noncomputable section`.
 - Module docstring describing `entropyBits` as the base-2 specialization, the primary public entropy API going forward, while `entropyNat` stays as the internal natural-log workhorse.
 
@@ -65,12 +65,12 @@ Corollaries of existing uniqueness theorems (new names; keep old names untouched
 Facade update in `Shannon/Entropy.lean`:
 
 - Add `import Shannon.Entropy.Bits`.
-- Update the module-chain diagram in the docstring to place `Bits` as a leaf after `Gibbs`, reflecting the actual import path for the Phase B bridge lemmas:
+- Update the module-chain diagram in the docstring to place `Bits` as a leaf after `Gibbs`, parallel to the existing `Converse` branch. `Converse` already branches off `Gibbs` (see `Shannon/Entropy/Converse.lean:1`, `import Shannon.Entropy.Gibbs`), and the current diagram places it there; the Phase B update adds `Bits` as a second leaf at the same level:
 
   ```
   Core → Uniform → Rational → Approx → Final → Gibbs → Joint → Properties
+                                                    ↘ Converse
                                                     ↘ Bits
-                                           ↘ Converse
   ```
 
 - Extend the "Import this file to access..." bullet list with "base-2 API: `entropyBits`, `entropyBits_unique`".
@@ -116,8 +116,8 @@ No rename or change to the existing `condEntropy` definition. No new namespace.
 Apply three point changes so `HEAD` matches `upstream/main` on tactic style for these files. `git diff upstream/main..HEAD -- Shannon/Entropy/{Uniform, Rational, Properties}.lean` confirms exactly these sites:
 
 - `Shannon/Entropy/Properties.lean`: three `push Not at <h>` → `push_neg at <h>` (lines around 36, 106, 118 in the current file).
-- `Shannon/Entropy/Uniform.lean`: in `Apos_mul`, replace the three-line `simp only [Apos]; rw [hident] at hrelab; exact hrelab` with upstream's `simpa [Apos, hident] using hrelab` (~lines 55-58).
-- `Shannon/Entropy/Rational.lean`: in `grouping_on_rational_counts`, replace the three-line `simp only [Apos]; rw [hident] at hrelab; exact hrelab` with `simpa [Apos, hident] using hrelab` (~lines 72-76). Also replace the `congr 1` inside `hsumA` with upstream's `simp [Apos, q]` (~line 70).
+- `Shannon/Entropy/Uniform.lean`: in `Apos_mul`, replace the three-line `simp only [Apos]; rw [hident] at hrelab; exact hrelab` with upstream's two-line form `simp [Apos, hident] at hrelab ⊢` followed by `exact hrelab` (~lines 55-58). Note that upstream does _not_ collapse these into a single `simpa ... using hrelab`; the goal-and-hypothesis `simp ... at hrelab ⊢` form is what `git diff upstream/main..HEAD -- Shannon/Entropy/Uniform.lean` flags.
+- `Shannon/Entropy/Rational.lean`: in `grouping_on_rational_counts`, replace the three-line `simp only [Apos]; rw [hident] at hrelab; exact hrelab` with `simpa [Apos, hident] using hrelab` (~lines 72-76). This file _does_ use the one-line `simpa` form upstream; the site is distinct from the `Uniform.lean` one above despite the visible similarity. Also replace the `congr 1` inside `hsumA` with upstream's `simp [Apos, q]` (~line 70).
 
 Do _not_ revert the `Properties.lean` Property 5 / Property 6 header / docstring renumbering. That renumbering is intentional and aligns with the transcription; it is a correctness improvement, not stylistic drift. The roadmap explicitly scopes this task to tactic style.
 
@@ -154,7 +154,7 @@ example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
   entropyBits_unique H hH
 ```
 
-The `entropyBits (uniformPNat 4) = 2` goal does need actual proof, not `sorry`; the placeholder above marks the spot. Expected approach: rewrite `(4 : ℝ) = 2^2` and apply `Real.logb_pow` (or `Real.logb_rpow`) plus `Real.logb_self`.
+The `entropyBits (uniformPNat 4) = 2` goal does need actual proof, not `sorry`; the placeholder above marks the spot. Expected approach: rewrite `(4 : ℝ) = 2^2` and apply `Real.logb_pow` (or `Real.logb_rpow`) plus `Real.logb_self`. Verify exact Mathlib names (`Real.logb_self_eq_one`, `Real.logb_pow`, `Real.logb_rpow`) against the pinned Mathlib v4.29.0 at implementation time; if any have been renamed or moved, grep `.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Log/` for the current canonical name rather than inventing a local wrapper.
 
 Extensions to existing test files:
 
