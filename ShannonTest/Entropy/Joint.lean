@@ -47,3 +47,8 @@ example : mutualInfo (prodDist (uniformPNat 2) (uniformPNat 1)) = 0 := by
   have h1 : entropyNat (uniformPNat 1) = 0 := by
     simpa using entropyNat_uniformPNat 1
   linarith
+
+example :
+    let p := prodDist (uniformPNat 2) (uniformPNat 3)
+    condEntropy p = -∑ a, ∑ b, p (a, b) * Real.log (p (a, b) / marginalFst p a) :=
+  condEntropy_eq_shannon_form _

@@ -124,6 +124,17 @@ theorem marginalSnd_prodDist {α β : Type} [Fintype α] [Fintype β]
 
 /-! ## Chain rule -/
 
+/-- Shannon's Property 5 form: the conditional entropy unfolds to the double
+sum `-∑_i ∑_j p(i, j) log p_i(j)` with `p_i(j) = p(i, j) / p_X(i)`. Ties the
+Lean definition of `condEntropy` to the summation form Shannon writes in the
+defining equation of Property 5 (Section 6, pp. 11-12). -/
+theorem condEntropy_eq_shannon_form
+    {α β : Type} [Fintype α] [Fintype β] (p : ProbDist (α × β)) :
+    condEntropy p
+      = -∑ a, ∑ b, p (a, b) * Real.log (p (a, b) / marginalFst p a) := by
+  unfold condEntropy
+  rw [Fintype.sum_prod_type]
+
 /-- **Chain rule for entropy**: `H(X,Y) = H(X) + H_X(Y)`.
 
 The proof expands `H(X)` over the product type by distributing the marginal
