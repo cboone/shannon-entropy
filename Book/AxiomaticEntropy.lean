@@ -29,6 +29,7 @@ Shannon observes that a uniform on `s^n` outcomes decomposes by grouping into `n
 The Lean counterparts are `Apos_mul` (additivity on alphabet-size products) and `Apos_pow` (the `n`-fold iterate) in `Shannon/Entropy/Uniform.lean`.
 
 Shannon then pins down `A` by a ratio-squeeze: for any `s, t > 1` and any `n`, pick the unique `m` with `s^m ≤ t^n < s^(m+1)`; monotonicity of `A` on uniform alphabet sizes forces `A(t)/A(s)` within `1/n` of `log t / log s`, and letting `n → ∞` gives `A(t)/A(s) = log_s t`.
+Concretely, both `A(t)/A(s)` and `log_s t` sit in the same closed interval `[m/n, (m+1)/n]` of width `1/n`, which is what delivers the `1/n` bound and pins the ratio in the limit.
 The Lean counterparts are `Apos_ratio_logb_close` feeding `Apos_ratio_eq_logb`, which combine in `Apos_eq_K_mul_log` to give `Apos H n = K H * log n` with `K H := Apos H 2 / log 2`.
 
 # Rational Case
