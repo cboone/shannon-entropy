@@ -24,10 +24,10 @@ Deliver seven things in one branch:
 1. `entropyBits_prodDist`: a one-line base-2 corollary of `entropyNat_prodDist`, closing the Phase B review's note about a natural follow-up lemma in `Shannon/Entropy/Bits.lean`.
 2. A new `Shannon/Entropy/RelativeEntropy.lean` module: `Supports` predicate, `relEntropy` / `relEntropyBits` definitions, `relEntropy_nonneg`, `relEntropy_eq_zero_iff`, and the log-sum inequality.
 3. A new `Shannon/Entropy/MutualInfo.lean` module: the `mutualInfo` definition (relocated from `Joint.lean`), the six identities the roadmap lists (`nonneg`, `eq_zero_iff_independent`, `symm`, `eq_entropy_sub_condEntropy` and its dual, `self`, `le_entropy`), their `mutualInfoBits` counterparts, the `swapJoint` helper used by `mutualInfo_symm`, and a `diagonalDist` helper used by `mutualInfo_self`.
-4. The information form of the data processing inequality for a Markov chain `X → Y → Z` via a kernel `W : β → ProbDist γ`, in `MutualInfo.lean`. Proof via the log-sum inequality from Task 2.
+4. The information form of the data processing inequality for a Markov chain `X → Y → Z` via a kernel `W : β → ProbDist γ`, in `MutualInfo.lean`. Proof via the zero-total-friendly log-sum inequality from Task 2, so the pointwise `(a, c)` application still works when a fiber mass vanishes.
 5. A new `Shannon/Entropy/BinaryEntropy.lean` module: `binEntropyBits p := Real.binEntropy p / Real.log 2` plus bits-flavored versions of the Mathlib binary-entropy lemmas (`_zero`, `_one`, `_two_inv_eq_one`, `_nonneg`, `_le_one`, continuity, symmetry).
-6. A new `Shannon/Entropy/Fano.lean` module: Fano's inequality in bits, stated as a bound on `condEntropyBits (swapJoint p)` in terms of `binEntropyBits Pe` and `Pe * Real.logb 2 (Fintype.card α - 1)` where `Pe` is the error probability of an estimator `f : β → α`.
-7. Three new Verso chapters (`MutualInformation`, `RelativeEntropy`, `FanoInequality`) covering the new primitives in narrative form, plus the corresponding test additions, transcription cross-reference updates, and facade edits.
+6. A new `Shannon/Entropy/Fano.lean` module: Fano's inequality in bits, stated as a bound on `condEntropyBits (swapJoint p)` in terms of `binEntropyBits Pe` and `Pe * Real.logb 2 (Fintype.card α - 1)` where `Pe` is the error probability of an estimator `f : β → α`. Budget the proof against nested-pair encodings of `(E, X, Y)` and explicitly spin out `Shannon/Entropy/FanoHelpers.lean` if the relabel / conditioning helper block stops being small and local.
+7. Three new Verso chapters (`MutualInformation`, `RelativeEntropy`, `FanoInequality`) covering the new primitives in narrative form, plus the corresponding test additions, transcription cross-reference updates, roadmap-sync edits, and facade edits.
 
 Non-goals (reserved for Phase D+):
 
@@ -101,7 +101,7 @@ def relEntropyBits {α : Type} [Fintype α] (p q : ProbDist α) : ℝ :=
 
 Core lemmas:
 
-- `relEntropy_eq_neg_gibbs_sum`:
+- Private helper `relEntropy_eq_neg_gibbs_sum`:
   `relEntropy p q = -∑ a, p a * Real.log (q a / p a)` on support. Proof: termwise `p_a * log (p_a / q_a) = -p_a * log (q_a / p_a)` using `Real.log_div`; off-support terms vanish because `p_a = 0`.
 - `relEntropy_nonneg (hsupp : Supports q p)`: `0 ≤ relEntropy p q`. Proof: rewrite via `relEntropy_eq_neg_gibbs_sum`, apply `gibbs_inequality p q hsupp`, negate.
 - `relEntropyBits_nonneg`: same for bits. Proof: divide by `Real.log 2 > 0`.
@@ -119,29 +119,33 @@ Core lemmas:
 
   Use `Real.log_eq_sub_iff_of_pos` (or equivalent: `Real.log x = x - 1 ↔ x = 1` for `x > 0`, easy from `Real.log_le_sub_one_of_pos` combined with the `Real.add_one_le_exp` direction) to pin each positive term. For the `Supports` bookkeeping, note that `∑ p a - ∑ q a = 0` combined with pointwise `p a ≤ q a` forces equality everywhere.
 
-  If the strict-equality characterization is not directly in Mathlib at the pinned version, add a private helper lemma `private lemma log_eq_sub_one_iff_of_pos {x : ℝ} (hx : 0 < x) : Real.log x = x - 1 ↔ x = 1` whose proof uses `Real.strictConcaveOn_negMulLog` (a strictly-concave function has a unique maximum) or the simpler `Real.log_lt_sub_one_of_ne` if present. Grep `.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Log/` for the current canonical name before writing the helper.
+  Grep `.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Log/` for the current canonical name before writing the proof. Budget a private helper lemma `private lemma log_eq_sub_one_iff_of_pos {x : ℝ} (hx : 0 < x) : Real.log x = x - 1 ↔ x = 1` as part of Task 2 unless the pinned Mathlib already ships an equivalent under another name. Do not treat this helper as an optional fallback discovered late in the proof.
 
 - `relEntropy_self`: `relEntropy p p = 0`. Proof: each term is `p a * log 1 = 0`.
 
 Log-sum inequality:
 
 ```lean
-/-- **Log-sum inequality**: for nonneg sequences `a, b : α → ℝ` with `A = ∑ aᵢ`, `B = ∑ bᵢ`, support condition `∀ i, 0 < aᵢ → 0 < bᵢ`, and `A > 0`, `B > 0`:
+/-- **Log-sum inequality**: for nonneg sequences `a, b : α → ℝ` with `A = ∑ aᵢ`, `B = ∑ bᵢ`, and support condition `∀ i, 0 < aᵢ → 0 < bᵢ`:
     ∑ i, a i * log (a i / b i) ≥ A * log (A / B).
 
-Equality holds iff the sequences are proportional (a i / b i is constant on support). -/
+The statement is total: if `A = 0`, both sides are `0`; if `A > 0`, the support hypothesis forces `B > 0`, so the normalized probability-distribution proof applies. Equality holds iff the sequences are proportional (a i / b i is constant on support). -/
 theorem log_sum_inequality
     {α : Type} [Fintype α]
     (a b : α → ℝ)
     (ha_nonneg : ∀ i, 0 ≤ a i) (hb_nonneg : ∀ i, 0 ≤ b i)
-    (hsupp : ∀ i, 0 < a i → 0 < b i)
-    (hA_pos : 0 < ∑ i, a i) (hB_pos : 0 < ∑ i, b i) :
+    (hsupp : ∀ i, 0 < a i → 0 < b i) :
     (∑ i, a i) * Real.log ((∑ i, a i) / (∑ i, b i)) ≤
       ∑ i, a i * Real.log (a i / b i) := by
   ...
 ```
 
-Proof strategy: normalize to the probability-distribution case. Let `p := a / A`, `q := b / B` (as `ProbDist α`); then the log-sum inequality reduces to `relEntropy_nonneg` applied to `(p, q)` with support `Supports q p` inherited from `hsupp`. Concretely:
+Proof strategy: split on `A = ∑ i, a i`.
+
+- If `A = 0`, use `Finset.sum_eq_zero_iff_of_nonneg` and `ha_nonneg` to show `a i = 0` for every `i`, so both sides are `0` by simplification.
+- If `A > 0`, first show `B = ∑ i, b i > 0`: choose `i` with `0 < a i` from the positive total, then apply `hsupp`; now normalize to the probability-distribution case. Let `p := a / A`, `q := b / B` (as `ProbDist α`); then the log-sum inequality reduces to `relEntropy_nonneg` applied to `(p, q)` with support `Supports q p` inherited from `hsupp`.
+
+Concretely:
 
 ```text
 ∑ a_i log(a_i / b_i)
@@ -152,7 +156,7 @@ Proof strategy: normalize to the probability-distribution case. Let `p := a / A`
 
 Since `relEntropy p q ≥ 0`, we get `∑ a_i log(a_i / b_i) ≥ A · log(A / B)`.
 
-Leave the equality case out of Phase C (not needed by DPI or Fano; can be added later if Phase D wants it).
+Leave the equality case out of Phase C even though the statement above mentions it informally; DPI and Fano only need the inequality, and the zero-total generalization is the proof-critical part for this phase.
 
 `RelativeEntropy.lean` module docstring structure (top of file) follows the Phase B `Bits.lean` style: `# Shannon.Entropy.RelativeEntropy`, one-paragraph overview, "Main definitions" list (`Supports`, `relEntropy`, `relEntropyBits`), "Main results" list (`relEntropy_nonneg`, `relEntropy_eq_zero_iff`, `log_sum_inequality`).
 
@@ -184,7 +188,7 @@ def diagonalDist {α : Type} [Fintype α] [DecidableEq α]
     simp [prob_sum_eq_one p]
 ```
 
-Supporting identities on the helpers:
+Private supporting identities on the helpers (keep these local unless downstream code needs them on the public API):
 
 - `marginalFst_swapJoint : marginalFst (swapJoint p) = marginalSnd p`. Proof: unfold `swapJoint`, `relabelProb`, `Equiv.prodComm`; sum over β rearranges to marginalSnd.
 - `marginalSnd_swapJoint : marginalSnd (swapJoint p) = marginalFst p`. Dual.
@@ -344,7 +348,7 @@ For each `(a, c)`, apply the log-sum inequality with `a_b := p(a, b) · W b c` a
 - `∑_b b_b = marginalFst p a · (∑_b marginalSnd p b · W b c) = marginalFst q a · marginalSnd q c`
 - `a_b · log(a_b / b_b) = p(a,b) · W b c · log(p(a,b) / (marginalFst p a · marginalSnd p b))` for `W b c > 0`, matching one term of `D(p ‖ prodMarginals p)`.
 
-Summing over `(a, c)` and reshaping gives `D(q ‖ prodMarginals q) ≤ D(p ‖ prodMarginals p)`; use `mutualInfo_eq_relEntropy_prodMarginals` to translate back.
+The zero-total-friendly statement from Task 2 is essential here: some fixed `(a, c)` fibers may have total mass `0`, and the proof should discharge those fibers by simplification rather than by manufacturing positivity assumptions. Summing over `(a, c)` and reshaping then gives `D(q ‖ prodMarginals q) ≤ D(p ‖ prodMarginals p)`; use `mutualInfo_eq_relEntropy_prodMarginals` to translate back.
 
 Add the base-2 corollary `mutualInfoBits_kernelPushforward_le` by dividing by `Real.log 2`.
 
@@ -378,13 +382,15 @@ Lifted lemmas (each one-line, dividing the Mathlib nats lemma by `Real.log 2`):
 - `binEntropyBits_le_one (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : binEntropyBits p ≤ 1` (from `Real.binEntropy_le_log_two`).
 - `binEntropyBits_eq_zero_iff : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1` (from `Real.binEntropy_eq_zero`).
 - `binEntropyBits_continuous : Continuous binEntropyBits` (from `Real.binEntropy_continuous`, since `fun p => Real.binEntropy p / Real.log 2` is continuous).
-- `binEntropyBits_eq_negMulLog_pair : binEntropyBits p = (Real.negMulLog p + Real.negMulLog (1 - p)) / Real.log 2` (from `Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub`).
+- Private helper `binEntropyBits_eq_negMulLog_pair : binEntropyBits p = (Real.negMulLog p + Real.negMulLog (1 - p)) / Real.log 2` (from `Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub`) if the Fano proof wants a direct bridge to `negMulLog`.
 
 Module docstring follows the Phase B template: one-paragraph overview, "Main definitions" (`binEntropyBits`), "Main results" list.
 
 ### 6. Fano's inequality (`Fano.lean`)
 
 Create `Shannon/Entropy/Fano.lean`. Imports: `Shannon.Entropy.MutualInfo` (brings `condEntropy`, `swapJoint`, `condEntropyBits`) and `Shannon.Entropy.BinaryEntropy`.
+
+Phase C does not assume a new general three-variable entropy API. Budget the proof against nested pairs only, e.g. `Bool × (α × β)` and `(Bool × α) × β`, together with relabelings proved through `relabelProb` and `entropyNat_relabelInvariant`. If the relabel / conditioning bookkeeping grows beyond a compact local helper section, promote it to `Shannon/Entropy/FanoHelpers.lean` within the same task instead of hiding the extra scope inside `Fano.lean`.
 
 Statement (base-2):
 
@@ -419,7 +425,8 @@ The `log₂(0)` edge case at `|α| = 1`: when `Fintype.card α = 1`, `(Fintype.c
 Auxiliary definition / lemmas in `Fano.lean`:
 
 - `errorProb p f : ℝ := ∑ ab ∈ univ.filter (f ab.2 ≠ ab.1), p ab` with standalone lemmas `errorProb_nonneg`, `errorProb_le_one`.
-- If the three-variable-joint construction gets heavy, split into a helper module. Keep in `Fano.lean` if it stays under ~150 lines of supporting infrastructure.
+- A nested-pair error-tagged joint helper (local section or `FanoHelpers.lean`) that augments `(X, Y)` with the Boolean error event and provides the relabel lemmas needed to reuse the existing pairwise chain rule twice.
+- If the nested-pair helper block grows beyond ~100-150 lines, split it into `Shannon/Entropy/FanoHelpers.lean` and treat that file as part of Task 6, not as accidental proof detritus.
 
 If the full error-indicator-plus-chain-rule proof of Fano proves awkward at the pinned Mathlib (especially the `H(X | E, Y)` split), fall back to a direct summation argument: expand `condEntropy (swapJoint p)` as a double sum, split into correct and incorrect terms, and bound each. This is more elementary but longer; prefer the chain-rule proof first.
 
@@ -442,6 +449,8 @@ Existing test files to extend:
 - `ShannonTest/Entropy.lean` aggregator: add `import ShannonTest.Entropy.{RelativeEntropy, MutualInfo, BinaryEntropy, Fano}`.
 
 Each test file follows the `write-lean-tests` skill discipline: one `example` per exported symbol, closed by `by exact <lemma>` or `by simpa using <lemma>` or (for composition tests) a short tactic block using only the public API. No `import Shannon.Entropy.<M>.Internal` patterns and no `sorry` escape hatches.
+
+Private helpers do not need one-example-per-lemma coverage; exported helpers do. When in doubt, keep proof-only bookkeeping private rather than widening the mirrored public surface unnecessarily.
 
 ### 8. Verso book chapters, transcription, facade, documentation
 
@@ -493,6 +502,8 @@ Update `AGENTS.md` / `CLAUDE.md` Module Layout section: add one-line entries for
 
 `cspell-words.txt` additions likely needed (add as they surface during prose writing): `kullback`, `leibler`, `kernelpushforward`, `binentropy`, `fano`, `mutualinfo`, possibly others flagged by `make lint-spelling`.
 
+Roadmap sync in `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`: update the Phase C goal, task summary, and file inventory so the parent roadmap explicitly mentions `BinaryEntropy`, `Fano`, and the expanded test mirror. This spun-out plan is temporary coordination detail; the roadmap remains the canonical long-lived inventory.
+
 ## Critical files
 
 Existing, to modify (rough task order):
@@ -500,6 +511,7 @@ Existing, to modify (rough task order):
 - `Shannon/Entropy/Bits.lean`: add `entropyBits_prodDist` (Task 1); update imports to include `Joint`.
 - `Shannon/Entropy/Joint.lean`: remove `mutualInfo` definition (Task 3); move the line into `MutualInfo.lean` verbatim. Update module docstring to drop the `mutualInfo` bullet.
 - `Shannon/Entropy.lean`: add imports and update module-chain diagram (Task 8).
+- `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`: sync the parent roadmap's Phase C inventory with this plan's settled scope (Task 8).
 - `ShannonTest/Entropy.lean`: register the four new test modules (Task 7).
 - `ShannonTest/Entropy/Bits.lean`: add `entropyBits_prodDist` example (Task 1).
 - `ShannonTest/Entropy/Joint.lean`: remove the `mutualInfo` example (moved to `MutualInfo.lean` test file) (Task 7).
@@ -515,6 +527,7 @@ New, to create:
 - `Shannon/Entropy/MutualInfo.lean` (Tasks 3 and 4).
 - `Shannon/Entropy/BinaryEntropy.lean` (Task 5).
 - `Shannon/Entropy/Fano.lean` (Task 6).
+- `Shannon/Entropy/FanoHelpers.lean` (Task 6, only if the nested-pair helper block stops being small and local).
 - `ShannonTest/Entropy/RelativeEntropy.lean` (Task 7).
 - `ShannonTest/Entropy/MutualInfo.lean` (Task 7).
 - `ShannonTest/Entropy/BinaryEntropy.lean` (Task 7).
@@ -554,11 +567,11 @@ The roadmap's Phase C unit stays coherent across both PRs; splitting is an imple
 Per-task tripwires (run locally before committing each task):
 
 - Task 1: `lake build Shannon.Entropy.Bits` compiles; `lake test` runs the new `entropyBits_prodDist` example.
-- Task 2: `lake build Shannon.Entropy.RelativeEntropy` compiles cold; `lake test` runs the new `RelativeEntropy` test file. `relEntropy_eq_zero_iff` closes without `sorry` and without a custom `log_eq_sub_one_iff_of_pos` helper if Mathlib's pinned version already has an equivalent.
+- Task 2: `lake build Shannon.Entropy.RelativeEntropy` compiles cold; `lake test` runs the new `RelativeEntropy` test file. `relEntropy_eq_zero_iff` closes without `sorry`; if the pinned Mathlib does not already expose the needed strict log-equality characterization, the planned private `log_eq_sub_one_iff_of_pos` helper lands as part of this task.
 - Task 3: `lake build Shannon.Entropy.MutualInfo` compiles; all seven mutual-info theorems plus `swapJoint`, `diagonalDist`, their marginal / entropy identities land; the relocated `mutualInfo` definition is in `MutualInfo.lean` only (grep confirms no duplicate in `Joint.lean`).
 - Task 4: the DPI theorem `mutualInfo_kernelPushforward_le` closes; concrete test example on a small joint passes.
 - Task 5: `lake build Shannon.Entropy.BinaryEntropy` compiles; `binEntropyBits (1/2) = 1` example passes.
-- Task 6: `lake build Shannon.Entropy.Fano` compiles; concrete Fano example on `α := Fin 2`, `β := Fin 2` passes.
+- Task 6: `lake build Shannon.Entropy.Fano` compiles; concrete Fano example on `α := Fin 2`, `β := Fin 2` passes. If `FanoHelpers.lean` exists, `lake build Shannon.Entropy.FanoHelpers` also compiles; otherwise the nested-pair bookkeeping remains a compact local section inside `Fano.lean` rather than an untracked mini-subproject.
 - Task 7: `lake test` green end-to-end; every new public definition or theorem has a matching `example` in the appropriate `ShannonTest/Entropy/*.lean` file.
 - Task 8: `lake build Book` compiles cold; `make book` produces `_site/html-multi/index.html` listing all eight chapters (Introduction, AxiomaticEntropy, Properties, Logarithm, MutualInformation, RelativeEntropy, FanoInequality, Bibliography) in the TOC.
 
@@ -578,8 +591,8 @@ Upstream-sync note: Phase C introduces strictly new modules (`RelativeEntropy`, 
 
 ## Open questions (to resolve during execution)
 
-- **`relEntropy_eq_zero_iff` proof route**: the cleanest route uses `Real.log x = x - 1 ↔ x = 1` for positive `x`. If that exact iff is not already in the pinned Mathlib v4.29, add a short private helper proved from `Real.strictConcaveOn_negMulLog` or `Real.log_lt_sub_one_of_ne` (whichever is present). Prefer reusing Mathlib over inventing a local helper.
-- **`log_sum_inequality` statement shape**: the plan above states it in the `∑ a_i log(a_i / b_i) ≥ A log(A/B)` direction (concave form). Some presentations state the convex form with `a · log(b/a)`. The concave form is more convenient for DPI; state and prove just that direction, and add a convex-form restatement only if Phase D or Fano needs it.
+- **`relEntropy_eq_zero_iff` proof route**: the cleanest route uses `Real.log x = x - 1 ↔ x = 1` for positive `x`. Expect to budget a short private helper proved from `Real.strictConcaveOn_negMulLog` or a stricter log inequality already present under another name. Prefer reusing Mathlib over inventing more local machinery than this one helper.
+- **`log_sum_inequality` statement shape**: the plan above states it in the `∑ a_i log(a_i / b_i) ≥ A log(A/B)` direction (concave form), but generalized so `A = 0` is allowed and simplifies to the trivial `0 ≤ 0` case. Some presentations state the convex form with `a · log(b/a)`. The concave form is more convenient for DPI; state and prove just that direction, and add a convex-form restatement only if Phase D or Fano needs it.
 - **DPI proof route**: log-sum is the first choice; the three-variable-joint route is the fallback. Lock in whichever lands cleaner within one commit's worth of work, and record the choice in the commit message.
 - **Fano helper modularization**: if the error-indicator three-variable-joint machinery needed by Fano grows beyond ~100 lines, extract it into a helper module (suggested name: `Shannon/Entropy/FanoHelpers.lean`) rather than bloating `Fano.lean`. Otherwise keep the helpers inline.
 - **`mutualInfoBits` / `condEntropyBits` surface depth**: the plan adds bits-flavored counterparts only for the theorems Phase C's own Book chapters and test cases touch. If a lemma is used only from a nats proof, leave its bits-flavored variant for a later phase.

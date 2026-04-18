@@ -19,6 +19,7 @@ Equipartition
 Fano
 Finset
 Fintype
+fiberwise
 Frobenius
 frontmatter
 hcard
@@ -58,6 +59,7 @@ pointwise
 pushforward
 Pushforward
 recursivity
+relabelings
 rpow
 Schur
 shannontest

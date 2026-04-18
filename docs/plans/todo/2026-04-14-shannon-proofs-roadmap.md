@@ -262,8 +262,9 @@ Properties}.lean`, new `Shannon/Entropy/Bits.lean`, new files in
 
 Goal: complete the primitives layer (mutual information properties,
 relative entropy, log-sum inequality, data processing inequality in its
-information form). All items are short derivations from Gibbs and existing
-infrastructure; they unblock Phase D and round out Section 6.
+information form, a base-2 binary-entropy helper, and Fano's inequality).
+All items are short derivations from Gibbs and existing infrastructure;
+they unblock Phase D and round out Section 6.
 
 Tasks:
 
@@ -300,29 +301,41 @@ Tasks:
    `aᵢ, bᵢ` with `∑ aᵢ = A`, `∑ bᵢ = B`, and support condition
    `aᵢ > 0 → bᵢ > 0`,
    `∑ aᵢ · log (aᵢ/bᵢ) ≥ A · log (A/B)`.
+   State it in a form that also handles the degenerate `A = 0` case, since
+   the Phase C DPI proof applies log-sum fiberwise and some fibers can have
+   zero total mass.
 4. Data processing inequality (information form). In `MutualInfo.lean`:
    given a kernel `W : α → ProbDist γ` and a joint `(X, Y)`, the Markov
    chain `X → Y → Z := (W (Y ·))` satisfies `I(X;Z) ≤ I(X;Y)`. (Phase E
-   covers Shannon's transducer form, which is Theorem 7.)
-5. Fano's inequality. `H(X|Y) ≤ h₂(Pₑ) + Pₑ · log(|X| − 1)` where `Pₑ` is
-   the error probability of an estimator. State and prove in base 2 via
-   `entropyBits`. This requires introducing the binary entropy helper
-   `h₂ : ℝ → ℝ` (defined as `entropyBits` on the two-point distribution,
-   or directly via `-p · logb 2 p − (1 − p) · logb 2 (1 − p)` with a
-   `0 · log 0 = 0` convention) with a handful of supporting lemmas
-   (continuity, maximum at `1/2`, value at endpoints).
-6. Testing.
+   covers Shannon's transducer form, which is Theorem 7.) The proof should
+   use the zero-total-friendly log-sum statement above rather than baking in
+   positivity assumptions that fail on vanishing fibers.
+5. Binary entropy helper. New module `Shannon/Entropy/BinaryEntropy.lean`.
+   Define `binEntropyBits : ℝ → ℝ` by dividing Mathlib's `Real.binEntropy`
+   by `Real.log 2`, and expose the small base-2 lemma set Phase C needs
+   (`0`, `1`, `1/2`, symmetry, nonnegativity, `≤ 1`, continuity, endpoint
+   characterization).
+6. Fano's inequality. New module `Shannon/Entropy/Fano.lean` proving
+   `H(X|Y) ≤ h₂(Pₑ) + Pₑ · log(|X| − 1)` where `Pₑ` is the error
+   probability of an estimator. State and prove it in base 2 via
+   `entropyBits`, `condEntropyBits`, and `binEntropyBits`. Budget the proof
+   against nested-pair encodings of the `(E, X, Y)` construction and split a
+   small helper module only if that bookkeeping outgrows a compact local
+   section.
+7. Testing.
    - New test files `ShannonTest/Entropy/MutualInfo.lean`,
-     `ShannonTest/Entropy/RelativeEntropy.lean`.
+     `ShannonTest/Entropy/RelativeEntropy.lean`,
+     `ShannonTest/Entropy/BinaryEntropy.lean`, and
+     `ShannonTest/Entropy/Fano.lean`.
    - Cases: `mutualInfo_nonneg` on an independent `prodDist` gives exactly
-     zero; `mutualInfo_self` on a two-point uniform gives `1` bit;
-     `relEntropy` of a support-covering pair such as `(1/2, 1/2)` vs.
-     `(1/4, 3/4)` matches the closed-form value; `log_sum_inequality`
-     equality case when `aᵢ = bᵢ`; Fano's inequality numerically
-     sanity-checked on a two-symbol alphabet with a known error
-     probability.
+   zero; `mutualInfo_self` on a two-point uniform gives `1` bit;
+   `relEntropy` of a support-covering pair such as `(1/2, 1/2)` vs.
+   `(1/4, 3/4)` matches the closed-form value; `log_sum_inequality`
+   equality case when `aᵢ = bᵢ`; `binEntropyBits (1/2) = 1`; Fano's inequality numerically
+   sanity-checked on a two-symbol alphabet with a known error
+   probability.
    - `make check` green.
-7. Verso book update.
+8. Verso book update.
    - New chapter `Book/MutualInformation.lean` covers `I(X;Y)` and the
      identities proved in this phase.
    - New chapter `Book/RelativeEntropy.lean` covers `D(p‖q)`, the
@@ -332,8 +345,10 @@ Tasks:
    - Chapter ordering in `Book.lean` updated.
 
 Files created: `Shannon/Entropy/MutualInfo.lean`,
-`Shannon/Entropy/RelativeEntropy.lean`, matching test files, new Book
-chapters. Facade `Shannon.Entropy.lean` updated.
+`Shannon/Entropy/RelativeEntropy.lean`,
+`Shannon/Entropy/BinaryEntropy.lean`, `Shannon/Entropy/Fano.lean`,
+matching test files, new Book chapters. Facade `Shannon.Entropy.lean`
+updated.
 
 ## Phase D: I.i.d. AEP and typical sets (Theorems 3–4 special case)
 
@@ -550,8 +565,9 @@ New, to create:
 - Phase B: `Shannon/Entropy/Bits.lean`,
   `ShannonTest/Entropy/{Uniform, Rational, Gibbs, Bits}.lean`,
   `Book/{AxiomaticEntropy, Properties, Logarithm}.lean`
-- Phase C: `Shannon/Entropy/{MutualInfo, RelativeEntropy}.lean`,
-  `ShannonTest/Entropy/{MutualInfo, RelativeEntropy}.lean`,
+- Phase C: `Shannon/Entropy/{MutualInfo, RelativeEntropy, BinaryEntropy,
+  Fano}.lean`, `ShannonTest/Entropy/{MutualInfo, RelativeEntropy,
+  BinaryEntropy, Fano}.lean`,
   `Book/{MutualInformation, RelativeEntropy, FanoInequality}.lean`
 - Phase D: `Shannon/Entropy/{IID, AEP}.lean`,
   `ShannonTest/Entropy/{IID, AEP}.lean`,
@@ -617,7 +633,8 @@ when iterating):
   example computes to the expected value in the new test file.
 - Phase C: for a specific independent `prodDist p q`, `mutualInfo = 0` and
   `mutualInfoBits = 0`; `relEntropy` of a support-covering hand-picked pair
-  matches the analytic value.
+  matches the analytic value; `binEntropyBits (1/2) = 1`; and the
+  two-symbol Fano sanity check closes with the expected error probability.
 - Phase D: pick `α := Fin 2`, `p := (0.3, 0.7)`, `N := 10`, `ε := 0.1`;
   check an explicit element of the typical set and the bounds on
   `|typicalSet|`.
