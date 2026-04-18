@@ -7,3 +7,4 @@ import ShannonTest.Entropy.Joint
 import ShannonTest.Entropy.Properties
 import ShannonTest.Entropy.Converse
 import ShannonTest.Entropy.Final
+import ShannonTest.Entropy.Bits

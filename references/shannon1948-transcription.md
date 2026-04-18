@@ -158,10 +158,11 @@ This is an early form of the data processing inequality: deterministic processin
 ## Formalization Cross-References
 
 - **Theorem 2** (uniqueness of entropy): `entropyNat_unique`, `entropyBase_unique` in `Shannon/Entropy/Final.lean`
+- **Theorem 2** (base 2 specialization): `entropyBits_unique` in `Shannon/Entropy/Bits.lean`
 - **Property 1** (non-negativity, deterministic iff): `entropyNat_eq_zero_iff` in `Shannon/Entropy/Properties.lean`
 - **Property 2** (maximum at uniformity): `entropyNat_eq_log_card_iff` in `Shannon/Entropy/Properties.lean`
 - **Property 3** (subadditivity): `entropyNat_joint_le_add` in `Shannon/Entropy/Properties.lean`
 - **Property 4** (doubly stochastic): `entropyNat_doublyStochastic_le` in `Shannon/Entropy/Properties.lean`
-- **Property 5** (chain rule): `chain_rule` in `Shannon/Entropy/Joint.lean`
+- **Property 5** (chain rule): `chain_rule` in `Shannon/Entropy/Joint.lean`, with the summation form given by `condEntropy_eq_shannon_form`
 - **Property 6** (conditioning reduces entropy): `condEntropy_le_entropyNat` in `Shannon/Entropy/Properties.lean`
 - **Converse** (entropyNat satisfies axioms): `entropyNat_shannonAxioms` in `Shannon/Entropy/Converse.lean`

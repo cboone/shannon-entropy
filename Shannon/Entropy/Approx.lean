@@ -8,6 +8,10 @@ Phase 3 of the characterization: continuity extension.
 Constructs floor-count rational approximants `approxProb p N` and proves
 their convergence to `p`. This is the bridge from the rational formula to the
 full real-probability formula.
+
+## Shannon narrative (Appendix 2, p. 49)
+
+Shannon closes the characterization with a continuity argument: rational distributions are dense in the probability simplex, and any real-probability `p` can be written as the limit of rational approximants `p^(N)` with denominator near `N`. Applying the continuity axiom to `H` and the elementary continuity of `-∑ p_i log p_i` lifts the Phase 2 rational formula to all `p`. Our counterpart is `approxProb p N` built from floor-count masses (`approxCount p N a = ⌊N · p a⌋` up to a denominator correction), together with `tendsto_approxProb p : Tendsto (approxProb p) atTop (𝓝 p)`. These feed the final theorems in `Shannon/Entropy/Final.lean`.
 -/
 namespace Shannon
 

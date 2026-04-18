@@ -1,4 +1,5 @@
 import Shannon.Entropy.Final
+import Shannon.Entropy.Bits
 
 /-!
 # Shannon Entropy: Uniqueness Tests
@@ -23,3 +24,12 @@ example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
       ∀ {α : Type} [Fintype α] (p : ProbDist α),
         H p = -Kb * ∑ a, p a * Real.logb b (p a) :=
   entropyBase_unique H hH b hb
+
+/-- Uniqueness (base-2 form): specialization of `entropyBase_unique` to `b = 2`.
+-/
+example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
+    (hH : ShannonEntropyAxioms H) :
+    ∃ Kb : ℝ, 0 < Kb ∧
+      ∀ {α : Type} [Fintype α] (p : ProbDist α),
+        H p = -Kb * ∑ a, p a * Real.logb 2 (p a) :=
+  entropyBits_unique H hH

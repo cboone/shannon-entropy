@@ -130,8 +130,8 @@ Tasks:
    - `Book/Bibliography.lean`: Shannon 1948 with DOI, supporting references
      (Cover and Thomas, MacKay).
 
-   Foundations moves to Phase B, grouped with `AxiomaticEntropy`, to avoid
-   splitting the axiomatic content across phases.
+   The earlier `Foundations` placeholder is folded into `AxiomaticEntropy` in
+   Phase B, to avoid splitting the axiomatic content across phases.
 
 4. Build targets.
 
@@ -230,8 +230,10 @@ Tasks:
    (`push Not` → `push_neg`; `simp only … rw …` → `simpa …`). Bring these
    over in one commit so a future upstream PR has a clean diff.
 5. Testing.
-   - New test files: `ShannonTest/Entropy/Uniform.lean`,
-     `ShannonTest/Entropy/Rational.lean`, `ShannonTest/Entropy/Gibbs.lean`,
+   - `ShannonTest/Entropy/Uniform.lean`,
+     `ShannonTest/Entropy/Rational.lean`, and
+     `ShannonTest/Entropy/Gibbs.lean` were added in the 2026-04-14 test
+     backfill; Phase B extends those files and adds the new
      `ShannonTest/Entropy/Bits.lean`.
    - Cases to exercise: `Apos_mul` on concrete `n, m`; `Apos_eq_K_mul_log`
      on `n = 4` equal to `2 · Apos H 2`; `entropyNat_of_rational_counts` on
@@ -275,6 +277,13 @@ Tasks:
    - `mutualInfo_self`: `I(X;X) = H(X)`
    - `mutualInfo_le_entropy`: `I(X;Y) ≤ min(H(X), H(Y))`
    - Also provide the base-2 variants `mutualInfoBits` via `entropyBits`.
+   - Along the way, add `entropyBits_prodDist`:
+     `entropyBits (prodDist p q) = entropyBits p + entropyBits q`, a one-line
+     consequence of `entropyNat_prodDist` and the
+     `entropyBits_eq_entropyNat_div_log_two` bridge. Called out in the Phase
+     B branch review (`docs/reviews/2026-04-18-chore-implement-phase-b.md`)
+     as a natural companion lemma to land with Phase C's first base-2
+     statements. Lives in `Shannon/Entropy/Bits.lean`, not `MutualInfo.lean`.
 2. New module `Shannon/Entropy/RelativeEntropy.lean`. Define a support
    predicate `Supports q p := ∀ a, 0 < p a → 0 < q a`. Define
    `relEntropy (p q : ProbDist α) : ℝ := ∑ a, p a * log (p a / q a)` (KL
@@ -540,7 +549,7 @@ New, to create:
   Bibliography}.lean`, `ShannonTest/Book.lean`
 - Phase B: `Shannon/Entropy/Bits.lean`,
   `ShannonTest/Entropy/{Uniform, Rational, Gibbs, Bits}.lean`,
-  `Book/{Foundations, AxiomaticEntropy, Properties, Logarithm}.lean`
+  `Book/{AxiomaticEntropy, Properties, Logarithm}.lean`
 - Phase C: `Shannon/Entropy/{MutualInfo, RelativeEntropy}.lean`,
   `ShannonTest/Entropy/{MutualInfo, RelativeEntropy}.lean`,
   `Book/{MutualInformation, RelativeEntropy, FanoInequality}.lean`
@@ -602,7 +611,7 @@ when iterating):
 - Phase A: `lake build Book` succeeds as a source-compile check;
   `make book` generates non-empty rendered output under `_site/`; the
   book's table of contents lists the Introduction and Bibliography
-  chapters (Foundations lands in Phase B).
+  chapters (`AxiomaticEntropy` lands in Phase B).
 - Phase B: `entropyBits (uniformPNat 2) = 1`;
   `entropyBits (uniformPNat 4) = 2`; Shannon's worked `(1/2, 1/3, 1/6)`
   example computes to the expected value in the new test file.

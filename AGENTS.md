@@ -73,6 +73,9 @@ or `bin/bootstrap-worktree` first.
 - `Shannon/Entropy/Joint.lean` -- joint distributions, marginals, conditional entropy, chain rule
 - `Shannon/Entropy/Properties.lean` -- Section 6: deterministic iff, uniform iff, subadditivity, Schur-concavity
 - `Shannon/Entropy/Converse.lean` -- converse: `entropyNat` satisfies the Shannon axioms
+- `Shannon/Entropy/Bits.lean` -- base-2 public API (`entropyBits`, base-2 uniqueness bridge)
+
+`entropyBits` is the primary public entropy API from Phase C onward; `entropyNat` remains the internal natural-log workhorse used throughout the Appendix 2 characterization proof.
 
 ### Book Import Discipline
 
