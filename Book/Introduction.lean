@@ -27,8 +27,13 @@ Readers who want the formal proof first should start with these modules:
 - `Shannon/Entropy/Joint.lean`
 - `Shannon/Entropy/Properties.lean`
 - `Shannon/Entropy/Converse.lean`
+- `Shannon/Entropy/Bits.lean`
 
-Readers who want the narrative companion should read this book alongside `references/shannon1948-transcription.md` and the Lean modules above.
+Readers who want the narrative companion should read the following book chapters in order, alongside `references/shannon1948-transcription.md` and the Lean modules above:
+
+- Axiomatic Entropy (Shannon's Appendix 2 characterization and its Lean counterparts)
+- Properties of Entropy (Shannon's Section 6 Properties 1-6)
+- Logarithm Base and the Scale Constant (the `K` constant and the bits / nats distinction)
 
 # Working In This Repo
 

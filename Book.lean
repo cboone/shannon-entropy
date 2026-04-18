@@ -1,5 +1,8 @@
 import VersoManual
 import Book.Introduction
+import Book.AxiomaticEntropy
+import Book.Properties
+import Book.Logarithm
 import Book.Bibliography
 
 open Verso.Genre Manual
@@ -15,5 +18,11 @@ This companion book explains the Lean 4 formalization in this repository alongsi
 It is structured as a Manual so later phases can add chapters, internal cross-references, and bibliography material without changing the publication model.
 
 {include 0 Book.Introduction}
+
+{include 0 Book.AxiomaticEntropy}
+
+{include 0 Book.Properties}
+
+{include 0 Book.Logarithm}
 
 {include 0 Book.Bibliography}
