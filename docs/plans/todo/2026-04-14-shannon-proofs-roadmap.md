@@ -321,7 +321,9 @@ Tasks:
    `entropyBits`, `condEntropyBits`, and `binEntropyBits`. Budget the proof
    against nested-pair encodings of the `(E, X, Y)` construction and split a
    small helper module only if that bookkeeping outgrows a compact local
-   section.
+   section. The landed implementation uses `Shannon/Entropy/FanoHelpers.lean`
+   to package the conditional-row decomposition and the one-row `q`-ary
+   entropy bound at a distinguished decoder output.
 7. Testing.
    - New test files `ShannonTest/Entropy/MutualInfo.lean`,
      `ShannonTest/Entropy/RelativeEntropy.lean`,
@@ -346,7 +348,8 @@ Tasks:
 
 Files created: `Shannon/Entropy/MutualInfo.lean`,
 `Shannon/Entropy/RelativeEntropy.lean`,
-`Shannon/Entropy/BinaryEntropy.lean`, `Shannon/Entropy/Fano.lean`,
+`Shannon/Entropy/BinaryEntropy.lean`, `Shannon/Entropy/FanoHelpers.lean`,
+`Shannon/Entropy/Fano.lean`,
 matching test files, new Book chapters. Facade `Shannon.Entropy.lean`
 updated.
 
