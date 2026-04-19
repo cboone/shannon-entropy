@@ -3,153 +3,108 @@
 > [!NOTE]
 > This is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), in which I'm expanding the formalization to cover the entirety of [Shannon's paper](./references/shannon1948.pdf).
 
-This repository formalizes Shannon's finite-alphabet characterization theorem
-from Shannon (1948), Appendix 2.
+This repository is a Lean 4 formalization of Shannon's finite-alphabet entropy theory from Shannon (1948). The completed core covers Appendix 2's characterization theorem, the converse showing that Shannon entropy satisfies the axioms, and the Section 6 entropy properties built on top of that foundation.
 
-The central result is:
+The project also includes a base-2 public API, `entropyBits`, and a Verso companion book, `Shannon 1948: A Formalization Companion`. The active roadmap extends the fork toward Shannon's Theorems 3 through 7 for finite-state sources. Continuous / differential entropy, channel capacity, and the noisy-channel coding theorem remain out of scope for now.
 
-- For any uncertainty functional `H` satisfying the Shannon-style axiom bundle
-  (continuity, strict monotonicity on uniform distributions, grouping, and
-  relabel invariance), there is a positive constant `K` such that
-  `H(p) = -K * Σ p_i log p_i`.
-- Equivalently, for any base `b > 1`, there is `Kb > 0` such that
-  `H(p) = -Kb * Σ p_i log_b p_i`.
+## Main Result
 
-## Formalization Scope
+- For any uncertainty functional `H` satisfying the Shannon-style axiom bundle (continuity, strict monotonicity on uniform distributions, grouping, and relabel invariance), there is a positive constant `K` such that `H(p) = -K * Σ p_i log p_i`.
+- Equivalently, for any base `b > 1`, there is `Kb > 0` such that `H(p) = -Kb * Σ p_i log_b p_i`.
 
-- Finite alphabets only.
-- Real-valued probability vectors with explicit simplex proofs.
-- Proof structure follows Shannon's Appendix-2 phases:
-  1. Equiprobable case (`A(n)` behaves logarithmically).
-  2. Rational probabilities via grouped equiprobable refinement.
-  3. Extension to real probabilities via continuity and rational approximation.
+## Project Status
 
-## Main Theorems
+### Done Today
 
-### Characterization (Appendix 2)
+- Appendix 2 uniqueness theorem in `Shannon/Entropy/Final.lean`.
+- Converse theorem `entropyNat_shannonAxioms` in `Shannon/Entropy/Converse.lean`.
+- Section 6 properties, including deterministic iff zero entropy, uniform iff maximal entropy, subadditivity, Schur-concavity, conditioning reduces entropy, conditional-entropy nonnegativity, chain rule, and product additivity.
+- Base-2 public API in `Shannon/Entropy/Bits.lean`, where `entropyBits` is the primary public entropy API.
+- Companion book infrastructure and current chapters under `Book/`.
 
-- `entropyNat_unique`: `Shannon/Entropy/Final.lean`
-- `entropyBase_unique`: `Shannon/Entropy/Final.lean`
+### Planned Next
 
-### Converse
+- Shannon Theorems 3 and 4, first in the i.i.d. setting, then in the finite-state-source setting described in the roadmap.
+- Theorems 5 through 7, including entropy rates and data processing in Shannon's source model.
+- Additional companion-book chapters that track the formalization phase by phase.
 
-- `entropyNat_shannonAxioms`: `entropyNat` satisfies `ShannonEntropyAxioms` in `Shannon/Entropy/Converse.lean`
+### Out of Scope
 
-### Section 6 Properties
+- Continuous / differential entropy.
+- Channel capacity and the noisy-channel coding theorem.
+- A full formalization of every part of Shannon's 1948 paper.
 
-- `entropyNat_eq_zero_iff`: H = 0 iff deterministic in `Shannon/Entropy/Properties.lean`
-- `entropyNat_eq_log_card_iff`: H = log|α| iff uniform in `Shannon/Entropy/Properties.lean`
-- `entropyNat_joint_le_add`: subadditivity H(X,Y) ≤ H(X) + H(Y) in `Shannon/Entropy/Properties.lean`
-- `entropyNat_doublyStochastic_le`: Schur-concavity H(Ap) ≥ H(p) in `Shannon/Entropy/Properties.lean`
-- `condEntropy_le_entropyNat`: conditioning reduces entropy in `Shannon/Entropy/Properties.lean`
-- `condEntropy_nonneg`: conditional entropy ≥ 0 in `Shannon/Entropy/Properties.lean`
-- `chain_rule`: H(X,Y) = H(X) + H_X(Y) in `Shannon/Entropy/Joint.lean`
-- `entropyNat_prodDist`: H(X×Y) = H(X) + H(Y) in `Shannon/Entropy/Joint.lean`
+## Repository Surfaces
 
-### Base-2 Public API
+- `Shannon/`: Lean library modules.
+- `ShannonTest/`: `example`-based regression tests that mirror the public API.
+- `Book/`, `Book.lean`, `Main.lean`: Verso companion book sources and renderer.
+- `references/`: the bundled Shannon paper and related study materials.
 
-`entropyBits` is the primary public entropy API from Phase C onward;
-`entropyNat` remains the internal natural-log workhorse used throughout the
-Appendix 2 characterization proof.
+## Imports and Entry Points
 
-- `entropyBits`: base-2 Shannon entropy in `Shannon/Entropy/Bits.lean`
-- `entropyBits_eq_entropyNat_div_log_two`: bridge to the natural-log form in `Shannon/Entropy/Bits.lean`
-- `entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`: base-2 counterparts of the single-variable bounds in `Shannon/Entropy/Bits.lean`
-- `entropyBits_unique`: base-2 restatement of `entropyBase_unique` in `Shannon/Entropy/Bits.lean`
-- `entropyBits_unique_eq`: same, with the constant named as `K H * Real.log 2` in `Shannon/Entropy/Bits.lean`
+- `Shannon.lean`: project entrypoint.
+- `Shannon/Entropy.lean`: facade import for the full entropy development.
+- `ShannonTest/Entropy.lean`: aggregate import for the entropy test suite.
 
-## Module Layout
+## Representative Results
 
-- `Shannon/Entropy/Core.lean`
-  Foundations: probability distributions, axiom bundle, core constructions.
-- `Shannon/Entropy/Uniform.lean`
-  Phase 1: equiprobable characterization.
-- `Shannon/Entropy/Rational.lean`
-  Phase 2: rational case + worked `(1/2, 1/3, 1/6)` grouping example.
-- `Shannon/Entropy/Approx.lean`
-  Phase 3: floor-count rational approximants and convergence lemmas.
-- `Shannon/Entropy/Final.lean`
-  Final uniqueness theorems.
-- `Shannon/Entropy/Gibbs.lean`
-  Gibbs inequality, negMulLog bridge, entropy nonnegativity, uniform entropy.
-- `Shannon/Entropy/Joint.lean`
-  Joint distributions, marginals, conditional entropy, chain rule.
-- `Shannon/Entropy/Properties.lean`
-  Section 6 properties: deterministic iff, uniform iff, subadditivity, Schur-concavity, conditioning.
-- `Shannon/Entropy/Converse.lean`
-  Converse: `entropyNat` satisfies the Shannon axioms, completing the iff characterization.
-- `Shannon/Entropy/Bits.lean`
-  Base-2 public API: `entropyBits`, natural-log bridge, and base-2 uniqueness theorems.
-- `Shannon/Entropy.lean`
-  Facade import.
-- `Shannon.lean`
-  Project entrypoint.
+- `entropyNat_unique` and `entropyBase_unique` in `Shannon/Entropy/Final.lean`: Appendix 2 characterization in natural-log and arbitrary-base form.
+- `entropyNat_shannonAxioms` in `Shannon/Entropy/Converse.lean`: the converse direction.
+- `entropyBits`, `entropyBits_eq_entropyNat_div_log_two`, and `entropyBits_unique` in `Shannon/Entropy/Bits.lean`: the base-2 public API and uniqueness restatement.
+- `chain_rule` and `entropyNat_prodDist` in `Shannon/Entropy/Joint.lean`: chain rule and product additivity.
+- `entropyNat_eq_zero_iff`, `entropyNat_eq_log_card_iff`, `entropyNat_joint_le_add`, `condEntropy_le_entropyNat`, `condEntropy_nonneg`, and `entropyNat_doublyStochastic_le` in `Shannon/Entropy/Properties.lean`: core Section 6 properties.
 
-## How To Read The Proof
+## Reading Paths
 
-If you want to read this like a paper:
+1. Proof path: `Shannon/Entropy/Core.lean -> Uniform.lean -> Rational.lean -> Approx.lean -> Final.lean`.
+2. API path: `Shannon/Entropy/Bits.lean -> Joint.lean -> Properties.lean -> Converse.lean`.
+3. Book path: `Book/Introduction.lean -> Book/AxiomaticEntropy.lean -> Book/Properties.lean -> Book/Logarithm.lean`.
 
-1. Start in `Shannon/Entropy/Core.lean` for definitions and axioms.
-2. Read `Shannon/Entropy/Uniform.lean` for the equiprobable logarithm law
-   (`Apos H n = K * log n`).
-3. Read `Shannon/Entropy/Rational.lean` for rational distributions via grouping.
-4. Read `Shannon/Entropy/Approx.lean` for the continuity bridge
-   (`approxProb p N → p`).
-5. Finish in `Shannon/Entropy/Final.lean` for the final uniqueness theorems.
-6. Continue to `Shannon/Entropy/Gibbs.lean` for the Gibbs inequality.
-7. Read `Shannon/Entropy/Joint.lean` for joint distributions and the chain rule.
-8. Read `Shannon/Entropy/Properties.lean` for the Section 6 entropy properties.
-9. Read `Shannon/Entropy/Converse.lean` for the proof that `entropyNat` satisfies the axioms.
-10. Read `Shannon/Entropy/Bits.lean` for the base-2 public API (`entropyBits`) and its uniqueness restatement.
-
-For pedagogical context, see the worked decomposition theorem in
-`Shannon/Entropy/Rational.lean`:
-
-- `worked_grouping_identity`
-- `workedCompose_masses`
+For a worked Shannon-style grouping example, see `worked_grouping_identity` and `workedCompose_masses` in `Shannon/Entropy/Rational.lean`.
 
 ## Build and Verify
 
-Requirements:
-
-- Lean toolchain from `lean-toolchain`
-- Lake (bundled with Lean)
-
-Commands:
+In every fresh clone or worktree, start with:
 
 ```bash
 bin/bootstrap-worktree
-lake build Shannon
-lake build Book
-make test
-make check
-make book
 ```
 
-CI workflow:
+This step is mandatory. It runs `lake update`, downloads Mathlib's prebuilt artifacts, and builds both the `Shannon` library and the `Book` library.
 
-- `.github/workflows/ci.yml`
+Common commands:
+
+```bash
+lake build Shannon
+lake build Book
+lake test
+lake lint
+make check
+make book
+make serve
+```
+
+- `lake build Book` is a compile-only check for the companion book sources.
+- `make book` renders the HTML book into `./_site/html-multi/`.
+- `make serve` builds the book and serves it locally at `http://localhost:8000/`.
+- `make check` runs markdown lint, spelling, Lean lint, build, and tests.
+
+CI lives in `.github/workflows/ci.yml`.
 
 ## Companion Book
 
 The repository includes a Verso companion book, `Shannon 1948: A Formalization Companion`, that grows alongside the Lean development.
 
-- `make book` renders the HTML book into `./_site/html-multi/`.
-- `make serve` builds the book and serves it locally at `http://localhost:8000/`.
-- `lake build Book` is a compile-only check for the book sources, useful when iterating on prose without rendering.
+The current book includes an introduction, a chapter on the axiomatic entropy characterization, a chapter on the Section 6 properties, a chapter on the logarithm law and base choice, and a bibliography.
 
-Book chapters must not `import Shannon` directly. The `generate-book` executable links every transitive C object on its argv, and pulling Mathlib through `Shannon` pushes the macOS link command past `ARG_MAX`. Future chapters that need to render Lean code will use `subverso` highlight artifacts instead of a direct import.
-
-The book currently includes an introduction, a chapter on the axiomatic entropy characterization, a chapter on the Section 6 properties, a chapter on the logarithm law, and a bibliography. Later roadmap phases add further technical chapters in lockstep with the formalization.
+Book chapters must not `import Shannon` or any `Shannon.*` module directly. The `generate-book` executable links every transitive C object on its argv, and on macOS that can push the link command past `ARG_MAX`. Chapters that need rendered Lean snippets should use highlight artifacts rather than a direct import.
 
 ## Notes on Axioms
 
-Shannon's symmetry principle ("depends only on probabilities, not labels") is
-represented explicitly as:
+Shannon's symmetry principle ("depends only on probabilities, not labels") is represented explicitly as `ShannonEntropyAxioms.relabelInvariant`.
 
-- `ShannonEntropyAxioms.relabelInvariant`
-
-This makes permutation/relabeling steps fully explicit in Lean proofs.
+This makes permutation and relabeling steps explicit in Lean proofs.
 
 ## AI Statement
 
@@ -167,3 +122,5 @@ This formalization is being completed with substantial assistance from Opus 4.6 
 This formalization project is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), copyright 2026 Samuel Schlesinger, licensed under [the MIT license](./LICENSES/MIT.txt).
 
 Modifications and additions are copyright 2026 Christopher Boone. Newly added Lean code is licensed under [Apache 2.0](./LICENSES/Apache-2.0.txt); Lean code from the forked project is still under [MIT](./LICENSES/MIT.txt); substantially modified Lean code is dual licensed under [MIT](./LICENSES/MIT.txt) and [Apache 2.0](./LICENSES/Apache-2.0.txt). Prose and mathematical exposition are licensed under [CC BY 4.0](./LICENSES/CC-BY-4.0.txt).
+
+See `NOTICE`, `LICENSES/`, and per-file SPDX metadata for the file-level provenance and license breakdown.
