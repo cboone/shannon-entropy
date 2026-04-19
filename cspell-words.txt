@@ -60,12 +60,14 @@ pushforward
 Pushforward
 recursivity
 relabelings
+relentropy
 rpow
 Schur
 shannontest
 simpa
 subadditivity
 subverso
+swapjoint
 symm
 tendsto
 Tendsto

@@ -49,9 +49,11 @@ theorem entropyBits_prodDist
     {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist α) (q : ProbDist β) :
     entropyBits (prodDist p q) = entropyBits p + entropyBits q := by
-  rw [entropyBits_eq_entropyNat_div_log_two, entropyBits_eq_entropyNat_div_log_two,
-      entropyBits_eq_entropyNat_div_log_two, entropyNat_prodDist, add_div]
+  simp only [entropyBits_eq_entropyNat_div_log_two]
+  rw [entropyNat_prodDist, add_div]
 ```
+
+Using `simp only` for the bridge rewrite avoids fragility from occurrence ordering when later edits reshape the right-hand side.
 
 This pulls `Joint.lean` into `Bits.lean`'s transitive import closure (currently `Bits` imports `Gibbs` which imports `Final → Approx → Rational → Uniform`; it does not pick up `Joint`). Update the `import` line to `import Shannon.Entropy.Joint` (which itself imports `Gibbs`, so the existing import chain stays intact).
 
@@ -184,18 +186,20 @@ def diagonalDist {α : Type} [Fintype α] [DecidableEq α]
     · exact le_refl _
   · -- ∑ (a, b), (if a = b then p a else 0) = ∑ a, p a = 1
     rw [Fintype.sum_prod_type]
-    simp_rw [Finset.sum_ite_eq' Finset.univ _ fun a => p a]
+    simp_rw [Finset.sum_ite_eq Finset.univ _ fun a => p a]
     simp [prob_sum_eq_one p]
 ```
+
+The inner sum `∑ b, if a = b then p a else 0` has bound variable `b` on the right of the equality (`a = b`), which matches `Finset.sum_ite_eq` (not the primed variant `Finset.sum_ite_eq'`, which requires the bound variable on the left of the equality). Verify the invocation against the pinned Mathlib during implementation — both variants exist with subtly different orientations and the choice depends on how `Fintype.sum_prod_type` normalizes the outer / inner bound-variable names.
 
 Private supporting identities on the helpers (keep these local unless downstream code needs them on the public API):
 
 - `marginalFst_swapJoint : marginalFst (swapJoint p) = marginalSnd p`. Proof: unfold `swapJoint`, `relabelProb`, `Equiv.prodComm`; sum over β rearranges to marginalSnd.
 - `marginalSnd_swapJoint : marginalSnd (swapJoint p) = marginalFst p`. Dual.
 - `entropyNat_swapJoint : entropyNat (swapJoint p) = entropyNat p`. Follows from `entropyNat_relabelInvariant` (already in `Converse.lean`).
-- `marginalFst_diagonalDist : marginalFst (diagonalDist p) = p`. Proof: `∑ b, if a = b then p a else 0 = p a` via `Finset.sum_ite_eq'`.
+- `marginalFst_diagonalDist : marginalFst (diagonalDist p) = p`. Proof: `∑ b, if a = b then p a else 0 = p a` via `Finset.sum_ite_eq` (see orientation note above).
 - `marginalSnd_diagonalDist : marginalSnd (diagonalDist p) = p`. Dual.
-- `entropyNat_diagonalDist : entropyNat (diagonalDist p) = entropyNat p`. Proof: the joint sum restricts to the diagonal; `Finset.sum_ite_eq'` inside `Fintype.sum_prod_type`.
+- `entropyNat_diagonalDist : entropyNat (diagonalDist p) = entropyNat p`. Proof: the joint sum restricts to the diagonal; `Finset.sum_ite_eq` inside `Fintype.sum_prod_type`.
 
 Core theorems (`H` is `entropyNat`):
 
@@ -322,8 +326,10 @@ def kernelPushforward
 
 Marginal and entropy identities:
 
-- `marginalFst_kernelPushforward : marginalFst (kernelPushforward p W) = marginalFst p`.
-- `marginalSnd_kernelPushforward` expressed as a kernel-pushforward of `marginalSnd p`: useful for DPI.
+- `marginalFst_kernelPushforward : marginalFst (kernelPushforward p W) = marginalFst p`. Proof: `∑ c, ∑ b, p(a, b) · W b c = ∑ b, p(a, b) · ∑ c, W b c = ∑ b, p(a, b) = marginalFst p a` using `Finset.sum_comm`, `prob_sum_eq_one (W b)`, and the definition of `marginalFst`.
+- `marginalSnd_kernelPushforward : marginalSnd (kernelPushforward p W) c = ∑ b, marginalSnd p b * W b c`. The second marginal of the push-forward is the push-forward of the second marginal under the same kernel. This exact shape is what the DPI log-sum reshape consumes: the reshape computes `∑_b marginalFst p a · marginalSnd p b · W b c = marginalFst p a · marginalSnd (kernelPushforward p W) c`, matching the "b-side total" term needed by `log_sum_inequality`. Proof: `∑ a, ∑ b, p(a, b) · W b c = ∑ b, (∑ a, p(a, b)) · W b c = ∑ b, marginalSnd p b · W b c` via `Finset.sum_comm` and `Finset.sum_mul`.
+
+Lock the exact statement of `marginalSnd_kernelPushforward` before writing the DPI proof body so the reshape step is a pure rewrite rather than a side computation.
 
 DPI statement:
 
@@ -386,11 +392,18 @@ Lifted lemmas (each one-line, dividing the Mathlib nats lemma by `Real.log 2`):
 
 Module docstring follows the Phase B template: one-paragraph overview, "Main definitions" (`binEntropyBits`), "Main results" list.
 
-### 6. Fano's inequality (`Fano.lean`)
+### 6. Fano's inequality (`Fano.lean` plus `FanoHelpers.lean`)
 
-Create `Shannon/Entropy/Fano.lean`. Imports: `Shannon.Entropy.MutualInfo` (brings `condEntropy`, `swapJoint`, `condEntropyBits`) and `Shannon.Entropy.BinaryEntropy`.
+Create `Shannon/Entropy/Fano.lean` alongside `Shannon/Entropy/FanoHelpers.lean`. Imports: `Fano.lean` imports `Shannon.Entropy.FanoHelpers` (which in turn imports `Shannon.Entropy.MutualInfo` for `condEntropy`, `swapJoint`, `condEntropyBits`) and `Shannon.Entropy.BinaryEntropy`.
 
-Phase C does not assume a new general three-variable entropy API. Budget the proof against nested pairs only, e.g. `Bool × (α × β)` and `(Bool × α) × β`, together with relabelings proved through `relabelProb` and `entropyNat_relabelInvariant`. If the relabel / conditioning bookkeeping grows beyond a compact local helper section, promote it to `Shannon/Entropy/FanoHelpers.lean` within the same task instead of hiding the extra scope inside `Fano.lean`.
+Phase C does not assume a new general three-variable entropy API. The proof splits `H(E, X | Y) = H(E | Y) + H(X | E, Y)` via two applications of the existing pairwise `chain_rule`, bridged by relabelings of the nested-pair encodings `(β × (Bool × α))` and `((β × Bool) × α)`. The pairwise chain rule conditions on the first coordinate of a pair, so every step either introduces a `swapJoint` (to put the conditioning variable on the left) or a `relabelProb` (to regroup nested pairs); each rearrangement is justified by `entropyNat_relabelInvariant`.
+
+Create `FanoHelpers.lean` preemptively rather than conditionally: the nested-pair bookkeeping is the proof's dominant cost, and splitting it out from day one keeps `Fano.lean` focused on the final inequality assembly. Plan the helper module around:
+
+- An `errorIndicatorJoint` constructor that augments `(X, Y)` with the Boolean error event `E = [f(Y) ≠ X]` as a joint on `(α × β) × Bool` (or equivalently on `α × β × Bool` via a `relabelProb`).
+- Relabel lemmas that bridge between `(α × β) × Bool`, `α × (β × Bool)`, `(α × Bool) × β`, and `β × (α × Bool)`, each proved via `entropyNat_relabelInvariant`.
+- The two chain-rule applications packaged as named lemmas (`condEntropy_joint_error_split` and similar) so the main Fano proof reads as four algebraic steps rather than four fresh relabel calculations.
+- A deterministic-function entropy lemma `H(E | X, Y) = 0` (since `E` is determined by `X` and `Y`), stated via `condEntropy` on the appropriate nested joint.
 
 Statement (base-2):
 
@@ -422,11 +435,10 @@ All four steps in nats first, then divide by `Real.log 2`. The `|α| − 1` cast
 
 The `log₂(0)` edge case at `|α| = 1`: when `Fintype.card α = 1`, `(Fintype.card α − 1 : ℕ) = 0`, and `Real.logb 2 0 = 0` by Mathlib's `log 0 = 0` convention, so the right-hand side collapses to `binEntropyBits Pe`. In this case `Pe = 0` is automatic (any estimator is correct since α has one element), so both sides are zero and the bound is trivial.
 
-Auxiliary definition / lemmas in `Fano.lean`:
+Auxiliary definition / lemmas:
 
-- `errorProb p f : ℝ := ∑ ab ∈ univ.filter (f ab.2 ≠ ab.1), p ab` with standalone lemmas `errorProb_nonneg`, `errorProb_le_one`.
-- A nested-pair error-tagged joint helper (local section or `FanoHelpers.lean`) that augments `(X, Y)` with the Boolean error event and provides the relabel lemmas needed to reuse the existing pairwise chain rule twice.
-- If the nested-pair helper block grows beyond ~100-150 lines, split it into `Shannon/Entropy/FanoHelpers.lean` and treat that file as part of Task 6, not as accidental proof detritus.
+- `errorProb p f : ℝ := ∑ ab ∈ univ.filter (f ab.2 ≠ ab.1), p ab` lives in `Fano.lean` with standalone lemmas `errorProb_nonneg`, `errorProb_le_one`.
+- The nested-pair error-tagged joint constructor, its relabel lemmas, and the two-step conditional-entropy split live in `FanoHelpers.lean` (see the list above).
 
 If the full error-indicator-plus-chain-rule proof of Fano proves awkward at the pinned Mathlib (especially the `H(X | E, Y)` split), fall back to a direct summation argument: expand `condEntropy (swapJoint p)` as a double sum, split into correct and incorrect terms, and bound each. This is more elementary but longer; prefer the chain-rule proof first.
 
@@ -449,6 +461,8 @@ Existing test files to extend:
 - `ShannonTest/Entropy.lean` aggregator: add `import ShannonTest.Entropy.{RelativeEntropy, MutualInfo, BinaryEntropy, Fano}`.
 
 Each test file follows the `write-lean-tests` skill discipline: one `example` per exported symbol, closed by `by exact <lemma>` or `by simpa using <lemma>` or (for composition tests) a short tactic block using only the public API. No `import Shannon.Entropy.<M>.Internal` patterns and no `sorry` escape hatches.
+
+For exported `def`s (`swapJoint`, `diagonalDist`, `kernelPushforward`, `Supports`, `relEntropy`, `relEntropyBits`, `mutualInfoBits`, `condEntropyBits`, `binEntropyBits`, `errorProb`), the mirroring rule is that each `def` needs a regression example, but "regression" can be indirect: a test case that unfolds the definition inside a larger expression and closes with a supporting lemma counts. Prefer exercising each `def` through a downstream lemma (e.g. exercise `swapJoint` via `marginalFst_swapJoint`) over standalone `example : swapJoint p = relabelProb _ p := rfl`-style checks, which mostly restate the definition and add little regression value.
 
 Private helpers do not need one-example-per-lemma coverage; exported helpers do. When in doubt, keep proof-only bookkeeping private rather than widening the mirrored public surface unnecessarily.
 
@@ -481,26 +495,34 @@ Add four bullets under `## Formalization Cross-References`, grouped alongside th
 
 - `**Relative entropy (Kullback-Leibler divergence)**: relEntropy, relEntropy_nonneg, relEntropy_eq_zero_iff in Shannon/Entropy/RelativeEntropy.lean`
 - `**Mutual information**: mutualInfo, mutualInfo_nonneg, mutualInfo_eq_zero_iff_independent, mutualInfo_symm, mutualInfo_self, mutualInfo_le_entropyFst/Snd in Shannon/Entropy/MutualInfo.lean`
-- `**Data processing inequality (information form)**: mutualInfo_kernelPushforward_le in Shannon/Entropy/MutualInfo.lean. Shannon's transducer form is Theorem 7 (Phase E).`
+- `**Data processing inequality (information form)**: mutualInfo_kernelPushforward_le in Shannon/Entropy/MutualInfo.lean. Forward pointer: Shannon's transducer form (Theorem 7 in the paper) is deferred to Phase E and is a distinct statement, not a restatement of the information-form DPI.`
 - `**Fano's inequality**: fanoInequality in Shannon/Entropy/Fano.lean`
+
+The Theorem 7 forward pointer is emphasized so readers do not mistake the information-form DPI proved here for the paper's transducer-form statement.
 
 Per the Phase A/B pattern, do not introduce new transcription prose sections for these (they are not separate Shannon theorems); just the cross-reference bullets.
 
 Facade update in `Shannon/Entropy.lean`:
 
-Add `import Shannon.Entropy.RelativeEntropy`, `import Shannon.Entropy.MutualInfo`, `import Shannon.Entropy.BinaryEntropy`, `import Shannon.Entropy.Fano`. Extend the "Import this file to access..." bullet list. Update the module-chain diagram:
+Add `import Shannon.Entropy.RelativeEntropy`, `import Shannon.Entropy.MutualInfo`, `import Shannon.Entropy.BinaryEntropy`, `import Shannon.Entropy.Fano`. Extend the "Import this file to access..." bullet list so it mentions the full Phase C base-2 surface: `entropyBits`, `mutualInfoBits`, `condEntropyBits`, `binEntropyBits`, `relEntropyBits`, `fanoInequality`. Update the module-chain diagram:
 
 ```
-Core → Uniform → Rational → Approx → Final → Gibbs → Joint → Properties
-                                                  ↘ Converse
-                                                  ↘ Bits → RelativeEntropy → MutualInfo
-                                                       (standalone) BinaryEntropy
-                                                       Properties, BinaryEntropy → Fano
+Core → Uniform → Rational → Approx → Final → Gibbs → Joint → Properties → MutualInfo → Fano
+                                                    ↘ Converse                         ↗
+                                                    ↘ Bits → RelativeEntropy ↗
+                                                      (Mathlib only) → BinaryEntropy ↗
 ```
+
+The three feeders into `Fano` are `MutualInfo` (for `condEntropyBits` and the conditional-entropy chain-rule helpers), `RelativeEntropy` (transitively, through `MutualInfo`), and `BinaryEntropy` (standalone from Mathlib). `BinaryEntropy` depends only on Mathlib and does not participate in the `Core → ... → Joint` chain at all.
 
 Update `AGENTS.md` / `CLAUDE.md` Module Layout section: add one-line entries for `Shannon/Entropy/{RelativeEntropy, MutualInfo, BinaryEntropy, Fano}.lean`. Note in the `entropyBits`/`entropyNat` paragraph that base-2 mutual information (`mutualInfoBits`), conditional entropy (`condEntropyBits`), and binary entropy (`binEntropyBits`) join the public surface with Phase C.
 
-`cspell-words.txt` additions likely needed (add as they surface during prose writing): `kullback`, `leibler`, `kernelpushforward`, `binentropy`, `fano`, `mutualinfo`, possibly others flagged by `make lint-spelling`.
+`cspell-words.txt` already contains `binentropy`, `Fano`, `kernelpushforward`, `Kullback`, `Leibler`, and `mutualinfo` from Phase B / earlier work. Phase C adds the two new identifiers that surface in Book prose and module docstrings:
+
+- relentropy
+- swapjoint
+
+Insert both in the existing alphabetical order. Re-run `make lint-spelling` after the prose edits land to catch any additional words (e.g. identifier casings, author names in Book chapters) this list missed.
 
 Roadmap sync in `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`: update the Phase C goal, task summary, and file inventory so the parent roadmap explicitly mentions `BinaryEntropy`, `Fano`, and the expanded test mirror. This spun-out plan is temporary coordination detail; the roadmap remains the canonical long-lived inventory.
 
@@ -527,7 +549,7 @@ New, to create:
 - `Shannon/Entropy/MutualInfo.lean` (Tasks 3 and 4).
 - `Shannon/Entropy/BinaryEntropy.lean` (Task 5).
 - `Shannon/Entropy/Fano.lean` (Task 6).
-- `Shannon/Entropy/FanoHelpers.lean` (Task 6, only if the nested-pair helper block stops being small and local).
+- `Shannon/Entropy/FanoHelpers.lean` (Task 6, created preemptively alongside `Fano.lean`).
 - `ShannonTest/Entropy/RelativeEntropy.lean` (Task 7).
 - `ShannonTest/Entropy/MutualInfo.lean` (Task 7).
 - `ShannonTest/Entropy/BinaryEntropy.lean` (Task 7).
@@ -538,22 +560,18 @@ New, to create:
 
 ## Commit strategy
 
-Seven commits keep the branch reviewable. Each commit is self-contained (library + its test mirror + any docstring and facade edits). Book chapters and documentation ride a single trailing commit so the code-reviewable commits do not interleave with prose-dense ones.
+Eight commits keep the branch reviewable. Each commit is self-contained (library + its test mirror + any docstring and facade edits). Book chapters and documentation ride a single trailing commit so the code-reviewable commits do not interleave with prose-dense ones.
 
 1. `feat(entropy): add entropyBits_prodDist base-2 corollary` (Task 1, `Bits.lean` + `ShannonTest/Entropy/Bits.lean`).
 2. `feat(entropy): introduce RelativeEntropy with Supports and KL divergence` (Task 2 definitions + `relEntropy_nonneg`, `relEntropy_eq_zero_iff`, `relEntropy_self`; test file seed).
 3. `feat(entropy): log-sum inequality` (Task 2 final lemma; test extension).
-4. `feat(entropy): relocate mutualInfo, prove core properties and DPI` (Tasks 3 and 4 together: `MutualInfo.lean` creation, `mutualInfo` relocation from `Joint.lean`, all seven mutual-info theorems, `swapJoint`, `diagonalDist`, `kernelPushforward`, DPI, the matching test module; `ShannonTest/Entropy/Joint.lean` loses its `mutualInfo` example).
-5. `feat(entropy): binary entropy helper in bits` (Task 5, `BinaryEntropy.lean` + test module).
-6. `feat(entropy): Fano's inequality` (Task 6, `Fano.lean` + test module).
-7. `docs(book): MutualInformation, RelativeEntropy, FanoInequality chapters` (Task 8 book additions, transcription cross-refs, facade edits, Introduction reading-order update, AGENTS.md module-layout entries, cspell-words updates).
+4. `feat(entropy): relocate mutualInfo and prove core properties` (Task 3: `MutualInfo.lean` creation, `mutualInfo` relocation from `Joint.lean`, all seven mutual-info theorems, `swapJoint`, `diagonalDist`, `kernelPushforward`, their helper lemmas, the matching test module entries; `ShannonTest/Entropy/Joint.lean` loses its `mutualInfo` example).
+5. `feat(entropy): data processing inequality (information form)` (Task 4: DPI statement, proof via the log-sum inequality, `marginalFst_kernelPushforward` / `marginalSnd_kernelPushforward` shape, `mutualInfoBits_kernelPushforward_le`, and DPI test example). Split from commit 4 unconditionally: the log-sum reshape bookkeeping is the single largest proof in Phase C and deserves its own reviewable unit regardless of how cleanly it lands.
+6. `feat(entropy): binary entropy helper in bits` (Task 5, `BinaryEntropy.lean` + test module).
+7. `feat(entropy): Fano's inequality` (Task 6, `Fano.lean` + `FanoHelpers.lean` + test module).
+8. `docs(book): MutualInformation, RelativeEntropy, FanoInequality chapters` (Task 8 book additions, transcription cross-refs, facade edits, Introduction reading-order update, AGENTS.md module-layout entries, cspell-words updates).
 
-If Task 4's DPI proof grows unexpectedly large (the log-sum reshape bookkeeping is the most likely trouble spot), split commit 4 into two:
-
-- 4a. `feat(entropy): relocate mutualInfo and prove core properties`
-- 4b. `feat(entropy): data processing inequality (information form)`
-
-If Task 6's Fano proof grows, similarly split commit 6 into two (`binEntropyBits` corollaries needed by Fano into 6a; `fanoInequality` itself into 6b).
+If Task 6's Fano proof grows, split commit 7 into two (`binEntropyBits` corollaries needed by Fano into 7a; `fanoInequality` itself into 7b). The `FanoHelpers.lean` material stays with 7a since it is infrastructure, not the top-level statement.
 
 If the branch exceeds ~15 commits during implementation, consider splitting into two PRs:
 
@@ -571,7 +589,7 @@ Per-task tripwires (run locally before committing each task):
 - Task 3: `lake build Shannon.Entropy.MutualInfo` compiles; all seven mutual-info theorems plus `swapJoint`, `diagonalDist`, their marginal / entropy identities land; the relocated `mutualInfo` definition is in `MutualInfo.lean` only (grep confirms no duplicate in `Joint.lean`).
 - Task 4: the DPI theorem `mutualInfo_kernelPushforward_le` closes; concrete test example on a small joint passes.
 - Task 5: `lake build Shannon.Entropy.BinaryEntropy` compiles; `binEntropyBits (1/2) = 1` example passes.
-- Task 6: `lake build Shannon.Entropy.Fano` compiles; concrete Fano example on `α := Fin 2`, `β := Fin 2` passes. If `FanoHelpers.lean` exists, `lake build Shannon.Entropy.FanoHelpers` also compiles; otherwise the nested-pair bookkeeping remains a compact local section inside `Fano.lean` rather than an untracked mini-subproject.
+- Task 6: `lake build Shannon.Entropy.Fano` compiles; concrete Fano example on `α := Fin 2`, `β := Fin 2` passes. `lake build Shannon.Entropy.FanoHelpers` also compiles (the helper module lands preemptively, not conditionally).
 - Task 7: `lake test` green end-to-end; every new public definition or theorem has a matching `example` in the appropriate `ShannonTest/Entropy/*.lean` file.
 - Task 8: `lake build Book` compiles cold; `make book` produces `_site/html-multi/index.html` listing all eight chapters (Introduction, AxiomaticEntropy, Properties, Logarithm, MutualInformation, RelativeEntropy, FanoInequality, Bibliography) in the TOC.
 
