@@ -42,7 +42,8 @@ theorem errorProb_eq_one_sub_sum_correct {α β : Type} [Fintype α] [Fintype β
           = (fun x : α => if x = f y then p (x, y) else 0) := by
             funext x
             by_cases h : x = f y <;> simp [h, eq_comm]
-    simpa [hfun] using (Fintype.sum_ite_eq' (i := f y) (f := fun x : α => p (x, y)))
+    rw [hfun]
+    simpa using (Fintype.sum_ite_eq' (i := f y) (f := fun x : α => p (x, y)))
   have hsplit' := hsplit
   simp_rw [not_ne_iff] at hsplit'
   have hcorrect' : ∑ ab with f ab.2 = ab.1, p ab = ∑ y, p (f y, y) := by
