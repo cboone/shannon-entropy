@@ -1,3 +1,9 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT
+-/
+
 import Shannon.Entropy.Joint
 
 /-!
@@ -15,6 +21,11 @@ Gibbs inequality and concavity of `negMulLog`.
 4. `entropyNat_doublyStochastic_le` — Schur-concavity: doubly stochastic averaging
 5. `condEntropy_le_entropyNat` — conditioning reduces entropy: `H_X(Y) ≤ H(Y)`
 6. `condEntropy_nonneg` — conditional entropy is nonnegative
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Section 6, pp. 11-12.
+- [CoverThomas2006]: Thomas M. Cover and Joy A. Thomas, *Elements of Information Theory*, 2nd ed., Wiley, 2006, Chapter 2.
 -/
 namespace Shannon
 

@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: CC-BY-4.0
+-/
+
 import VersoManual
 
 open Verso.Genre Manual
@@ -51,3 +56,9 @@ Shannon states that conditioning on `X` never increases entropy: `H_X(Y) ≤ H(Y
 The Lean statement is `condEntropy_le_entropyNat` in `Shannon/Entropy/Properties.lean`.
 The proof combines Property 5 (chain rule) with Property 3 (subadditivity): `H(X) + H_X(Y) = H(X, Y) ≤ H(X) + H(Y)`, cancel `H(X)` on the left.
 The complementary `condEntropy_nonneg` shows the conditional entropy is itself nonnegative.
+
+# References
+
+- `[Shannon1948]` Claude E. Shannon, _A Mathematical Theory of Communication_, _Bell System Technical Journal_ 27 (1948), Section 6, pp. 11-12.
+- `[CoverThomas2006]` Thomas M. Cover and Joy A. Thomas, _Elements of Information Theory_, 2nd ed., Wiley, 2006, Chapter 2.
+- `[MacKay2003]` David J. C. MacKay, _Information Theory, Inference, and Learning Algorithms_, Cambridge University Press, 2003, Chapter 4.

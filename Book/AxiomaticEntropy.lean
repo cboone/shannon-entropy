@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: CC-BY-4.0
+-/
+
 import VersoManual
 
 open Verso.Genre Manual
@@ -54,3 +59,9 @@ The Lean counterparts are `approxProb p N` (built from floor-count masses) and `
 Combining the three phases gives Shannon's *Theorem 2*: every functional `H` satisfying the axioms equals `-K ∑ p_i log p_i` for some positive `K`.
 The Lean statement is `entropyNat_unique` in `Shannon/Entropy/Final.lean`; its base-parametric restatement is `entropyBase_unique`, which makes the constant's dependence on the logarithm base explicit.
 The transcription entry for Theorem 2 lives in `references/shannon1948-transcription.md` under the `## Formalization Cross-References` section.
+
+# References
+
+- `[Shannon1948]` Claude E. Shannon, _A Mathematical Theory of Communication_, _Bell System Technical Journal_ 27 (1948), Section 6 and Appendix 2.
+- `[CoverThomas2006]` Thomas M. Cover and Joy A. Thomas, _Elements of Information Theory_, 2nd ed., Wiley, 2006.
+- `[MacKay2003]` David J. C. MacKay, _Information Theory, Inference, and Learning Algorithms_, Cambridge University Press, 2003.

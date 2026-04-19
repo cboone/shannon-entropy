@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: CC-BY-4.0
+-/
+
 import VersoManual
 import Book.Introduction
 import Book.AxiomaticEntropy

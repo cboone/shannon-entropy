@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2026 Christopher Boone
+# SPDX-License-Identifier: Apache-2.0
+
+version = 1
+
+[[annotations]]
+path = [
+  "NOTICE",
+  "AGENTS.md",
+  "CHANGELOG.md",
+  "CONTRIBUTING.md",
+  ".github/PULL_REQUEST_TEMPLATE.md",
+  ".github/SECURITY.md",
+  ".github/copilot-instructions.md",
+  "docs/**/*.md",
+  "references/shannon1948-summary.md",
+  "references/shannon1948-transcription.md",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Christopher Boone"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["README.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2026 Samuel Schlesinger", "2026 Christopher Boone"]
+SPDX-License-Identifier = "MIT AND CC-BY-4.0"
+
+[[annotations]]
+path = [
+  ".github/workflows/ci.yml",
+  ".ignore",
+  ".markdownlint-cli2.jsonc",
+  ".vscode/extensions.json",
+  ".vscode/settings.json",
+  ".workmux.yml",
+  "Makefile",
+  "bin/bootstrap-worktree",
+  "cspell-words.txt",
+  "cspell.jsonc",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Christopher Boone"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = [".gitignore", "lake-manifest.json", "lakefile.toml", "lean-toolchain"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2026 Samuel Schlesinger", "2026 Christopher Boone"]
+SPDX-License-Identifier = "MIT"

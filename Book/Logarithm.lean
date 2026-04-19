@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: CC-BY-4.0
+-/
+
 import VersoManual
 
 open Verso.Genre Manual
@@ -39,3 +44,9 @@ The Lean counterparts of the base-parametric and base-2 forms of Theorem 2 are:
 Phase C and later phases of this formalization work in bits.
 Statements aimed at Shannon's communication-theoretic results (the Asymptotic Equipartition Property, typical sets, channel capacity) will be stated in terms of `entropyBits` rather than `entropyNat`.
 The natural-log `entropyNat` remains available as an internal workhorse, and the bridge lemmas `entropyBits_eq_entropyNat_div_log_two` and `entropyNat_eq_entropyBits_mul_log_two` let proofs cross between the two units as needed.
+
+# References
+
+- `[Shannon1948]` Claude E. Shannon, _A Mathematical Theory of Communication_, _Bell System Technical Journal_ 27 (1948), Section 1 and Appendix 2.
+- `[CoverThomas2006]` Thomas M. Cover and Joy A. Thomas, _Elements of Information Theory_, 2nd ed., Wiley, 2006.
+- `[MacKay2003]` David J. C. MacKay, _Information Theory, Inference, and Learning Algorithms_, Cambridge University Press, 2003.

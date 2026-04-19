@@ -1,3 +1,9 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT
+-/
+
 import Shannon.Entropy.Approx
 
 /-!
@@ -12,6 +18,10 @@ Combines the rational characterization and continuity extension to prove:
 ## Shannon narrative (Appendix 2, closing paragraph, p. 49)
 
 This module states Shannon's **Theorem 2** (the uniqueness statement advertised at the top of Section 6 and proved across Appendix 2, pp. 48-49): any functional `H` satisfying the three axioms of continuity, monotonicity on uniforms, and grouping must be of the form `H p = -K ∑ p_i log p_i` for some positive constant `K`. The base-parametric restatement `entropyBase_unique` shows the constant rescales with the logarithm base, anchoring the "base choice = unit choice" reading that Shannon stresses in Section 1. The base-2 specialization lives in `Shannon/Entropy/Bits.lean`. The corresponding transcription entries are in `references/shannon1948-transcription.md` under the `## Formalization Cross-References` section.
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Section 6 and Appendix 2, pp. 11-12, 48-49.
 -/
 namespace Shannon
 

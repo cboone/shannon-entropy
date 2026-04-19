@@ -1,3 +1,9 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT
+-/
+
 import Shannon.Entropy.Rational
 
 /-!
@@ -12,6 +18,10 @@ full real-probability formula.
 ## Shannon narrative (Appendix 2, p. 49)
 
 Shannon closes the characterization with a continuity argument: rational distributions are dense in the probability simplex, and any real-probability `p` can be written as the limit of rational approximants `p^(N)` with denominator near `N`. Applying the continuity axiom to `H` and the elementary continuity of `-∑ p_i log p_i` lifts the Phase 2 rational formula to all `p`. Our counterpart is `approxProb p N` built from floor-count masses (`approxCount p N a = ⌊N · p a⌋` up to a denominator correction), together with `tendsto_approxProb p : Tendsto (approxProb p) atTop (𝓝 p)`. These feed the final theorems in `Shannon/Entropy/Final.lean`.
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Appendix 2, p. 49.
 -/
 namespace Shannon
 

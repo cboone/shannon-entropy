@@ -43,7 +43,7 @@ Current expected set unless new evidence appears during implementation:
 - Use both copyright lines:
   - `2026 Samuel Schlesinger`
   - `2026 Christopher Boone`
-- Use `SPDX-License-Identifier: MIT OR Apache-2.0`.
+- Use the SPDX license expression `MIT OR Apache-2.0`.
 - Add a brief Apache-style modification notice stating the file is derived from the upstream project and has been substantially modified in this fork.
 
 Current expected set:
