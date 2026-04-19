@@ -1,0 +1,12 @@
+This project is a fork of `SamuelSchlesinger/shannon-1948-formalization` and continues to carry upstream material from that repository.
+
+Copyright ownership and licensing are tracked per file with SPDX metadata.
+
+- Original upstream source files retained from the fork are licensed under the MIT license unless marked otherwise.
+- New code, tests, scripts, and tooling added in this fork are licensed under the Apache License 2.0 unless marked otherwise.
+- New prose and mathematical exposition added in this fork are licensed under CC BY 4.0 unless marked otherwise.
+- Substantially modified upstream Lean source files carry per-file dual-license notices and modification notices.
+
+Bundled reference material is not relicensed by this project. In particular, `references/shannon1948.pdf` is included as copyrighted reference material by Claude E. Shannon for study context.
+
+See `LICENSES/` together with the per-file SPDX metadata for the governing terms of each file.
