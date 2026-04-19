@@ -151,11 +151,9 @@ represented explicitly as:
 
 This makes permutation/relabeling steps fully explicit in Lean proofs.
 
-## AI Assistance
+## AI Statement
 
-This project was developed with substantial assistance from Claude (Anthropic).
-Claude contributed to proof development, code structure, and documentation
-throughout the formalization effort.
+This formalization is being completed with substantial assistance from Opus 4.6 + 4.7 and GPT 5.4, through [`claude`](https://claude.com/claude-code) and [`opencode`](https://opencode.ai), and [GitHub Copilot](https://github.com/features/copilot).
 
 ## Reference
 
@@ -164,6 +162,8 @@ throughout the formalization effort.
 
 ## License
 
-This project is licensed under the MIT License. Original work copyright Samuel
-Schlesinger; modifications and additions copyright Christopher Boone. See
-[`LICENSE`](./LICENSE) for the full text.
+[The original paper](./references/shannon1948.pdf), _A Mathematical Theory of Communication_, is copyright 1948 Claude Shannon.
+
+This formalization project is a fork of [SamuelSchlesinger/shannon-1948-formalization](https://github.com/SamuelSchlesinger/shannon-1948-formalization), copyright 2026 Samuel Schlesinger, licensed under [the MIT license](./LICENSES/MIT.txt).
+
+Modifications and additions are copyright 2026 Christopher Boone. Newly added Lean code is licensed under [Apache 2.0](./LICENSES/APACHE-2.0.txt); Lean code from the forked project is still under [MIT](./LICENSES/MIT.txt); substantially modified Lean code is dual licensed under [MIT](./LICENSES/MIT.txt) and [Apache 2.0](./LICENSES/APACHE-2.0.txt). Prose and mathematical exposition are licensed under [CC BY 4.0](./LICENSES/CC-BY-4.0.txt).
