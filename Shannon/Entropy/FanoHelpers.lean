@@ -270,7 +270,7 @@ theorem entropyNat_le_qaryEntropy_at_distinguished_of_nonempty_compl
           simp [Real.binEntropy_one_sub, add_comm, mul_comm]
 
 theorem entropyNat_le_qaryEntropy_at_distinguished
-    {α : Type} [Fintype α] [DecidableEq α] [Nonempty α]
+    {α : Type} [Fintype α] [DecidableEq α]
     (r : ProbDist α) (a0 : α) :
     entropyNat r ≤ Real.qaryEntropy (Fintype.card α) (1 - r a0) := by
   classical

@@ -54,10 +54,11 @@ theorem binEntropyBits_nonneg (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : 0 ≤ binEnt
   exact div_nonneg (Real.binEntropy_nonneg hp₀ hp₁) (Real.log_nonneg (by norm_num))
 
 theorem binEntropyBits_le_one (_hp₀ : 0 ≤ p) (_hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 := by
+  have hnonneg : 0 ≤ Real.binEntropy p := Real.binEntropy_nonneg _hp₀ _hp₁
   unfold binEntropyBits
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   rw [div_le_iff₀ hlog2_pos]
-  simpa using Real.binEntropy_le_log_two (p := p)
+  linarith [hnonneg, Real.binEntropy_le_log_two (p := p)]
 
 theorem binEntropyBits_eq_zero_iff : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1 := by
   constructor
