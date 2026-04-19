@@ -8,3 +8,6 @@ import ShannonTest.Entropy.Properties
 import ShannonTest.Entropy.Converse
 import ShannonTest.Entropy.Final
 import ShannonTest.Entropy.Bits
+import ShannonTest.Entropy.RelativeEntropy
+import ShannonTest.Entropy.MutualInfo
+import ShannonTest.Entropy.BinaryEntropy

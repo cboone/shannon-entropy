@@ -1,4 +1,4 @@
-import Shannon.Entropy.Gibbs
+import Shannon.Entropy.Joint
 
 /-!
 # Shannon.Entropy.Bits
@@ -19,6 +19,7 @@ the uniqueness theorems in base-2 units.
 - `entropyBits_eq_entropyNat_div_log_two`: bridge to the natural-log form
 - `entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`:
   base-2 counterparts of the single-variable bounds from `Gibbs`
+- `entropyBits_prodDist`: base-2 counterpart of `entropyNat_prodDist` on product distributions
 - `entropyBits_unique`: the base-2 restatement of `entropyBase_unique`
 - `entropyBits_unique_eq`: same, with the constant named as `K H * Real.log 2`
 -/
@@ -74,6 +75,16 @@ theorem entropyBits_le_logb_two_card {α : Type} [Fintype α] [Nonempty α]
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   rw [entropyBits_eq_entropyNat_div_log_two, ← Real.log_div_log]
   exact (div_le_div_iff_of_pos_right hlog2_pos).2 (entropyNat_le_log_card p)
+
+/-- Additivity for independent distributions in bits: `entropyBits (prodDist p q) = entropyBits p + entropyBits q`.
+
+Base-2 counterpart of `entropyNat_prodDist`, obtained by dividing the natural-log identity by `Real.log 2`. -/
+theorem entropyBits_prodDist
+    {α β : Type} [Fintype α] [Fintype β]
+    (p : ProbDist α) (q : ProbDist β) :
+    entropyBits (prodDist p q) = entropyBits p + entropyBits q := by
+  simp only [entropyBits_eq_entropyNat_div_log_two]
+  rw [entropyNat_prodDist, add_div]
 
 /-- Base-2 uniqueness (tighter statement that names the constant):
 any `H` satisfying the Shannon axioms agrees with base-2 Shannon entropy

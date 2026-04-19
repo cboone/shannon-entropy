@@ -15,7 +15,6 @@ the infrastructure for multi-variable entropy identities.
 - `prodDist`: product (independent) distribution from two marginals
 - `IsIndependent`: predicate for independence of a joint distribution
 - `condEntropy`: conditional entropy `H_X(Y) = -∑ p(x,y) log(p(x,y)/p(x))`
-- `mutualInfo`: mutual information `I(X;Y) = H(X) + H(Y) - H(X,Y)`
 
 ## Main results
 
@@ -66,7 +65,7 @@ def prodDist {α β : Type} [Fintype α] [Fintype β]
       _ = ∑ a, p a * 1 := by rw [prob_sum_eq_one q]
       _ = 1 := by simp [mul_one, prob_sum_eq_one p]
 
-/-! ## Independence, conditional entropy, mutual information -/
+/-! ## Independence and conditional entropy -/
 
 /-- A joint distribution is independent when it factors as the product of its marginals. -/
 def IsIndependent {α β : Type} [Fintype α] [Fintype β]
@@ -81,11 +80,6 @@ The formula uses Lean's `0 / 0 = 0` and `log 0 = 0` conventions: when
 def condEntropy {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist (α × β)) : ℝ :=
   -∑ ab : α × β, p ab * Real.log (p ab / marginalFst p ab.1)
-
-/-- Mutual information `I(X;Y) = H(X) + H(Y) - H(X,Y)`. -/
-def mutualInfo {α β : Type} [Fintype α] [Fintype β]
-    (p : ProbDist (α × β)) : ℝ :=
-  entropyNat (marginalFst p) + entropyNat (marginalSnd p) - entropyNat p
 
 /-! ## Support lemmas -/
 

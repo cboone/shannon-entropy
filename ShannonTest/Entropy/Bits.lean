@@ -29,6 +29,11 @@ example (p : ProbDist (Fin 3)) : 0 ≤ entropyBits p :=
 example (p : ProbDist (Fin 3)) : entropyBits p ≤ Real.logb 2 (Fintype.card (Fin 3) : ℝ) :=
   entropyBits_le_logb_two_card p
 
+example :
+    entropyBits (prodDist (uniformPNat 2) (uniformPNat 3))
+      = entropyBits (uniformPNat 2) + entropyBits (uniformPNat 3) :=
+  entropyBits_prodDist (uniformPNat 2) (uniformPNat 3)
+
 example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
     (hH : ShannonEntropyAxioms H) {α : Type} [Fintype α] (p : ProbDist α) :
     H p = -(K H * Real.log 2) * ∑ a, p a * Real.logb 2 (p a) :=
