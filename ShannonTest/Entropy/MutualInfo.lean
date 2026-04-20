@@ -20,6 +20,17 @@ example :
   rfl
 
 example :
+    mutualInfoBits (prodDist (uniformPNat 2) (uniformPNat 3)) = 0 := by
+  have hnat : mutualInfo (prodDist (uniformPNat 2) (uniformPNat 3)) = 0 := by
+    rw [mutualInfo_eq_zero_iff_independent]
+    intro a b
+    rw [marginalFst_prodDist, marginalSnd_prodDist]
+    rfl
+  unfold mutualInfoBits
+  rw [hnat]
+  simp
+
+example :
     mutualInfo (prodDist (uniformPNat 2) (uniformPNat 3))
       = relEntropy (prodDist (uniformPNat 2) (uniformPNat 3))
           (prodDist (marginalFst (prodDist (uniformPNat 2) (uniformPNat 3)))

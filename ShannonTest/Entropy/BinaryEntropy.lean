@@ -28,3 +28,6 @@ example (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 :=
 
 example (p : ℝ) : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1 :=
   binEntropyBits_eq_zero_iff
+
+example : Continuous binEntropyBits :=
+  binEntropyBits_continuous

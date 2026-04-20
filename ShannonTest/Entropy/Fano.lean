@@ -36,12 +36,35 @@ example (p : ProbDist (Fin 2 × Fin 3)) (f : Fin 3 → Fin 2) :
 
 example :
     let p := prodDist (uniformPNat 2) (uniformPNat 2)
-    condEntropyBits (swapJoint p) ≤ binEntropyBits (errorProb p id) := by
+    errorProb p id = (1 : ℝ) / 2 := by
   intro p
-  have h := fanoInequality p id
-  have hzero : errorProb p id * Real.logb 2 ((Fintype.card (Fin 2) - 1 : ℕ) : ℝ) = 0 := by
+  rw [errorProb_eq_one_sub_sum_correct]
+  simp [p, prodDist]
+  change 1 - (∑ x : Fin 2, (uniformPNat 2) x * (uniformPNat 2) x) = ((2 : ℝ)⁻¹)
+  rw [Fin.sum_univ_two]
+  norm_num [uniformPNat]
+
+example :
+    let p := prodDist (uniformPNat 2) (uniformPNat 2)
+    condEntropyBits (swapJoint p) ≤ 1 := by
+  intro p
+  have hPe : errorProb p id = (1 : ℝ) / 2 := by
+    rw [errorProb_eq_one_sub_sum_correct]
+    simp [p, prodDist]
+    change 1 - (∑ x : Fin 2, (uniformPNat 2) x * (uniformPNat 2) x) = ((2 : ℝ)⁻¹)
+    rw [Fin.sum_univ_two]
+    norm_num [uniformPNat]
+  have hbin : binEntropyBits (1 / 2 : ℝ) = 1 := by
+    have hhalf : (1 / 2 : ℝ) = 2⁻¹ := by norm_num
+    rw [hhalf]
+    exact binEntropyBits_two_inv
+  have h : condEntropyBits (swapJoint p) ≤
+      binEntropyBits (errorProb p id) +
+        errorProb p id * Real.logb 2 ((Fintype.card (Fin 2) - 1 : ℕ) : ℝ) :=
+    fanoInequality p id
+  rw [hPe, hbin] at h
+  have hzero : (1 / 2 : ℝ) * Real.logb 2 ((Fintype.card (Fin 2) - 1 : ℕ) : ℝ) = 0 := by
     simp
   calc
-    condEntropyBits (swapJoint p) ≤
-        binEntropyBits (errorProb p id) + errorProb p id * Real.logb 2 ((Fintype.card (Fin 2) - 1 : ℕ) : ℝ) := h
-    _ = binEntropyBits (errorProb p id) := by rw [hzero, add_zero]
+    condEntropyBits (swapJoint p) ≤ 1 + (1 / 2 : ℝ) * Real.logb 2 ((Fintype.card (Fin 2) - 1 : ℕ) : ℝ) := h
+    _ = 1 := by rw [hzero, add_zero]

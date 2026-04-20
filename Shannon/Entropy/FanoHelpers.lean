@@ -16,7 +16,7 @@ noncomputable section
 open Finset Real
 
 /-- Deterministic point distribution on a finite type. -/
-def pointDist {α : Type} [Fintype α] (a0 : α) : ProbDist α := by
+private def pointDist {α : Type} [Fintype α] (a0 : α) : ProbDist α := by
   classical
   refine ⟨fun a => if a = a0 then 1 else 0, ?_⟩
   constructor
@@ -25,21 +25,21 @@ def pointDist {α : Type} [Fintype α] (a0 : α) : ProbDist α := by
   · rw [Finset.sum_ite_eq']
     simp
 
-@[simp] theorem pointDist_apply_self {α : Type} [Fintype α] (a0 : α) :
+@[simp] private theorem pointDist_apply_self {α : Type} [Fintype α] (a0 : α) :
     pointDist a0 a0 = 1 := by
   classical
   simp [pointDist]
 
-@[simp] theorem pointDist_apply_ne {α : Type} [Fintype α] {a0 a : α} (h : a ≠ a0) :
+@[simp] private theorem pointDist_apply_ne {α : Type} [Fintype α] {a0 a : α} (h : a ≠ a0) :
     pointDist a0 a = 0 := by
   classical
   simp [pointDist, h]
 
-theorem entropyNat_pointDist {α : Type} [Fintype α] (a0 : α) :
+private theorem entropyNat_pointDist {α : Type} [Fintype α] (a0 : α) :
     entropyNat (pointDist a0) = 0 := by
   simpa [IsDeterministic, pointDist] using (entropyNat_eq_zero_iff (pointDist a0)).2 ⟨a0, by simp⟩
 
-theorem prob_eq_zero_of_marginalSnd_eq_zero {α β : Type} [Fintype α] [Fintype β]
+private theorem prob_eq_zero_of_marginalSnd_eq_zero {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist (α × β)) (y : β) (hy : marginalSnd p y = 0) (x : α) :
     p (x, y) = 0 := by
   have hswap : marginalFst (swapJoint p) y = 0 := by
@@ -107,7 +107,7 @@ theorem condEntropy_swapJoint_eq_sum_marginalSnd_entropyNat_condDistFstGivenSnd
     simpa [entropyNat_swapJoint] using hrel
   linarith [hrel', hchain]
 
-theorem entropyNat_bool_eq_binEntropy (p : ProbDist Bool) :
+private theorem entropyNat_bool_eq_binEntropy (p : ProbDist Bool) :
     entropyNat p = Real.binEntropy (p true) := by
   have hsum : p true + p false = 1 := by
     simpa [Fintype.sum_bool] using prob_sum_eq_one p
@@ -117,12 +117,12 @@ theorem entropyNat_bool_eq_binEntropy (p : ProbDist Bool) :
   simpa [add_comm] using (Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub (p true)).symm
 
 /-- Auxiliary family for splitting off a distinguished point. -/
-def pointComplementFib {α : Type} (a0 : α) : Bool → Type
+private def pointComplementFib {α : Type} (a0 : α) : Bool → Type
   | true => {x // x ≠ a0}
   | false => PUnit
 
 /-- Relabel `Sigma (pointComplementFib a0)` back to `α`. -/
-noncomputable def pointComplementEquiv {α : Type} [DecidableEq α] (a0 : α) :
+private noncomputable def pointComplementEquiv {α : Type} [DecidableEq α] (a0 : α) :
     Sigma (pointComplementFib a0) ≃ α := by
   classical
   refine
@@ -145,7 +145,7 @@ noncomputable def pointComplementEquiv {α : Type} [DecidableEq α] (a0 : α) :
     · simp [h]
     · simp [h]
 
-instance pointComplementFibFintype {α : Type} [Fintype α] [DecidableEq α] (a0 : α) (b : Bool) :
+private instance pointComplementFibFintype {α : Type} [Fintype α] [DecidableEq α] (a0 : α) (b : Bool) :
     Fintype (pointComplementFib a0 b) := by
   cases b
   · change Fintype PUnit
@@ -153,7 +153,7 @@ instance pointComplementFibFintype {α : Type} [Fintype α] [DecidableEq α] (a0
   · change Fintype {x : α // x ≠ a0}
     infer_instance
 
-theorem sum_subtype_ne_eq_one_sub {α : Type} [Fintype α] [DecidableEq α]
+private theorem sum_subtype_ne_eq_one_sub {α : Type} [Fintype α] [DecidableEq α]
     (r : ProbDist α) (a0 : α) :
     ∑ x : {x // x ≠ a0}, r x.1 = 1 - r a0 := by
   have hsplit : ∑ x, r x = r a0 + ∑ x : {x // x ≠ a0}, r x.1 := by
@@ -162,7 +162,7 @@ theorem sum_subtype_ne_eq_one_sub {α : Type} [Fintype α] [DecidableEq α]
   linarith
 
 /-- Bernoulli law that records whether an outcome differs from a distinguished point. -/
-def splitAtPoint {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) : ProbDist Bool := by
+private def splitAtPoint {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) : ProbDist Bool := by
   refine ⟨fun b => if b then 1 - r a0 else r a0, ?_⟩
   constructor
   · intro b
@@ -172,16 +172,16 @@ def splitAtPoint {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) : ProbDist
       linarith [prob_le_one r a0]
   · simp
 
-@[simp] theorem splitAtPoint_false {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) :
+@[simp] private theorem splitAtPoint_false {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) :
     splitAtPoint r a0 false = r a0 := by
   simp [splitAtPoint]
 
-@[simp] theorem splitAtPoint_true {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) :
+@[simp] private theorem splitAtPoint_true {α : Type} [Fintype α] (r : ProbDist α) (a0 : α) :
     splitAtPoint r a0 true = 1 - r a0 := by
   simp [splitAtPoint]
 
 /-- Conditional distributions for the point/complement split at `a0`. -/
-def splitAtPointCond {α : Type} [Fintype α] [DecidableEq α] (r : ProbDist α) (a0 : α)
+private def splitAtPointCond {α : Type} [Fintype α] [DecidableEq α] (r : ProbDist α) (a0 : α)
     [Nonempty {x // x ≠ a0}] :
     (b : Bool) → ProbDist (pointComplementFib a0 b)
   | false => pointDist PUnit.unit
@@ -199,7 +199,7 @@ def splitAtPointCond {α : Type} [Fintype α] [DecidableEq α] (r : ProbDist α)
                   rw [Finset.sum_div]
             _ = 1 := by simp [sum_subtype_ne_eq_one_sub, he]
 
-theorem splitAtPointCond_true_mass {α : Type} [Fintype α] [DecidableEq α]
+private theorem splitAtPointCond_true_mass {α : Type} [Fintype α] [DecidableEq α]
     (r : ProbDist α) (a0 : α) [Nonempty {x // x ≠ a0}] (x : {x // x ≠ a0}) :
     splitAtPoint r a0 true * splitAtPointCond r a0 true x = r x.1 := by
   classical
@@ -228,7 +228,7 @@ private theorem relabel_compose_splitAtPoint_eq_self {α : Type} [Fintype α] [D
     simp [pointComplementEquiv, composeProb, splitAtPointCond, splitAtPoint, h]
     exact splitAtPointCond_true_mass r a0 ⟨x, h⟩
 
-theorem entropyNat_le_qaryEntropy_at_distinguished_of_nonempty_compl
+private theorem entropyNat_le_qaryEntropy_at_distinguished_of_nonempty_compl
     {α : Type} [Fintype α] [DecidableEq α] (r : ProbDist α) (a0 : α)
     [Nonempty {x // x ≠ a0}] :
     entropyNat r ≤ Real.qaryEntropy (Fintype.card α) (1 - r a0) := by

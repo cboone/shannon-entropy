@@ -11,4 +11,5 @@ import ShannonTest.Entropy.Bits
 import ShannonTest.Entropy.RelativeEntropy
 import ShannonTest.Entropy.MutualInfo
 import ShannonTest.Entropy.BinaryEntropy
+import ShannonTest.Entropy.FanoHelpers
 import ShannonTest.Entropy.Fano
