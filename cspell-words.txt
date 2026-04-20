@@ -2,11 +2,13 @@ Anson
 agnostically
 approximants
 backticked
+biconditional
 bibtex
 binentropy
 Brouwer
 cboone
 Chebyshev
+compl
 congr
 cleveref
 cooldown
@@ -23,6 +25,7 @@ fiberwise
 Frobenius
 frontmatter
 hcard
+hcast
 hchain
 hident
 hrelab
@@ -58,6 +61,7 @@ pandocciter
 pointwise
 pushforward
 Pushforward
+qary
 recursivity
 relabelings
 relentropy
