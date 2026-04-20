@@ -1,25 +1,18 @@
 version = 1
 
+# Project-authored prose: NOTICE plus every tracked Markdown file.
+# README.md (compound MIT AND CC-BY-4.0, upstream-derived) and
+# CODE_OF_CONDUCT.md (CC-BY-SA-4.0, Contributor Covenant) are scoped
+# out via dedicated override annotations below.
 [[annotations]]
-path = [
-  "NOTICE",
-  "AGENTS.md",
-  "CHANGELOG.md",
-  "CONTRIBUTING.md",
-  ".github/PULL_REQUEST_TEMPLATE.md",
-  ".github/SECURITY.md",
-  ".github/copilot-instructions.md",
-  "docs/**/*.md",
-  "references/shannon1948-summary.md",
-  "references/shannon1948-transcription.md",
-]
+path = ["NOTICE", "**/*.md"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Christopher Boone"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
 path = ["README.md"]
-precedence = "aggregate"
+precedence = "override"
 SPDX-FileCopyrightText = ["2026 Samuel Schlesinger", "2026 Christopher Boone"]
 SPDX-License-Identifier = "MIT AND CC-BY-4.0"
 
