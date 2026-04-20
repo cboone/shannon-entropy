@@ -62,12 +62,6 @@ def diagonalDist {α : Type} [Fintype α] [DecidableEq α]
             simp
       _ = 1 := prob_sum_eq_one p
 
-private theorem marginalSnd_pos_of_prob_pos {α β : Type} [Fintype α] [Fintype β]
-    (p : ProbDist (α × β)) (a : α) (b : β) (h : 0 < p (a, b)) :
-    0 < marginalSnd p b :=
-  lt_of_lt_of_le h
-    (Finset.single_le_sum (fun a' _ => prob_nonneg p (a', b)) (Finset.mem_univ a))
-
 theorem marginalFst_swapJoint {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist (α × β)) :
     marginalFst (swapJoint p) = marginalSnd p := by
@@ -389,6 +383,9 @@ theorem mutualInfo_kernelPushforward_le
         exact mul_pos
           (mul_pos (marginalFst_pos_of_prob_pos p a b hpab) (marginalSnd_pos_of_prob_pos p a b hpab))
           hWbc)
+    -- Identifies `∑_b marginalFst p a * marginalSnd p b * W b c` with
+    -- `marginalFst q a * marginalSnd q c` on the LHS of `log_sum_inequality`, where
+    -- `marginalFst q = marginalFst p` and `marginalSnd q c = ∑_b marginalSnd p b * W b c`.
     simpa [q, prodDist, marginalFst_kernelPushforward, marginalSnd_kernelPushforward, Finset.mul_sum,
       mul_assoc, mul_left_comm, mul_comm] using hls
   have hsum :

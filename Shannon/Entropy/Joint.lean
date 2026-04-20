@@ -98,6 +98,13 @@ lemma marginalFst_pos_of_prob_pos {α β : Type} [Fintype α] [Fintype β]
   lt_of_lt_of_le h
     (Finset.single_le_sum (fun b' _ => prob_nonneg p (a, b')) (Finset.mem_univ b))
 
+/-- A positive joint probability implies a positive second marginal. -/
+lemma marginalSnd_pos_of_prob_pos {α β : Type} [Fintype α] [Fintype β]
+    (p : ProbDist (α × β)) (a : α) (b : β) (h : 0 < p (a, b)) :
+    0 < marginalSnd p b :=
+  lt_of_lt_of_le h
+    (Finset.single_le_sum (fun a' _ => prob_nonneg p (a', b)) (Finset.mem_univ a))
+
 /-! ## Marginals of product distributions -/
 
 /-- The first marginal of a product distribution recovers the first factor. -/
