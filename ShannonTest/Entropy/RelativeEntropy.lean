@@ -58,8 +58,10 @@ example : relEntropy (uniformPNat 2) quarterThreeQuarter = Real.log (4 / 3 : ℝ
   rw [hlog23]
   ring
 
-example : relEntropy (uniformPNat 2) (uniformPNat 2) = 0 ↔ ∀ a, (uniformPNat 2) a = (uniformPNat 2) a :=
-  relEntropy_eq_zero_iff _ _ (by intro a h; exact h)
+example :
+    relEntropy (uniformPNat 2) quarterThreeQuarter = 0
+      ↔ ∀ a, (uniformPNat 2) a = quarterThreeQuarter a :=
+  relEntropy_eq_zero_iff _ _ (by intro a _; fin_cases a <;> simp [quarterThreeQuarter])
 
 example :
     (∑ i, (uniformPNat 2) i) * Real.log ((∑ i, (uniformPNat 2) i) / (∑ i, (uniformPNat 2) i))
