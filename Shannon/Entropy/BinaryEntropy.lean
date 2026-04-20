@@ -49,18 +49,18 @@ def binEntropyBits (p : ℝ) : ℝ := Real.binEntropy p / Real.log 2
   unfold binEntropyBits
   rw [Real.binEntropy_one_sub]
 
-theorem binEntropyBits_nonneg (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : 0 ≤ binEntropyBits p := by
+theorem binEntropyBits_nonneg {p : ℝ} (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : 0 ≤ binEntropyBits p := by
   unfold binEntropyBits
   exact div_nonneg (Real.binEntropy_nonneg hp₀ hp₁) (Real.log_nonneg (by norm_num))
 
-theorem binEntropyBits_le_one (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 := by
+theorem binEntropyBits_le_one {p : ℝ} (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 := by
   have hnonneg : 0 ≤ Real.binEntropy p := Real.binEntropy_nonneg hp₀ hp₁
   unfold binEntropyBits
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   rw [div_le_iff₀ hlog2_pos]
   linarith [hnonneg, Real.binEntropy_le_log_two (p := p)]
 
-theorem binEntropyBits_eq_zero_iff : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1 := by
+theorem binEntropyBits_eq_zero_iff {p : ℝ} : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1 := by
   constructor
   · intro h
     have hlog2_ne : Real.log 2 ≠ 0 := ne_of_gt (Real.log_pos (by norm_num))
