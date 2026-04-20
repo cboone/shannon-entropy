@@ -1,0 +1,9 @@
+This identifier applies to bundled reference material that is included in the `shannon-entropy` repository for study context.
+
+Covered material:
+
+- `references/shannon1948.pdf`
+
+The covered material is copyright 1948 Claude E. Shannon.
+
+This repository does not relicense that material under MIT, Apache-2.0, CC-BY-4.0, or any other project-wide license. No additional permission is granted here beyond whatever rights the recipient already has under applicable law.

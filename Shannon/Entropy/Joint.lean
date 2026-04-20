@@ -1,3 +1,11 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT OR Apache-2.0
+
+This file is derived from `SamuelSchlesinger/shannon-1948-formalization` and has been substantially modified in this fork.
+-/
+
 import Shannon.Entropy.Gibbs
 
 /-!
@@ -21,6 +29,10 @@ the infrastructure for multi-variable entropy identities.
 - `chain_rule`: `H(X,Y) = H(X) + H_X(Y)`
 - `entropyNat_prodDist`: `H(X × Y) = H(X) + H(Y)` for independent distributions
 - `marginalFst_prodDist`, `marginalSnd_prodDist`: marginals of product distributions
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Section 6, pp. 11-12.
 -/
 namespace Shannon
 
@@ -128,7 +140,11 @@ theorem marginalSnd_prodDist {α β : Type} [Fintype α] [Fintype β]
 /-- Shannon's Property 5 form: the conditional entropy unfolds to the double
 sum `-∑_i ∑_j p(i, j) log p_i(j)` with `p_i(j) = p(i, j) / p_X(i)`. Ties the
 Lean definition of `condEntropy` to the summation form Shannon writes in the
-defining equation of Property 5 (Section 6, pp. 11-12). -/
+defining equation of Property 5 (Section 6, pp. 11-12).
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Section 6, pp. 11-12. -/
 theorem condEntropy_eq_shannon_form
     {α β : Type} [Fintype α] [Fintype β] (p : ProbDist (α × β)) :
     condEntropy p

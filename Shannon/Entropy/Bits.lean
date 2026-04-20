@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: Apache-2.0
+-/
+
 import Shannon.Entropy.Joint
 
 /-!
@@ -22,6 +27,12 @@ the uniqueness theorems in base-2 units.
 - `entropyBits_prodDist`: base-2 counterpart of `entropyNat_prodDist` on product distributions
 - `entropyBits_unique`: the base-2 restatement of `entropyBase_unique`
 - `entropyBits_unique_eq`: same, with the constant named as `K H * Real.log 2`
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Section 1 and Appendix 2.
+- [CoverThomas2006]: Thomas M. Cover and Joy A. Thomas, *Elements of Information Theory*, 2nd ed., Wiley, 2006, Chapter 2.
+- [MacKay2003]: David J. C. MacKay, *Information Theory, Inference, and Learning Algorithms*, Cambridge University Press, 2003, Chapter 4.
 -/
 namespace Shannon
 

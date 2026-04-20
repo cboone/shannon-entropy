@@ -56,6 +56,7 @@ nonneg
 nonnegativity
 olean
 oleans
+opencode
 Pandoc
 pandocciter
 pointwise
@@ -81,5 +82,6 @@ Verso
 VersoManual
 versowebcomponents
 workmux
+workstream
 worktree
 worktrees

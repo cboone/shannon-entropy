@@ -1,3 +1,9 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT
+-/
+
 import Shannon.Entropy.Core
 
 /-!
@@ -15,6 +21,10 @@ Main outputs:
 Shannon introduces `A(n) := H(1/n, ..., 1/n)` for the uniform distribution on `n` outcomes, and observes that a uniform distribution on `s^n` outcomes decomposes by grouping into `n` independent uniform choices of size `s`, giving Shannon's mnemonic `A(s^n) = n · A(s)`. Our Lean counterparts are `Apos_mul` (additivity on products of alphabet sizes, `Apos H (n * m) = Apos H n + Apos H m`) and `Apos_pow` (the `n`-fold iterate, `Apos H (n^k) = k · Apos H n`).
 
 The logarithmic form `A(n) = K log n` then follows from a ratio-squeeze argument: for any `s, t > 1` and any `n`, pick `m` so that `s^m ≤ t^n < s^(m+1)`; monotonicity of `A` on uniform alphabet sizes pins `A(t)/A(s)` within `1/n` of `log t / log s`, and letting `n → ∞` forces `A(t)/A(s) = log_s t`. Our counterpart is `Apos_ratio_logb_close` feeding `Apos_ratio_eq_logb`, which combine in `Apos_eq_K_mul_log` to give `Apos H n = K H * log n` with `K H := Apos H 2 / log 2`.
+
+## References
+
+- [Shannon1948]: Claude E. Shannon, *A Mathematical Theory of Communication*, *Bell System Technical Journal* 27 (1948), Appendix 2, pp. 48-49.
 -/
 namespace Shannon
 

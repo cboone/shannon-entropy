@@ -1,3 +1,9 @@
+/-
+SPDX-FileCopyrightText: 2026 Samuel Schlesinger
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: MIT
+-/
+
 import Shannon.Entropy.Properties
 import Shannon.Entropy.Converse
 import Shannon.Entropy.Bits
