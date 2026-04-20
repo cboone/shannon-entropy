@@ -1,30 +1,29 @@
-# SPDX-FileCopyrightText: 2026 Christopher Boone
-# SPDX-License-Identifier: Apache-2.0
-
 version = 1
 
+# Project-authored prose: NOTICE plus every tracked Markdown file.
+# README.md (compound MIT AND CC-BY-4.0, upstream-derived) and
+# CODE_OF_CONDUCT.md (CC-BY-SA-4.0, Contributor Covenant) are scoped
+# out via dedicated override annotations below.
 [[annotations]]
-path = [
-  "NOTICE",
-  "AGENTS.md",
-  "CHANGELOG.md",
-  "CONTRIBUTING.md",
-  ".github/PULL_REQUEST_TEMPLATE.md",
-  ".github/SECURITY.md",
-  ".github/copilot-instructions.md",
-  "docs/**/*.md",
-  "references/shannon1948-summary.md",
-  "references/shannon1948-transcription.md",
-]
+path = ["NOTICE", "**/*.md"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Christopher Boone"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
 path = ["README.md"]
-precedence = "aggregate"
+precedence = "override"
 SPDX-FileCopyrightText = ["2026 Samuel Schlesinger", "2026 Christopher Boone"]
 SPDX-License-Identifier = "MIT AND CC-BY-4.0"
+
+# Code of Conduct: adapted from the Contributor Covenant, which is
+# itself under CC-BY-SA-4.0. Override any other inferred licensing
+# for this one file.
+[[annotations]]
+path = ["CODE_OF_CONDUCT.md"]
+precedence = "override"
+SPDX-FileCopyrightText = ["Contributor Covenant Contributors", "2026 Christopher Boone"]
+SPDX-License-Identifier = "CC-BY-SA-4.0"
 
 [[annotations]]
 path = [
@@ -35,6 +34,7 @@ path = [
   ".vscode/settings.json",
   ".workmux.yml",
   "Makefile",
+  "REUSE.toml",
   "bin/bootstrap-worktree",
   "cspell-words.txt",
   "cspell.jsonc",
