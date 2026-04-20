@@ -383,11 +383,14 @@ theorem mutualInfo_kernelPushforward_le
         exact mul_pos
           (mul_pos (marginalFst_pos_of_prob_pos p a b hpab) (marginalSnd_pos_of_prob_pos p a b hpab))
           hWbc)
-    -- Identifies `∑_b marginalFst p a * marginalSnd p b * W b c` with
-    -- `marginalFst q a * marginalSnd q c` on the LHS of `log_sum_inequality`, where
-    -- `marginalFst q = marginalFst p` and `marginalSnd q c = ∑_b marginalSnd p b * W b c`.
-    simpa [q, prodDist, marginalFst_kernelPushforward, marginalSnd_kernelPushforward, Finset.mul_sum,
-      mul_assoc, mul_left_comm, mul_comm] using hls
+    -- Identify the denominator on the LHS of `log_sum_inequality` with the product of `q`'s
+    -- marginals: `∑_b marginalFst p a * marginalSnd p b * W b c = prodDist (marginalFst q) (marginalSnd q) (a, c)`.
+    have hdenom :
+        (∑ b, marginalFst p a * marginalSnd p b * W b c) =
+          prodDist (marginalFst q) (marginalSnd q) (a, c) := by
+      simp [q, prodDist, marginalFst_kernelPushforward, marginalSnd_kernelPushforward,
+        Finset.mul_sum, mul_left_comm, mul_comm]
+    simpa [q, hdenom] using hls
   have hsum :
       ∑ ac : α × γ, q ac * Real.log (q ac / prodDist (marginalFst q) (marginalSnd q) ac) ≤
         ∑ ac : α × γ, ∑ b, p (ac.1, b) * W b ac.2 * Real.log
