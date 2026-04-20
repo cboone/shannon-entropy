@@ -53,8 +53,8 @@ theorem binEntropyBits_nonneg (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : 0 ≤ binEnt
   unfold binEntropyBits
   exact div_nonneg (Real.binEntropy_nonneg hp₀ hp₁) (Real.log_nonneg (by norm_num))
 
-theorem binEntropyBits_le_one (_hp₀ : 0 ≤ p) (_hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 := by
-  have hnonneg : 0 ≤ Real.binEntropy p := Real.binEntropy_nonneg _hp₀ _hp₁
+theorem binEntropyBits_le_one (hp₀ : 0 ≤ p) (hp₁ : p ≤ 1) : binEntropyBits p ≤ 1 := by
+  have hnonneg : 0 ≤ Real.binEntropy p := Real.binEntropy_nonneg hp₀ hp₁
   unfold binEntropyBits
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   rw [div_le_iff₀ hlog2_pos]
@@ -74,11 +74,6 @@ theorem binEntropyBits_eq_zero_iff : binEntropyBits p = 0 ↔ p = 0 ∨ p = 1 :=
 theorem binEntropyBits_continuous : Continuous binEntropyBits := by
   unfold binEntropyBits
   fun_prop
-
-private theorem binEntropyBits_eq_negMulLog_pair (p : ℝ) :
-    binEntropyBits p = (Real.negMulLog p + Real.negMulLog (1 - p)) / Real.log 2 := by
-  unfold binEntropyBits
-  rw [Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
 
 end
 

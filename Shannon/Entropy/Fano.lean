@@ -140,9 +140,6 @@ theorem fanoInequality
     condEntropy_swapJoint_le_qaryEntropy_errorProb p f
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hcard_ge : 1 ≤ Fintype.card α := Nat.succ_le_of_lt (Fintype.card_pos_iff.mpr ‹Nonempty α›)
-  have hcast : ((Fintype.card α - 1 : ℕ) : ℝ) = (Fintype.card α : ℝ) - 1 := by
-    rw [Nat.cast_sub hcard_ge]
-    norm_num
   have hcastInt : ((((Fintype.card α : ℤ) - 1 : ℤ) : ℝ)) = ((Fintype.card α - 1 : ℕ) : ℝ) := by
     norm_num [Nat.cast_sub hcard_ge]
   have hdiv : condEntropy (swapJoint p) / Real.log 2 ≤ Real.qaryEntropy (Fintype.card α) Pe / Real.log 2 :=
