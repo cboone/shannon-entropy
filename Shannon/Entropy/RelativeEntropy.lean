@@ -203,7 +203,7 @@ theorem log_sum_inequality
           _ = 1 := by simp [B, hB_pos.ne']
     have hpq_supp : Supports q p := by
       intro i hpi
-      show 0 < b i / B
+      change 0 < b i / B
       have hai : 0 < a i := by
         dsimp [p] at hpi
         exact (div_pos_iff_of_pos_right hA_pos).mp hpi

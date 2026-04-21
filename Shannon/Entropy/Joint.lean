@@ -124,7 +124,7 @@ theorem marginalFst_prodDist {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist α) (q : ProbDist β) :
     marginalFst (prodDist p q) = p := by
   ext a
-  show ∑ b, p a * q b = p a
+  change ∑ b, p a * q b = p a
   rw [← Finset.mul_sum, prob_sum_eq_one q, mul_one]
 
 /-- The second marginal of a product distribution recovers the second factor. -/
@@ -132,7 +132,7 @@ theorem marginalSnd_prodDist {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist α) (q : ProbDist β) :
     marginalSnd (prodDist p q) = q := by
   ext b
-  show ∑ a, p a * q b = q b
+  change ∑ a, p a * q b = q b
   rw [← Finset.sum_mul, prob_sum_eq_one p, one_mul]
 
 /-! ## Chain rule -/

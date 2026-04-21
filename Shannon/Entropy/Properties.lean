@@ -169,7 +169,7 @@ theorem entropyNat_joint_le_add {α β : Type} [Fintype α] [Fintype β]
   let q := prodDist (marginalFst p) (marginalSnd p)
   have hsupp : ∀ ab, 0 < p ab → 0 < q ab := by
     intro ⟨a, b⟩ hab
-    show 0 < marginalFst p a * marginalSnd p b
+    change 0 < marginalFst p a * marginalSnd p b
     exact mul_pos (marginalFst_pos_of_prob_pos p a b hab)
       (lt_of_lt_of_le hab
         (Finset.single_le_sum (fun a' _ => prob_nonneg p (a', b)) (Finset.mem_univ a)))
@@ -243,7 +243,7 @@ theorem entropyNat_doublyStochastic_le {n : Type} [Fintype n] [DecidableEq n]
   have hrow : ∀ i, ∑ j, A i j * negMulLog (p j) ≤
       negMulLog (doublyStochasticApply A hA p i) := by
     intro i
-    show ∑ j, A i j * negMulLog (p j) ≤ negMulLog (∑ j, A i j * p j)
+    change ∑ j, A i j * negMulLog (p j) ≤ negMulLog (∑ j, A i j * p j)
     have := Real.concaveOn_negMulLog.le_map_sum
       (t := Finset.univ) (w := fun j => A i j) (p := fun j => (p j : ℝ))
       (fun j _ => nonneg_of_mem_doublyStochastic hA)

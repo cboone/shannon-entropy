@@ -39,7 +39,7 @@ theorem entropyNat_relabelInvariant
 theorem entropyNat_uniformMonotone :
     StrictMono fun n : ℕ+ => entropyNat (uniformPNat n) := by
   intro m n hmn
-  show entropyNat (uniformPNat m) < entropyNat (uniformPNat n)
+  change entropyNat (uniformPNat m) < entropyNat (uniformPNat n)
   rw [entropyNat_uniformPNat, entropyNat_uniformPNat]
   have hm_pos : (0 : ℝ) < m := by exact_mod_cast m.2
   have hmn_real : (m : ℝ) < (n : ℝ) := by exact_mod_cast hmn
