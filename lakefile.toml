@@ -17,6 +17,8 @@ autoImplicit = false
 relaxedAutoImplicit = false
 # Enable all mathlib linters: automatically matches what mathlib uses.
 weak.linter.mathlibStandardSet = true
+# This project does not enforce a hard line-length limit.
+weak.linter.style.longLine = false
 
 [[require]]
 name = "batteries"
