@@ -1,7 +1,7 @@
 # 2026-04-21 Phase D: i.i.d. AEP and typical sets (Theorems 3 and 4, i.i.d. case)
 
 Date: 2026-04-21
-Status: Draft. Targets Phase D of `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`. Branch `formalize/phase-d-iid-aep-and-typical-sets` off `main` at the current `7c29b4a` tip (post Phase C merge).
+Status: Draft. Targets Phase D of `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`. Branch `formalize/phase-d-iid-aep-and-typical-sets` off `main` at the current `7c29b4a` tip (post Phase C merge). Current branch state is still planning-only: no `Shannon/Entropy/IID.lean`, `Shannon/Entropy/AEP.lean`, or matching tests and book chapter have landed yet.
 
 ## Context
 
@@ -37,7 +37,7 @@ Deliver six things in one branch:
 2. The base-2 typical set `typicalSet p N ε : Finset (Fin N → α)` as a support-restricted ε-shell around `entropyBits p`, plus the per-element bounds `iidDist_le_of_mem_typicalSet` and `iidDist_ge_of_mem_typicalSet` stated in `2 ^ …` form directly (no natural-log detour).
 3. A finite Chebyshev-style concentration helper on `ProbDist α` in the AEP module (or split into a local `Concentration` section if the helper grows) and the Theorem 3 statement `aep_iid`: for every `ε, δ > 0`, there is `N₀` such that for `N ≥ N₀`, the typical set has `iidDist p N`-mass at least `1 − δ`.
 4. Theorem 4 statements `typicalSet_iidDist_card_le` and `typicalSet_iidDist_card_ge` bounding `|typicalSet p N ε|` above and (for `N` large, conditional on `δ`) below by the base-2 expressions the roadmap locks in.
-5. The `minCover` functional and its `Tendsto` consequence: for `0 < q < 1`, `Tendsto (fun N => Real.logb 2 (minCover p N q) / N) atTop (𝓝 (entropyBits p))`.
+5. The `minCover` functional on interior coverage thresholds `0 < q < 1` and its `Tendsto` consequence: `Tendsto (fun N => Real.logb 2 (minCover p N q hq₀ hq₁) / N) atTop (𝓝 (entropyBits p))`.
 6. A new Verso book chapter `Book/IIDAndAEP.lean` walking through the product construction, typical set, and the i.i.d. case of Theorems 3 and 4; transcription cross-references for the i.i.d. row; roadmap sync; facade update; test mirrors; `cspell-words.txt` additions.
 
 Non-goals (reserved for Phase E):
@@ -55,12 +55,13 @@ Non-goals (Phase F; permanently out of scope for this roadmap):
 
 ### 1. I.i.d. product distribution and N-fold additivity (`Shannon/Entropy/IID.lean`)
 
-Create `Shannon/Entropy/IID.lean`. Imports: `Shannon.Entropy.Bits` (for `entropyBits`, `entropyBits_prodDist`, and transitively `entropyNat_relabelInvariant` through `Joint`).
+Create `Shannon/Entropy/IID.lean`. Imports: `Shannon.Entropy.Bits` for the base-2 API and `Shannon.Entropy.Converse` for `entropyNat_relabelInvariant` (the latter is not re-exported by `Bits.lean`).
 
 Module skeleton:
 
 ```lean
 import Shannon.Entropy.Bits
+import Shannon.Entropy.Converse
 
 namespace Shannon
 
@@ -134,7 +135,7 @@ theorem iidDist_entropyBits {α : Type} [Fintype α]
 Two internal helpers the induction step uses:
 
 - `iidDist_succ_relabel : iidDist p (N + 1) = relabelProb (finSuccEquivCons α N) (prodDist p (iidDist p N))` (or the appropriate equivalence in Mathlib; `Fin.consEquiv` is the likely name). The equivalence sends `Fin.cons a x` to `(a, x)` and is the one that makes the left factor align with a single draw.
-- `entropyBits_relabelInvariant : entropyBits (relabelProb e p) = entropyBits p`. This is not currently in `Bits.lean`; it is a one-line consequence of `entropyNat_relabelInvariant` plus the bits / nat bridge. Add it to `Bits.lean` in a small Task 1a commit so `iidDist_entropyBits` can close without reaching into internals.
+- `entropyBits_relabelInvariant : entropyBits (relabelProb e p) = entropyBits p`. This is not currently in `Bits.lean`; it is a one-line consequence of `entropyNat_relabelInvariant` from `Converse.lean` plus the bits / nat bridge. Add it to `Bits.lean` in a small Task 1a commit so `iidDist_entropyBits` can close without reaching into internals.
 
 Task 1a (one-line helper in `Bits.lean`):
 
@@ -295,9 +296,9 @@ Proof: expand `iidDist p N x = ∏ i, p (x i)`, swap `∑ x` and `∑ i`, factor
 The per-symbol variance bound is likewise a standard `log^2`-weighted sum:
 
 ```lean
-/-- Per-symbol variance bound: `∑ a, p a * (logProbBits p a - entropyBits p)^2 ≤
-    max_a |logProbBits p a|^2`, but the precise bound does not matter for AEP; we just need
-    finiteness. -/
+/-- Sample-mean variance bound: the empirical average of `logProbBits` under `iidDist p N`
+    has variance at most `(∑ a, p a * (logProbBits p a - entropyBits p)^2) / N`.
+    The `1 / N` decay is the point: it is what feeds Chebyshev in `aep_iid`. -/
 private lemma iidDist_variance_logProb_bound
     {α : Type} [Fintype α]
     (p : ProbDist α) (N : ℕ) :
@@ -307,7 +308,7 @@ private lemma iidDist_variance_logProb_bound
   ...
 ```
 
-This is the scaling law `Var(Y̅_N) = Var(Y) / N` for i.i.d. samples, specialized to `Y = logProbBits p`. The proof uses `iidDist_sum_apply_sample` for the linear-in-`g` case and an independence-style cross-term argument for the quadratic case; budget ≈ 40 lines. If the cross-term bookkeeping is ugly, weaken to `≤ C` for some explicit constant `C` depending only on `p`; the AEP statement only needs `→ 0 as N → ∞`, and any `1/N`-asymptotic constant discharges that.
+This is the scaling law `Var(Y̅_N) = Var(Y) / N` for i.i.d. samples, specialized to `Y = logProbBits p`. The proof uses `iidDist_sum_apply_sample` for the linear-in-`g` case and an independence-style cross-term argument for the quadratic case; budget ≈ 40 lines. If the cross-term bookkeeping is ugly, keep a weakened but still vanishing estimate of the form `≤ C / N` for some explicit constant `C` depending only on `p`. Do not weaken all the way to `≤ C`: Chebyshev would then give only a fixed tail bound and would not prove the AEP.
 
 #### 3c. The AEP statement
 
@@ -379,18 +380,20 @@ The `Nat` cast on the cardinality is the minor bookkeeping detail: `(typicalSet 
 
 ```lean
 /-- **Minimum-cover cardinality**: the size of the smallest subset whose `iidDist p N` mass is
-at least `q`. Shannon's "starting from the most probable, how many sequences to accumulate
-probability `q`". Implemented via `Nat.find` on the set of cardinalities achieving the mass. -/
+at least `q`, for an interior coverage threshold with `0 < q < 1`. Shannon's "starting from
+the most probable, how many sequences to accumulate probability `q`". Implemented via
+`Nat.find` on the set of cardinalities achieving the mass. -/
 def minCover {α : Type} [Fintype α] [DecidableEq α]
-    (p : ProbDist α) (N : ℕ) (q : ℝ) : ℕ :=
+    (p : ProbDist α) (N : ℕ) (q : ℝ) (hq₀ : 0 < q) (hq₁ : q < 1) : ℕ :=
   Nat.find (h := ?_) ...
 
 /-- **Shannon's Theorem 4 (i.i.d. case, minCover form)**:
-    `Tendsto (fun N => Real.logb 2 (minCover p N q) / N) atTop (𝓝 (entropyBits p))` for `0 < q < 1`. -/
+    `Tendsto (fun N => Real.logb 2 (minCover p N q hq₀ hq₁) / N) atTop (𝓝 (entropyBits p))`
+    for `0 < q < 1`. -/
 theorem tendsto_logb_minCover_iid
     {α : Type} [Fintype α] [DecidableEq α]
     (p : ProbDist α) {q : ℝ} (hq₀ : 0 < q) (hq₁ : q < 1) :
-    Tendsto (fun N : ℕ => Real.logb 2 ((minCover p N q : ℝ)) / (N : ℝ))
+    Tendsto (fun N : ℕ => Real.logb 2 ((minCover p N q hq₀ hq₁ : ℝ)) / (N : ℝ))
       atTop (𝓝 (entropyBits p)) := by
   -- upper bound: minCover ≤ |typicalSet| (for N large, typical set already carries mass ≥ q),
   -- so logb 2 minCover / N ≤ logb 2 |typicalSet| / N ≤ (H + ε) + (logb 2 factor) / N → H + ε
@@ -403,8 +406,8 @@ theorem tendsto_logb_minCover_iid
 Implementation notes:
 
 - `Nat.find` requires decidability of the existential `∃ n, ∃ S : Finset (Fin N → α), S.card = n ∧ q ≤ ∑ x ∈ S, iidDist p N x`. Use `Finset.decidableDExistsFinset` plus the decidability of the membership/cardinality conjunction on a finite type.
-- The existential is nonempty (the full `Finset.univ` satisfies `mass ≥ q < 1`), so `Nat.find` is well-defined. Add a helper `minCover_exists` proving nonemptiness cleanly.
-- The `Tendsto` proof routes through `NNReal.tendsto_nhds` / `Metric.tendsto_atTop_nhds`: for every `ε' > 0`, produce `N₀` such that `|logb 2 (minCover p N q) / N − entropyBits p| ≤ ε'` for `N ≥ N₀`. Take `ε' := ε/2` (or `ε/3` depending on how the tail-inclusion argument unfolds), then combine `typicalSet_iidDist_card_le` and `typicalSet_iidDist_card_ge` with `aep_iid`.
+- Under `hq₁ : q < 1`, the existential is nonempty because the full `Finset.univ` has mass `1`. Add a helper `minCover_exists` proving nonemptiness cleanly; the lower hypothesis `hq₀` is part of the intended public contract, but the witness argument only needs `q < 1`.
+- The `Tendsto` proof routes through `NNReal.tendsto_nhds` / `Metric.tendsto_atTop_nhds`: for every `ε' > 0`, produce `N₀` such that `|logb 2 (minCover p N q hq₀ hq₁) / N − entropyBits p| ≤ ε'` for `N ≥ N₀`. Take `ε' := ε/2` (or `ε/3` depending on how the tail-inclusion argument unfolds), then combine `typicalSet_iidDist_card_le` and `typicalSet_iidDist_card_ge` with `aep_iid`.
 
 Base-2 corollaries on mass and cardinality use `(2 : ℝ) ^ x = Real.rpow 2 x`; `Real.rpow` plays well with `Real.logb` via `Real.logb_rpow`. If the reshaping cost inside this proof dominates the task, introduce the local `log2` / `exp2` wrappers proposed in Task 2; Task 5 is the deadline for making that call.
 
@@ -558,7 +561,7 @@ Upstream-sync note: Phase D introduces strictly new modules (`IID`, `AEP`) that 
 ## Open questions (to resolve during execution)
 
 - **`Real.logb 2` / `Real.rpow` ergonomics**: the roadmap's Phase D open question. Task 5's `Tendsto` proof is the stress test; if the Mathlib API is enough to keep proofs readable, skip the local wrapper. Otherwise, introduce a one-module-scope `log2 x := Real.logb 2 x` / `exp2 x := (2 : ℝ) ^ x` namespace inside `IID.lean` with the three arithmetic lemmas (`log2_exp2`, `exp2_log2`, `exp2_add`) the AEP proofs need, and land it with Task 5. Do **not** widen the public surface with this wrapper; Phase E can lift it if a second consumer materializes.
-- **Variance-scaling proof style**: the standard `Var(Y̅_N) = Var(Y) / N` identity factors cleanly through an independence-style cross-term cancellation. If the cross-term bookkeeping becomes fragile at the pinned Mathlib (especially around `Finset.sum_pow` / `sum_prod_comm` reshapes), weaken the statement to `≤ C` for some explicit constant `C := ∑ a, p a * (logProbBits p a - entropyBits p)^2` and lose the `1/N` scaling. The AEP only needs a `→ 0` tail, and `∃ N₀, ∀ N ≥ N₀, tail ≤ δ` reads off either version. Record the choice in the Task 3c commit message.
-- **`minCover` witness shape**: the `Nat.find` formulation is the cleanest statement, but the proof needs explicit decidability instances and a nonemptiness witness. If `Nat.find`'s decidability chain proves painful, fall back to a `Classical.choose`-based definition (strictly noncomputable) plus a `minCover_spec` characterization. The book chapter cites `minCover` by name; the choice between `Nat.find` and `Classical.choose` is invisible from the prose.
+- **Variance-scaling proof style**: the standard `Var(Y̅_N) = Var(Y) / N` identity factors cleanly through an independence-style cross-term cancellation. If the cross-term bookkeeping becomes fragile at the pinned Mathlib (especially around `Finset.sum_pow` / `sum_prod_comm` reshapes), weaken the statement only to an explicit `≤ C / N` bound for some constant `C := ∑ a, p a * (logProbBits p a - entropyBits p)^2` (or a slightly larger closed-form constant). Do not weaken to `≤ C`: Chebyshev would then fail to force the tail to `0`, so `aep_iid` would not follow.
+- **`minCover` witness shape**: the `Nat.find` formulation is the cleanest statement, but the proof needs explicit decidability instances and a nonemptiness witness, and the definition is intentionally restricted to interior thresholds `0 < q < 1`. If `Nat.find`'s decidability chain proves painful, fall back to a `Classical.choose`-based definition (strictly noncomputable) plus a `minCover_spec` characterization with the same threshold hypotheses. The book chapter cites `minCover` by name; the choice between `Nat.find` and `Classical.choose` is invisible from the prose.
 - **`typicalSet` on `p` with partial support**: the plan's support restriction is `∀ i, 0 < p (x i)`. For `p` with full support (the common case, including `uniformPNat`), the restriction is vacuous. For `p` with zero atoms, the restriction automatically excludes `x` with any zero coordinate, which is already mass-zero under `iidDist p N`. Confirm in the Task 2 implementation that `typicalSet p N ε = Finset.univ.filter (numerical condition only)` on full-support `p`; if not, add a `typicalSet_of_fullSupport` convenience lemma.
 - **Book chapter forward pointer**: `Book/IIDAndAEP.lean` references Phase E's `Book.FiniteStateAEP`, which does not exist yet. Render the pointer as plain prose inside `Section "Toward Finite-State Sources (Phase E)"`, not as a `{docPage Book.FiniteStateAEP}` reference that would fail to resolve at book build time. When Phase E lands, upgrade the prose to an actual cross-reference.
