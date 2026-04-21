@@ -1,3 +1,8 @@
+/-
+SPDX-FileCopyrightText: 2026 Christopher Boone
+SPDX-License-Identifier: Apache-2.0
+-/
+
 import Shannon.Entropy.Properties
 import Shannon.Entropy.RelativeEntropy
 import Shannon.Entropy.Converse
