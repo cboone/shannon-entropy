@@ -359,8 +359,8 @@ theorem marginalSnd_kernelPushforward
           rw [Finset.sum_mul]
     _ = ∑ b, marginalSnd p b * W b c := rfl
 
-set_option maxHeartbeats 800000
-
+set_option maxHeartbeats 800000 in
+-- The per-fiber `log_sum_inequality` step produces a large arithmetic reshape that exceeds the default heartbeat budget.
 /-- **Data processing inequality (information form)**: for a Markov chain `X → Y → Z`, `I(X; Z) ≤ I(X; Y)`. -/
 theorem mutualInfo_kernelPushforward_le
     {α β γ : Type} [Fintype α] [Fintype β] [Fintype γ]
@@ -456,8 +456,6 @@ theorem mutualInfoBits_kernelPushforward_le
   have hlog2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   unfold mutualInfoBits
   exact (div_le_div_iff_of_pos_right hlog2_pos).2 (mutualInfo_kernelPushforward_le p W)
-
-set_option maxHeartbeats 200000
 
 end
 
