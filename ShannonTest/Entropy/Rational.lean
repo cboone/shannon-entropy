@@ -16,7 +16,7 @@ decomposition.
 open Shannon
 
 example :
-    relabelProb (Fintype.equivFinOfCardEq (by native_decide))
+    relabelProb (Fintype.equivFinOfCardEq (by decide))
       (composeProb (uniformPNat 2) (fun _ : Fin 2 => uniformPNat 1))
       = uniformPNat 2 := by
   simpa using
@@ -27,7 +27,7 @@ example :
       (N := 2)
       (hN := by decide)
       (hp := by intro a; norm_num [uniformPNat])
-      (e := Fintype.equivFinOfCardEq (by native_decide))
+      (e := Fintype.equivFinOfCardEq (by decide))
 
 example (H : {α : Type} → [Fintype α] → ProbDist α → ℝ)
     (hH : ShannonEntropyAxioms H) {α : Type} [Fintype α]
