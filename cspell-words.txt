@@ -8,6 +8,7 @@ binentropy
 Brouwer
 cboone
 Chebyshev
+Exponentiating
 compl
 congr
 cleveref
@@ -43,15 +44,19 @@ leanprover
 Leibler
 linarith
 logb
+logprob
 MacKay
 manualMain
 Mathlib
 memoryless
+mincover
 mutualinfo
 noncomputable
 natbib
+nhds
 nocite
 nolints
+nonemptiness
 nonneg
 nonnegativity
 olean
@@ -78,6 +83,8 @@ tendsto
 Tendsto
 termwise
 tikz
+typable
+typicalset
 Verso
 VersoManual
 versowebcomponents
