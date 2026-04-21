@@ -17,6 +17,15 @@ autoImplicit = false
 relaxedAutoImplicit = false
 # Enable all mathlib linters: automatically matches what mathlib uses.
 weak.linter.mathlibStandardSet = true
+# This project does not enforce a hard line-length limit.
+weak.linter.style.longLine = false
+# Blank lines inside tactic blocks are used deliberately to group reasoning
+# paragraphs; fighting mathlib's convention here would flatten readable proofs.
+weak.linter.style.emptyLine = false
+# Bare `simp`/`simp [...]` is accepted in this project; the mathlib preference
+# for `simp only` trades refactor brittleness against simp-set churn, a
+# tradeoff that is not worth the per-call boilerplate here.
+weak.linter.flexible = false
 
 [[require]]
 name = "batteries"

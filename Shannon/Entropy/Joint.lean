@@ -23,7 +23,6 @@ the infrastructure for multi-variable entropy identities.
 - `prodDist`: product (independent) distribution from two marginals
 - `IsIndependent`: predicate for independence of a joint distribution
 - `condEntropy`: conditional entropy `H_X(Y) = -∑ p(x,y) log(p(x,y)/p(x))`
-- `mutualInfo`: mutual information `I(X;Y) = H(X) + H(Y) - H(X,Y)`
 
 ## Main results
 
@@ -78,7 +77,7 @@ def prodDist {α β : Type} [Fintype α] [Fintype β]
       _ = ∑ a, p a * 1 := by rw [prob_sum_eq_one q]
       _ = 1 := by simp [mul_one, prob_sum_eq_one p]
 
-/-! ## Independence, conditional entropy, mutual information -/
+/-! ## Independence and conditional entropy -/
 
 /-- A joint distribution is independent when it factors as the product of its marginals. -/
 def IsIndependent {α β : Type} [Fintype α] [Fintype β]
@@ -93,11 +92,6 @@ The formula uses Lean's `0 / 0 = 0` and `log 0 = 0` conventions: when
 def condEntropy {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist (α × β)) : ℝ :=
   -∑ ab : α × β, p ab * Real.log (p ab / marginalFst p ab.1)
-
-/-- Mutual information `I(X;Y) = H(X) + H(Y) - H(X,Y)`. -/
-def mutualInfo {α β : Type} [Fintype α] [Fintype β]
-    (p : ProbDist (α × β)) : ℝ :=
-  entropyNat (marginalFst p) + entropyNat (marginalSnd p) - entropyNat p
 
 /-! ## Support lemmas -/
 
@@ -116,6 +110,13 @@ lemma marginalFst_pos_of_prob_pos {α β : Type} [Fintype α] [Fintype β]
   lt_of_lt_of_le h
     (Finset.single_le_sum (fun b' _ => prob_nonneg p (a, b')) (Finset.mem_univ b))
 
+/-- A positive joint probability implies a positive second marginal. -/
+lemma marginalSnd_pos_of_prob_pos {α β : Type} [Fintype α] [Fintype β]
+    (p : ProbDist (α × β)) (a : α) (b : β) (h : 0 < p (a, b)) :
+    0 < marginalSnd p b :=
+  lt_of_lt_of_le h
+    (Finset.single_le_sum (fun a' _ => prob_nonneg p (a', b)) (Finset.mem_univ a))
+
 /-! ## Marginals of product distributions -/
 
 /-- The first marginal of a product distribution recovers the first factor. -/
@@ -123,7 +124,7 @@ theorem marginalFst_prodDist {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist α) (q : ProbDist β) :
     marginalFst (prodDist p q) = p := by
   ext a
-  show ∑ b, p a * q b = p a
+  change ∑ b, p a * q b = p a
   rw [← Finset.mul_sum, prob_sum_eq_one q, mul_one]
 
 /-- The second marginal of a product distribution recovers the second factor. -/
@@ -131,7 +132,7 @@ theorem marginalSnd_prodDist {α β : Type} [Fintype α] [Fintype β]
     (p : ProbDist α) (q : ProbDist β) :
     marginalSnd (prodDist p q) = q := by
   ext b
-  show ∑ a, p a * q b = q b
+  change ∑ a, p a * q b = q b
   rw [← Finset.sum_mul, prob_sum_eq_one p, one_mul]
 
 /-! ## Chain rule -/

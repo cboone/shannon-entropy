@@ -165,4 +165,8 @@ This is an early form of the data processing inequality: deterministic processin
 - **Property 4** (doubly stochastic): `entropyNat_doublyStochastic_le` in `Shannon/Entropy/Properties.lean`
 - **Property 5** (chain rule): `chain_rule` in `Shannon/Entropy/Joint.lean`, with the summation form given by `condEntropy_eq_shannon_form`
 - **Property 6** (conditioning reduces entropy): `condEntropy_le_entropyNat` in `Shannon/Entropy/Properties.lean`
+- **Relative entropy (Kullback-Leibler divergence)**: `relEntropy`, `relEntropy_nonneg`, `relEntropy_eq_zero_iff` in `Shannon/Entropy/RelativeEntropy.lean`
+- **Mutual information**: `mutualInfo`, `mutualInfo_nonneg`, `mutualInfo_eq_zero_iff_independent`, `mutualInfo_symm`, `mutualInfo_self`, `mutualInfo_le_entropyFst`, and `mutualInfo_le_entropySnd` in `Shannon/Entropy/MutualInfo.lean`
+- **Data processing inequality (information form)**: `mutualInfo_kernelPushforward_le` in `Shannon/Entropy/MutualInfo.lean`. Forward pointer: Shannon's transducer form (Theorem 7 in the paper) is deferred to Phase E and is a distinct statement, not a restatement of the information-form DPI.
+- **Fano's inequality**: `fanoInequality` in `Shannon/Entropy/Fano.lean`
 - **Converse** (entropyNat satisfies axioms): `entropyNat_shannonAxioms` in `Shannon/Entropy/Converse.lean`
