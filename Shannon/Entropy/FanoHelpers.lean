@@ -234,9 +234,10 @@ private theorem relabel_compose_splitAtPoint_eq_self {α : Type} [Fintype α] [D
     exact splitAtPointCond_true_mass r a0 ⟨x, h⟩
 
 private theorem entropyNat_le_qaryEntropy_at_distinguished_of_nonempty_compl
-    {α : Type} [Fintype α] [DecidableEq α] (r : ProbDist α) (a0 : α)
+    {α : Type} [Fintype α] (r : ProbDist α) (a0 : α)
     [Nonempty {x // x ≠ a0}] :
     entropyNat r ≤ Real.qaryEntropy (Fintype.card α) (1 - r a0) := by
+  classical
   let composed := composeProb (splitAtPoint r a0) (splitAtPointCond r a0)
   have hgroup := entropyNat_grouping (p := splitAtPoint r a0) (q := splitAtPointCond r a0)
   have hrel : entropyNat r = entropyNat (splitAtPoint r a0) + ∑ b, splitAtPoint r a0 b * entropyNat (splitAtPointCond r a0 b) := by
@@ -275,7 +276,7 @@ private theorem entropyNat_le_qaryEntropy_at_distinguished_of_nonempty_compl
           simp [Real.binEntropy_one_sub, add_comm, mul_comm]
 
 theorem entropyNat_le_qaryEntropy_at_distinguished
-    {α : Type} [Fintype α] [DecidableEq α]
+    {α : Type} [Fintype α]
     (r : ProbDist α) (a0 : α) :
     entropyNat r ≤ Real.qaryEntropy (Fintype.card α) (1 - r a0) := by
   classical
