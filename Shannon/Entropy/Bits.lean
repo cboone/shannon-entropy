@@ -4,6 +4,7 @@ SPDX-License-Identifier: Apache-2.0
 -/
 
 import Shannon.Entropy.Joint
+import Shannon.Entropy.Converse
 
 /-!
 # Shannon.Entropy.Bits
@@ -22,6 +23,7 @@ the uniqueness theorems in base-2 units.
 
 - `entropyBits_def`: definitional expansion into `Real.logb 2`
 - `entropyBits_eq_entropyNat_div_log_two`: bridge to the natural-log form
+- `entropyBits_relabelInvariant`: relabeling outcomes preserves base-2 entropy
 - `entropyBits_nonneg`, `entropyBits_uniformPNat`, `entropyBits_le_logb_two_card`:
   base-2 counterparts of the single-variable bounds from `Gibbs`
 - `entropyBits_prodDist`: base-2 counterpart of `entropyNat_prodDist` on product distributions
@@ -67,6 +69,13 @@ lemma entropyNat_eq_entropyBits_mul_log_two {α : Type} [Fintype α] (p : ProbDi
   have hlog2_ne : Real.log 2 ≠ 0 := by
     apply Real.log_ne_zero.mpr; norm_num
   rw [entropyBits_eq_entropyNat_div_log_two, div_mul_cancel₀ _ hlog2_ne]
+
+/-- Relabeling outcomes by an equivalence preserves base-2 entropy. -/
+theorem entropyBits_relabelInvariant
+    {α β : Type} [Fintype α] [Fintype β] (e : α ≃ β) (p : ProbDist α) :
+    entropyBits (relabelProb e p) = entropyBits p := by
+  simp only [entropyBits_eq_entropyNat_div_log_two]
+  rw [entropyNat_relabelInvariant]
 
 /-- Base-2 entropy is nonnegative. -/
 theorem entropyBits_nonneg {α : Type} [Fintype α] (p : ProbDist α) :

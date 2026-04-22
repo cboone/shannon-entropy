@@ -34,6 +34,10 @@ example (p : ProbDist (Fin 3)) : 0 ≤ entropyBits p :=
 example (p : ProbDist (Fin 3)) : entropyBits p ≤ Real.logb 2 (Fintype.card (Fin 3) : ℝ) :=
   entropyBits_le_logb_two_card p
 
+example (p : ProbDist (Fin 3)) :
+    entropyBits (relabelProb (Equiv.refl (Fin 3)) p) = entropyBits p :=
+  entropyBits_relabelInvariant (Equiv.refl (Fin 3)) p
+
 example :
     entropyBits (prodDist (uniformPNat 2) (uniformPNat 3))
       = entropyBits (uniformPNat 2) + entropyBits (uniformPNat 3) :=
