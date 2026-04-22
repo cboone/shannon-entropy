@@ -1,7 +1,9 @@
 # 2026-04-21 Phase D: i.i.d. AEP and typical sets (Theorems 3 and 4, i.i.d. case)
 
 Date: 2026-04-21
-Status: Draft. Targets Phase D of `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md`. Branch `formalize/phase-d-iid-aep-and-typical-sets` off `main` at the current `7c29b4a` tip (post Phase C merge). Current branch state is still planning-only: no `Shannon/Entropy/IID.lean`, `Shannon/Entropy/AEP.lean`, or matching tests and book chapter have landed yet.
+Status: Completed 2026-04-22. Implements Phase D of `docs/plans/todo/2026-04-14-shannon-proofs-roadmap.md` on branch `formalize/phase-d-iid-aep-and-typical-sets`. Landed artifacts include `Shannon/Entropy/{IID,AEP}.lean`, matching `ShannonTest/Entropy/{IID,AEP}.lean`, the `Book/IIDAndAEP.lean` chapter, transcription and roadmap sync, and the Phase D facade updates.
+
+Implementation note: the landed AEP proof uses a small `ProbDist -> PMF/Measure` bridge to reuse Mathlib's variance and Chebyshev lemmas. The resulting public Phase D API matches the plan's target surface (`iidDist`, `typicalSet`, `aep_iid`, `typicalSet_iidDist_card_le`, `typicalSet_iidDist_card_ge`, `minCover`, and `tendsto_logb_minCover_iid`), and the roadmap's `Real.logb` / `rpow` open question was resolved in favor of staying Mathlib-native with no local wrapper namespace.
 
 ## Context
 

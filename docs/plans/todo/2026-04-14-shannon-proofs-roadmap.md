@@ -1,7 +1,7 @@
 # Shannon Proofs Roadmap
 
 Date: 2026-04-14
-Status: Phase A shipped 2026-04-18 on branch `docs/implement-phase-a-verso`; Phase B shipped 2026-04-18 on branch `chore/implement-phase-b`; Phase C shipped 2026-04-19 on branch `formalize/c-information-theoretic-primitives`; Phases D and E pending.
+Status: Phase A shipped 2026-04-18 on branch `docs/implement-phase-a-verso`; Phase B shipped 2026-04-18 on branch `chore/implement-phase-b`; Phase C shipped 2026-04-19 on branch `formalize/c-information-theoretic-primitives`; Phase D shipped 2026-04-22 on branch `formalize/phase-d-iid-aep-and-typical-sets`; Phase E pending.
 
 ## Context
 
