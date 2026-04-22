@@ -415,7 +415,6 @@ private lemma minCover_exists [DecidableEq α]
 `hq₀ : 0 < q` is part of the public contract (every downstream consumer needs it), but the
 witness construction here only uses `hq₁`; the `have _ := hq₀` below silences the unused-variable
 linter without dropping the hypothesis from the signature. -/
-@[nolint unusedArguments]
 def minCover [DecidableEq α]
     (p : ProbDist α) (N : ℕ) (q : ℝ) (hq₀ : 0 < q) (hq₁ : q < 1) : ℕ :=
   by
