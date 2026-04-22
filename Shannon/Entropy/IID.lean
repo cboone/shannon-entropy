@@ -102,7 +102,6 @@ theorem sum_mul_logProbBits {α : Type} [Fintype α] (p : ProbDist α) :
 
 /-- Base-2 typical set: words whose empirical per-symbol log-probability lies
 within `ε` of the entropy rate, restricted to the support of `p`. -/
-@[nolint unusedArguments]
 def typicalSet {α : Type} [Fintype α]
     (p : ProbDist α) (N : ℕ) (ε : ℝ) : Finset (Fin N → α) :=
   by
@@ -134,7 +133,6 @@ private lemma logb_iidDist_apply_eq_neg_sum_logProbBits {α : Type} [Fintype α]
   simp
 
 /-- Per-element upper bound on typical i.i.d. mass. -/
-@[nolint unusedArguments]
 theorem iidDist_le_of_mem_typicalSet
     {α : Type} [Fintype α]
     {p : ProbDist α} {N : ℕ} {ε : ℝ}
@@ -171,7 +169,6 @@ theorem iidDist_le_of_mem_typicalSet
     ring_nf
 
 /-- Per-element lower bound on typical i.i.d. mass. -/
-@[nolint unusedArguments]
 theorem iidDist_ge_of_mem_typicalSet
     {α : Type} [Fintype α]
     {p : ProbDist α} {N : ℕ} {ε : ℝ}

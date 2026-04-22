@@ -39,7 +39,7 @@ section Discrete
 variable {α : Type} [Fintype α]
 
 /-- Finite alphabets use the discrete measurable structure in this module's local PMF bridge. -/
-@[reducible] local instance instMeasurableSpace_shannon : MeasurableSpace α := ⊤
+@[reducible] local instance : MeasurableSpace α := ⊤
 
 private def probDistToPMF (p : ProbDist α) : PMF α :=
   PMF.ofFintype (fun a => ENNReal.ofReal (p a)) <| by
@@ -411,7 +411,10 @@ private lemma minCover_exists [DecidableEq α]
     q ≤ 1 := le_of_lt hq₁
     _ = ∑ x : Fin N → α, ∏ i, p (x i) := by simpa [iidDist_apply] using (prob_sum_eq_one (iidDist p N)).symm
 
-/-- Minimum cardinality of a set of length-`N` words carrying `iidDist p N`-mass at least `q`. -/
+/-- Minimum cardinality of a set of length-`N` words carrying `iidDist p N`-mass at least `q`.
+`hq₀ : 0 < q` is part of the public contract (every downstream consumer needs it), but the
+witness construction here only uses `hq₁`; the `have _ := hq₀` below silences the unused-variable
+linter without dropping the hypothesis from the signature. -/
 @[nolint unusedArguments]
 def minCover [DecidableEq α]
     (p : ProbDist α) (N : ℕ) (q : ℝ) (hq₀ : 0 < q) (hq₁ : q < 1) : ℕ :=
