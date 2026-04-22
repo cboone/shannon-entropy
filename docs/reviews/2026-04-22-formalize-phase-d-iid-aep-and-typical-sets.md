@@ -117,11 +117,7 @@ Phase D lands the i.i.d. special case of Shannon's Theorems 3 and 4. Two new Sha
 
 **Issues to address:**
 
-1. **(Minor) `@[nolint unusedArguments]` on `typicalSet` and the pointwise bounds.** `Shannon/Entropy/IID.lean:105`, `:137`, `:174` all carry `@[nolint unusedArguments]` attributes. For `typicalSet`, every argument (`α`, `Fintype α`, `p`, `N`, `ε`) is used in the body, so the attribute appears unnecessary. For `iidDist_le_of_mem_typicalSet` and `iidDist_ge_of_mem_typicalSet`, the hypothesis `hε : 0 < ε` was removed in commit `2012b95`, and the remaining signature looks fully used (`p`, `N`, `ε`, `x`, `hx` all feature in the proof). Both attributes read as leftovers from earlier drafts. Suggest removing them and running `lake lint` to confirm no linter complaint returns; if it does, a one-line comment would help a future reader understand why the attribute is retained.
-
-2. **(Minor) `@[reducible] local instance instMeasurableSpace_shannon`.** `Shannon/Entropy/AEP.lean:42` names a local measurable-space instance `instMeasurableSpace_shannon`. The `_shannon` suffix is unusual: instance names in Lean typically follow `instClassForType` camel case (e.g. `instMeasurableSpaceFin`). Suggest `instDiscreteMeasurableSpace` or simply leaving it anonymous (`local instance : MeasurableSpace α := ⊤`). Not blocking.
-
-3. **(Minor) `have _ := hq₀` inside `minCover`.** `Shannon/Entropy/AEP.lean:420` uses `have _ := hq₀` to silence an unused-variable complaint while keeping `hq₀ : 0 < q` in the public signature. A comment explaining that the hypothesis is part of the intended public contract (per the plan's Open Questions section) would help a future reader understand why a positivity hypothesis is carried through without being consumed.
+1. **(Minor, resolved) `have _ := hq₀` inside `minCover`.** `Shannon/Entropy/AEP.lean:422` keeps `hq₀ : 0 < q` in the public signature even though the witness construction only uses `hq₁`. An earlier draft paired `have _ := hq₀` with `@[nolint unusedArguments]`; the attribute was redundant and has been removed, and the definition's docstring now explains why the hypothesis is part of the intended public contract (per the plan's Open Questions section).
 
 **Suggestions:**
 
