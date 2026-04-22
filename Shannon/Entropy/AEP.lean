@@ -278,9 +278,10 @@ private lemma iidDist_variance_logProb_bound (p : ProbDist α) (N : ℕ) :
 
 /-- Shannon's Theorem 3 in the i.i.d. case: for large block lengths, the
 typical set carries arbitrarily close to full mass. -/
-theorem aep_iid [DecidableEq α] (p : ProbDist α) {ε δ : ℝ} (hε : 0 < ε) (hδ : 0 < δ) :
+theorem aep_iid (p : ProbDist α) {ε δ : ℝ} (hε : 0 < ε) (hδ : 0 < δ) :
     ∃ N₀ : ℕ, ∀ N ≥ N₀,
       (1 - δ : ℝ) ≤ ∑ x ∈ typicalSet p N ε, (iidDist p N) x := by
+  classical
   let C : ℝ := ∑ a, p a * (logProbBits p a - entropyBits p) ^ 2
   let N₀ : ℕ := Nat.ceil (C / (δ * ε ^ 2)) + 1
   refine ⟨N₀, ?_⟩
@@ -368,7 +369,7 @@ theorem typicalSet_iidDist_card_le
     _ = (2 : ℝ) ^ ((N : ℝ) * (entropyBits p + ε)) := by ring
 
 /-- Typical-set lower cardinality bound in the i.i.d. case. -/
-theorem typicalSet_iidDist_card_ge [DecidableEq α]
+theorem typicalSet_iidDist_card_ge
     (p : ProbDist α) {ε δ : ℝ} (hε : 0 < ε) (hδ : 0 < δ) :
     ∃ N₀ : ℕ, ∀ N ≥ N₀,
       (1 - δ) * (2 : ℝ) ^ ((N : ℝ) * (entropyBits p - ε)) ≤ (typicalSet p N ε).card := by

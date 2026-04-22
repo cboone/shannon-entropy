@@ -49,12 +49,12 @@ example (p : ProbDist (Fin 3)) (N : ℕ) (ε : ℝ) :
           |(1 / (N : ℝ)) * (∑ i, logProbBits p (x i)) - entropyBits p| < ε :=
   rfl
 
-example {p : ProbDist (Fin 2)} {N : ℕ} {ε : ℝ} (hε : 0 < ε)
+example {p : ProbDist (Fin 2)} {N : ℕ} {ε : ℝ}
     {x : Fin N → Fin 2} (hx : x ∈ typicalSet p N ε) :
     (iidDist p N) x ≤ (2 : ℝ) ^ (-(N : ℝ) * (entropyBits p - ε)) :=
   iidDist_le_of_mem_typicalSet (p := p) (N := N) (ε := ε) hx
 
-example {p : ProbDist (Fin 2)} {N : ℕ} {ε : ℝ} (hε : 0 < ε)
+example {p : ProbDist (Fin 2)} {N : ℕ} {ε : ℝ}
     {x : Fin N → Fin 2} (hx : x ∈ typicalSet p N ε) :
     (2 : ℝ) ^ (-(N : ℝ) * (entropyBits p + ε)) ≤ (iidDist p N) x :=
   iidDist_ge_of_mem_typicalSet (p := p) (N := N) (ε := ε) hx
