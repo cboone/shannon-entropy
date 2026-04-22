@@ -18,3 +18,5 @@ import ShannonTest.Entropy.MutualInfo
 import ShannonTest.Entropy.BinaryEntropy
 import ShannonTest.Entropy.FanoHelpers
 import ShannonTest.Entropy.Fano
+import ShannonTest.Entropy.IID
+import ShannonTest.Entropy.AEP

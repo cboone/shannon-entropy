@@ -11,6 +11,8 @@ import Shannon.Entropy.RelativeEntropy
 import Shannon.Entropy.MutualInfo
 import Shannon.Entropy.BinaryEntropy
 import Shannon.Entropy.Fano
+import Shannon.Entropy.IID
+import Shannon.Entropy.AEP
 
 /-!
 # Shannon.Entropy
@@ -23,6 +25,7 @@ Import this file to access the full development:
 - Section 6 properties: nonnegativity, maximum at uniform, subadditivity,
   conditioning reduces entropy, chain rule, product additivity
 - base-2 API: `entropyBits`, `mutualInfoBits`, `condEntropyBits`, `relEntropyBits`, `binEntropyBits`, `fanoInequality`
+- i.i.d. AEP API: `iidDist`, `typicalSet`, `aep_iid`, `typicalSet_iidDist_card_le`, `typicalSet_iidDist_card_ge`, `minCover`, `tendsto_logb_minCover_iid`
 
 ## Module chain
 
@@ -40,4 +43,8 @@ Phase C layer:
 - `{Properties, RelativeEntropy, Converse} → MutualInfo → FanoHelpers → Fano`
 - `Converse → FanoHelpers`
 - `BinaryEntropy → Fano` (Mathlib-only; no in-house dependency)
+
+Phase D layer:
+
+- `{Joint, Bits} → IID → AEP`
 -/
