@@ -16,8 +16,8 @@ tag := "introduction"
 This repository formalizes Shannon's finite-alphabet entropy characterization theorem from Appendix 2 of _A Mathematical Theory of Communication_ and the Section 6 properties that currently depend on it.
 
 The project is maintained in the `cboone/shannon-entropy` fork of Samuel Schlesinger's original `shannon-1948-formalization` repository.
-The current completed scope is Appendix 2 together with Section 6 Properties 1 through 6.
-Planned later phases extend the formalization to Shannon's Theorems 3 through 7 and expand this book in parallel.
+The current completed scope is Appendix 2 together with Section 6 Properties 1 through 6 and the i.i.d. special cases of Shannon's Theorems 3 and 4.
+Planned later phases extend the formalization to Shannon's finite-state versions of Theorems 3 through 7 and expand this book in parallel.
 
 # Reading Order
 
@@ -37,6 +37,8 @@ Readers who want the formal proof first should start with these modules:
 - `Shannon/Entropy/MutualInfo.lean`
 - `Shannon/Entropy/BinaryEntropy.lean`
 - `Shannon/Entropy/Fano.lean`
+- `Shannon/Entropy/IID.lean`
+- `Shannon/Entropy/AEP.lean`
 
 Readers who want the narrative companion should read the following book chapters in order, alongside `references/shannon1948-transcription.md` and the Lean modules above:
 
@@ -46,6 +48,7 @@ Readers who want the narrative companion should read the following book chapters
 - Mutual Information (the KL and chain-rule identities built on joint entropy)
 - Relative Entropy (KL divergence, log-sum, and the information-form DPI)
 - Fano's Inequality (decoder error as an upper bound on conditional entropy)
+- I.i.d. Sources and the AEP (typical sets, Theorem 3, and Theorem 4 in the i.i.d. case)
 
 # Working In This Repo
 

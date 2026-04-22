@@ -1,7 +1,7 @@
 # Shannon Proofs Roadmap
 
 Date: 2026-04-14
-Status: Phase A shipped 2026-04-18 on branch `docs/implement-phase-a-verso`; Phases B through E pending.
+Status: Phase A shipped 2026-04-18 on branch `docs/implement-phase-a-verso`; Phase B shipped 2026-04-18 on branch `chore/implement-phase-b`; Phase C shipped 2026-04-19 on branch `formalize/c-information-theoretic-primitives`; Phase D shipped 2026-04-22 on branch `formalize/phase-d-iid-aep-and-typical-sets`; Phase E pending.
 
 ## Context
 
@@ -386,18 +386,21 @@ Tasks:
    `∀ ε δ > 0, ∃ N₀, ∀ N ≥ N₀,
       ∑ x ∈ typicalSet p N ε, iidDist p N x ≥ 1 − δ`.
    Proof route: apply a Chebyshev bound to the random variable
-   `Yᵢ := -Real.logb 2 (p (Xᵢ))`. Mean is `entropyBits p`; variance is
-   bounded by `∑ p a · (Real.logb 2 (p a))²` on a finite alphabet. Prefer a
-   direct Chebyshev argument to invoking Mathlib's measure-theoretic LLN.
+   `Yᵢ := -Real.logb 2 (p (Xᵢ))`. Mean is `entropyBits p`; the sample mean
+   must satisfy a vanishing variance bound of the form `Var(Y̅_N) ≤ C / N`
+   for an explicit finite constant `C` depending only on `p` (for example
+   `C := ∑ p a · (logProbBits p a - entropyBits p)^2`). Prefer a direct
+   Chebyshev argument to invoking Mathlib's measure-theoretic LLN.
 4. Theorem 4 (typical set size).
    - `typicalSet_card_lower`:
-     `(1 − δ) · 2^(N · (entropyBits p − ε)) ≤ |typicalSet p N ε|` for
-     `N` large enough
+      `(1 − δ) · 2^(N · (entropyBits p − ε)) ≤ |typicalSet p N ε|` for
+      `N` large enough
    - `typicalSet_card_upper`:
-     `|typicalSet p N ε| ≤ 2^(N · (entropyBits p + ε))`
-   - Add `minCover p N q := min {|S| : S ⊆ univ ∧ iidDist p N S ≥ q}` and
-     derive `Tendsto (fun N => (Real.logb 2 (minCover p N q)) / N)`
-     `atTop (𝓝 (entropyBits p))` for `0 < q < 1`.
+      `|typicalSet p N ε| ≤ 2^(N · (entropyBits p + ε))`
+   - Add `minCover` for interior thresholds `0 < q < 1`, for example as
+      `minCover p N q hq₀ hq₁ := min {|S| : S ⊆ univ ∧ iidDist p N S ≥ q}`,
+      and derive `Tendsto (fun N => (Real.logb 2 (minCover p N q hq₀ hq₁)) / N)`
+      `atTop (𝓝 (entropyBits p))`.
 5. Testing.
    - New test files `ShannonTest/Entropy/IID.lean`,
      `ShannonTest/Entropy/AEP.lean`.
@@ -419,10 +422,8 @@ Tasks:
 Files created: `Shannon/Entropy/IID.lean`, `Shannon/Entropy/AEP.lean`,
 matching tests, new Book chapter.
 
-Open issue to resolve during execution: whether `Real.logb 2` /
-`(2 : ℝ) ^ _` arithmetic has enough Mathlib support to keep proofs clean,
-or whether we need a thin wrapper. If awkward, add a small `Bits` namespace
-with `log2`, `exp2`, and conversion lemmas used across Phases D and E.
+Resolved during execution: Mathlib's native `Real.logb` and `Real.rpow`
+lemmas were sufficient for Phase D. No wrapper namespace was needed.
 
 ## Phase E: Finite-state statistical sources and entropy rate (Theorems 3–7)
 
