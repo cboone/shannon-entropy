@@ -37,6 +37,8 @@ Readers who want the formal proof first should start with these modules:
 - `Shannon/Entropy/MutualInfo.lean`
 - `Shannon/Entropy/BinaryEntropy.lean`
 - `Shannon/Entropy/Fano.lean`
+- `Shannon/Entropy/IID.lean`
+- `Shannon/Entropy/AEP.lean`
 
 Readers who want the narrative companion should read the following book chapters in order, alongside `references/shannon1948-transcription.md` and the Lean modules above:
 
@@ -46,6 +48,7 @@ Readers who want the narrative companion should read the following book chapters
 - Mutual Information (the KL and chain-rule identities built on joint entropy)
 - Relative Entropy (KL divergence, log-sum, and the information-form DPI)
 - Fano's Inequality (decoder error as an upper bound on conditional entropy)
+- I.i.d. Sources and the AEP (typical sets, Theorem 3, and Theorem 4 in the i.i.d. case)
 
 # Working In This Repo
 

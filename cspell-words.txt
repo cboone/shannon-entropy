@@ -1,4 +1,5 @@
 Anson
+aep
 agnostically
 approximants
 backticked
@@ -35,6 +36,7 @@ hardwrap
 hardwrapped
 hardwrapping
 hsupp
+iid
 kernelpushforward
 Kullback
 lakefile

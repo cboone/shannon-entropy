@@ -11,6 +11,7 @@ import Book.Logarithm
 import Book.MutualInformation
 import Book.RelativeEntropy
 import Book.FanoInequality
+import Book.IIDAndAEP
 import Book.Bibliography
 
 open Verso.Genre Manual
@@ -38,5 +39,7 @@ It is structured as a Manual so later phases can add chapters, internal cross-re
 {include 0 Book.RelativeEntropy}
 
 {include 0 Book.FanoInequality}
+
+{include 0 Book.IIDAndAEP}
 
 {include 0 Book.Bibliography}

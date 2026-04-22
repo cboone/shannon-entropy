@@ -79,8 +79,10 @@ or `bin/bootstrap-worktree` first.
 - `Shannon/Entropy/BinaryEntropy.lean` -- base-2 wrapper around Mathlib's binary entropy
 - `Shannon/Entropy/FanoHelpers.lean` -- conditional-row and point/complement helpers for Fano's inequality
 - `Shannon/Entropy/Fano.lean` -- error probability, q-ary conditional-entropy bound, and Fano's inequality
+- `Shannon/Entropy/IID.lean` -- i.i.d. product distributions, self-information, and typical sets
+- `Shannon/Entropy/AEP.lean` -- finite Chebyshev, the i.i.d. AEP, typical-set cardinality, and `minCover`
 
-`entropyBits` is the primary public entropy API from Phase C onward; `mutualInfoBits`, `condEntropyBits`, and `binEntropyBits` join it on the public base-2 surface, while `entropyNat` remains the internal natural-log workhorse used throughout the Appendix 2 characterization proof.
+`entropyBits` is the primary public entropy API from Phase C onward; `mutualInfoBits`, `condEntropyBits`, and `binEntropyBits` join it on the public base-2 surface, and Phase D adds the i.i.d. product / typical-set API (`iidDist`, `typicalSet`, `aep_iid`, `minCover`). `entropyNat` remains the internal natural-log workhorse used throughout the Appendix 2 characterization proof.
 
 ### Book Import Discipline
 
