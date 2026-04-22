@@ -57,6 +57,7 @@ noncomputable
 natbib
 nhds
 nocite
+nolint
 nolints
 nonemptiness
 nonneg
