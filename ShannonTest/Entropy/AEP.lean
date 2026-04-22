@@ -15,10 +15,23 @@ cardinality bounds.
 open Shannon
 open scoped Topology
 
+noncomputable section
+
+private def bitValue : Fin 2 → ℝ := ![0, 1]
+
 example (p : ProbDist (Fin 3)) (f : Fin 3 → ℝ) (ε : ℝ) (hε : 0 < ε) :
     (∑ a ∈ Finset.univ.filter (fun a => ε ≤ |f a - (∑ b, p b * f b)|), p a)
       ≤ (∑ a, p a * (f a - (∑ b, p b * f b)) ^ 2) / ε ^ 2 :=
   chebyshev_finite p f ε hε
+
+example :
+    (∑ a ∈ Finset.univ.filter
+        (fun a : Fin 2 => (1 / 2 : ℝ) ≤ |bitValue a - (∑ b, (uniformPNat 2) b * bitValue b)|),
+      (uniformPNat 2) a)
+      ≤ (∑ a, (uniformPNat 2) a * (bitValue a - (∑ b, (uniformPNat 2) b * bitValue b)) ^ 2) /
+        (1 / 2 : ℝ) ^ 2 := by
+  simpa [bitValue, uniformPNat, Fin.sum_univ_two] using
+    chebyshev_finite (uniformPNat 2) bitValue (1 / 2 : ℝ) (by norm_num)
 
 example (p : ProbDist (Fin 3)) {ε δ : ℝ} (hε : 0 < ε) (hδ : 0 < δ) :
     ∃ N₀ : ℕ, ∀ N ≥ N₀,

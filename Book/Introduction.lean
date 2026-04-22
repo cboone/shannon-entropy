@@ -16,8 +16,8 @@ tag := "introduction"
 This repository formalizes Shannon's finite-alphabet entropy characterization theorem from Appendix 2 of _A Mathematical Theory of Communication_ and the Section 6 properties that currently depend on it.
 
 The project is maintained in the `cboone/shannon-entropy` fork of Samuel Schlesinger's original `shannon-1948-formalization` repository.
-The current completed scope is Appendix 2 together with Section 6 Properties 1 through 6.
-Planned later phases extend the formalization to Shannon's Theorems 3 through 7 and expand this book in parallel.
+The current completed scope is Appendix 2 together with Section 6 Properties 1 through 6 and the i.i.d. special cases of Shannon's Theorems 3 and 4.
+Planned later phases extend the formalization to Shannon's finite-state versions of Theorems 3 through 7 and expand this book in parallel.
 
 # Reading Order
 
